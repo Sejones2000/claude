@@ -583,14 +583,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 // ─────────────────────────────────────────────
 var SUPABASE_URL = 'https://ebvvhgutvgwsqvizwbyv.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidnZoZ3V0dmd3c3F2aXp3Ynl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDc5ODUsImV4cCI6MjA4NzY4Mzk4NX0.VWOhDXbkQc6ExD2Goklkcw9Bx0pwn6XmTFSCKG9bmEc';
-var API_URL = 'https://api.anthropic.com/v1/messages';
+var API_URL = 'https://ebvvhgutvgwsqvizwbyv.supabase.co/functions/v1/anthropic-proxy';
 var MODEL = 'claude-sonnet-4-6';
 
 // ─────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────
 var config = {
-  apiKey: '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',
+  apiKey: '',
   calMin: 2200, calMax: 2350,
   protTarget: 160, carbTarget: 260, fatTarget: 66.8,
   waterTarget: 2500, weightUnit: 'kg'
@@ -1225,7 +1225,7 @@ async function logMeal() {
 
     var resp = await fetch(API_URL, {
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':config.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
       body:JSON.stringify({model:MODEL,max_tokens:2000,system:sys,messages:[{role:'user',content:userContent}]})
     });
     if (!resp.ok) { var eData=await resp.json(); throw new Error((eData.error&&eData.error.message)||'API error '+resp.status); }
