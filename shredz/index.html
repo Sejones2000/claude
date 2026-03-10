@@ -777,7 +777,8 @@ function init() {
   if (!config.waterTarget) config.waterTarget = 2500;
   if (!config.weightUnit)  config.weightUnit = 'kg';
 
-  var hasKey = config.apiKey && config.apiKey !== 'PASTE_YOUR_KEY_HERE' && config.apiKey.length > 10;
+  // API key no longer needed — proxy handles auth
+  var hasKey = true;
 
   if (hasKey) {
     document.getElementById('setupScreen').style.display = 'none';
@@ -803,13 +804,7 @@ function saveSetup() {
   btn.disabled = true;
 
   var key = document.getElementById('setupApiKey').value.trim();
-  if (!key || key.length < 10) {
-    msg.style.color = '#ff1e3c';
-    msg.textContent = 'Please enter a valid API key';
-    btn.disabled = false;
-    return;
-  }
-  config.apiKey      = key;
+  config.apiKey      = key || 'proxy';
   config.calMin      = parseFloat(document.getElementById('setupCalMin').value)  || 2200;
   config.calMax      = parseFloat(document.getElementById('setupCalMax').value)  || 2350;
   config.protTarget  = parseFloat(document.getElementById('setupProt').value)    || 160;
