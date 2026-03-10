@@ -1220,7 +1220,11 @@ async function logMeal() {
 
     var resp = await fetch(API_URL, {
       method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
+      headers:{
+        'Content-Type':'application/json',
+        'anthropic-version':'2023-06-01',
+        'Authorization':'Bearer ' + SUPABASE_KEY
+      },
       body:JSON.stringify({model:MODEL,max_tokens:2000,system:sys,messages:[{role:'user',content:userContent}]})
     });
     if (!resp.ok) { var eData=await resp.json(); throw new Error((eData.error&&eData.error.message)||'API error '+resp.status); }
