@@ -1071,7 +1071,7 @@ Under 250 words. Write for a smart, curious adult — intellectually rigorous bu
   try {
     const response = await fetch(ANTHROPIC_PROXY_URL, {
       method: "POST",
-      headers: { "Content-Type":"application/json" },
+      headers: { "Content-Type":"application/json", "Authorization":"Bearer " + SUPABASE_ANON_KEY },
       body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system:systemPrompt, messages:[{role:"user",content:userMsg}] })
     });
     const data = await response.json();
@@ -1199,7 +1199,7 @@ async function generateDeepRead(slot, topic) {
     const isMon = slot === "monday";
     const response = await fetch(ANTHROPIC_PROXY_URL, {
       method:"POST",
-      headers:{"Content-Type":"application/json"},
+      headers:{"Content-Type":"application/json","Authorization":"Bearer " + SUPABASE_ANON_KEY},
       body:JSON.stringify({
         model:"claude-sonnet-4-20250514", max_tokens:4000,
         system:`You are an expert academic writer producing a long-form research synthesis for a highly educated reader with a music degree who is comfortable with complex musical, psychological, scientific and theoretical ideas. Write at the level of a well-researched journal feature or intellectual long-read (think Aeon, The Atlantic, a graduate seminar paper). Use a compelling title on the first line (no # prefix). Then use ## for section headings. Include specific theories, named researchers, technical terminology, and real examples. Be argumentative — have a thesis. Aim for 1,200-1,800 words. This is a genuine 10-15 minute read. ${isMon ? "This is the MONDAY read — introduce the topic broadly, lay theoretical foundations, set up key tensions and debates." : "This is the FRIDAY read — go deeper. Assume Monday context. Explore a specific contested angle or advanced application."}`,
