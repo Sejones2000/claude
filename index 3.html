@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curious Brain 🧠</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFF8F0;
+    --card1: #FF6B6B;
+    --card2: #4ECDC4;
+    --card3: #FFE66D;
+    --fact-bg: #1a1a2e;
+    --fact-accent: #e94560;
+    --fact-glow: #f5a623;
+    --accent: #2D2D2D;
+    --soft: #F5EFE8;
+    --white: #FFFFFF;
+    --text: #2D2D2D;
+    --muted: #888;
+    --deep-bg: #0f0f23;
+    --deep-accent: #7c3aed;
+    --deep-gold: #f59e0b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+    padding-bottom: 80px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; top: -20%; right: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #FFD6E0 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; bottom: -10%; left: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #C3F0ED 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--white);
+    border-top: 2px solid #f0ebe4;
+    display: flex; z-index: 100;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+
+  .nav-tab {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 10px 4px 12px; cursor: pointer;
+    border: none; background: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px; font-weight: 700;
+    color: var(--muted); transition: color 0.2s;
+    gap: 3px; position: relative;
+  }
+
+  .nav-tab.active { color: var(--accent); }
+  .nav-tab .nav-icon { font-size: 22px; }
+
+  .research-badge {
+    position: absolute; top: 6px; right: calc(50% - 20px);
+    background: var(--fact-accent); color: white;
+    font-size: 9px; font-weight: 800;
+    border-radius: 50px; padding: 2px 6px;
+    animation: pulse-badge 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-badge {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+  }
+
+  /* Views */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .app {
+    max-width: 420px; margin: 0 auto;
+    padding: 24px 20px 16px;
+    position: relative; z-index: 1;
+  }
+
+  /* Header */
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .logo { font-family: 'Fredoka One', cursive; font-size: 26px; color: var(--text); }
+  .logo span { display: inline-block; animation: wiggle 3s ease-in-out infinite; }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-10deg); }
+    40% { transform: rotate(10deg); }
+    60% { transform: rotate(-5deg); }
+  }
+
+  /* Meta bar */
+  .meta-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; background: var(--white);
+    border-radius: 16px; padding: 11px 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .streak { font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+  .streak-fire { font-size: 18px; }
+  .date-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+  /* Section labels */
+  .section-title { font-family: 'Fredoka One', cursive; font-size: 21px; margin-bottom: 4px; }
+  .section-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; font-weight: 600; }
+
+  /* Concept Cards */
+  .cards-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+
+  .concept-card {
+    border-radius: 20px; padding: 18px 20px;
+    cursor: pointer; position: relative; overflow: hidden;
+    border: 3px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: slideIn 0.4s ease both;
+  }
+
+  .concept-card:nth-child(1) { background: var(--card1); animation-delay: 0.05s; }
+  .concept-card:nth-child(2) { background: var(--card2); animation-delay: 0.10s; }
+  .concept-card:nth-child(3) { background: var(--card3); animation-delay: 0.15s; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .concept-card:hover, .fact-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 28px rgba(0,0,0,0.15); }
+  .concept-card.selected { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(45,45,45,0.15); }
+
+  .card-emoji { font-size: 32px; margin-bottom: 6px; display: block; }
+  .card-topic { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; margin-bottom: 3px; }
+  .card-concept { font-family: 'Fredoka One', cursive; font-size: 20px; color: var(--text); line-height: 1.2; }
+  .card-teaser { font-size: 12px; margin-top: 5px; opacity: 0.75; font-weight: 600; }
+  .card-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; opacity: 0.4; }
+
+  /* Fun Fact Card */
+  .fact-card {
+    background: var(--fact-bg);
+    border-radius: 20px; padding: 20px;
+    cursor: pointer; position: relative; overflow: hidden;
+    border: 3px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: slideIn 0.4s ease 0.22s both;
+  }
+
+  .fact-card::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(233,69,96,0.3) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .fact-card::after {
+    content: ''; position: absolute; bottom: -30px; left: -20px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(245,166,35,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .fact-card:hover { box-shadow: 0 10px 30px rgba(233,69,96,0.3); }
+  .fact-card.selected { border-color: var(--fact-glow); box-shadow: 0 0 0 4px rgba(245,166,35,0.3); }
+
+  .fact-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 2px;
+    color: var(--fact-accent); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .fact-label::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--fact-accent); }
+
+  .fact-emoji { font-size: 28px; margin-bottom: 6px; display: block; }
+
+  .fact-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; color: #f0f0f0;
+    line-height: 1.5; font-style: italic;
+  }
+
+  .fact-remember {
+    margin-top: 10px;
+    background: rgba(245,166,35,0.15);
+    border-left: 3px solid var(--fact-glow);
+    border-radius: 0 8px 8px 0;
+    padding: 6px 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; color: var(--fact-glow); font-weight: 700;
+  }
+
+  /* Buttons */
+  .learn-btn {
+    width: 100%; background: var(--accent); color: white;
+    border: none; border-radius: 18px; padding: 16px;
+    font-family: 'Fredoka One', cursive; font-size: 19px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: transform 0.2s, background 0.2s;
+    margin-bottom: 12px; box-shadow: 0 4px 18px rgba(45,45,45,0.25);
+  }
+
+  .learn-btn:hover:not(:disabled) { transform: translateY(-2px); background: #444; }
+  .learn-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .loading-dots span {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; background: white; margin: 0 3px;
+    animation: bounce 1s ease infinite;
+  }
+  .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* Lesson View */
+  .lesson-view { display: none; animation: fadeUp 0.4s ease both; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .lesson-header { border-radius: 20px; padding: 22px; margin-bottom: 18px; }
+  .back-btn {
+    background: rgba(0,0,0,0.15); border: none; border-radius: 50px;
+    padding: 6px 14px; font-family: 'Nunito', sans-serif;
+    font-weight: 700; font-size: 13px; cursor: pointer;
+    margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px;
+    color: var(--text); transition: transform 0.2s;
+  }
+  .back-btn.light { color: #fff; background: rgba(255,255,255,0.15); }
+  .back-btn:hover { transform: translateX(-2px); }
+
+  .lesson-emoji { font-size: 48px; margin-bottom: 8px; display: block; }
+  .lesson-topic-tag { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.65; margin-bottom: 5px; }
+  .lesson-title { font-family: 'Fredoka One', cursive; font-size: 26px; line-height: 1.15; color: var(--text); }
+  .lesson-title.light { color: #fff; }
+
+  .lesson-body {
+    background: var(--white); border-radius: 20px; padding: 22px;
+    font-size: 15px; line-height: 1.75; font-weight: 600; color: var(--text);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07); margin-bottom: 14px; white-space: pre-wrap;
+  }
+
+  .lesson-body.fact-body {
+    background: var(--fact-bg); color: #f0f0f0;
+    font-family: 'Playfair Display', serif;
+    font-weight: 400; font-size: 16px;
+    border: 1px solid rgba(233,69,96,0.3);
+  }
+
+  .save-btn {
+    width: 100%; background: #4ECDC4; color: var(--text);
+    border: none; border-radius: 18px; padding: 16px;
+    font-family: 'Fredoka One', cursive; font-size: 19px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: transform 0.2s; box-shadow: 0 4px 18px rgba(78,205,196,0.35);
+  }
+  .save-btn:hover { transform: translateY(-2px); }
+  .save-btn.saved { background: var(--card3); }
+
+  /* Library */
+  .encyclo-header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+  .encyclo-title { font-family: 'Fredoka One', cursive; font-size: 24px; }
+  .encyclo-count { background: var(--card1); border-radius: 50px; padding: 3px 12px; font-weight: 800; font-size: 13px; margin-left: auto; }
+  .encyclo-empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; font-weight: 700; }
+  .encyclo-empty .big { font-size: 44px; margin-bottom: 10px; }
+
+  .encyclo-item {
+    background: var(--white); border-radius: 16px; padding: 14px 16px;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
+    cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .encyclo-item:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .encyclo-item.fact-item { background: var(--fact-bg); }
+  .encyclo-item-emoji { font-size: 28px; }
+  .encyclo-item-info { flex: 1; }
+  .encyclo-item-concept { font-family: 'Fredoka One', cursive; font-size: 16px; margin-bottom: 2px; }
+  .fact-item .encyclo-item-concept { color: #f0f0f0; font-family: 'Playfair Display', serif; font-size: 14px; font-style: italic; font-weight: 700; }
+  .encyclo-item-meta { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .fact-item .encyclo-item-meta { color: var(--fact-glow); }
+  .topic-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Deep Dive */
+  .deep-header {
+    background: var(--deep-bg);
+    border-radius: 0 0 28px 28px; padding: 28px 20px 24px;
+    margin-bottom: 20px; position: relative; overflow: hidden;
+  }
+  .deep-header::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%);
+  }
+  .deep-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .deep-icon { font-size: 32px; }
+  .deep-title { font-family: 'Playfair Display', serif; font-size: 24px; color: white; font-weight: 700; }
+  .deep-subtitle { font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 600; font-family: 'Space Mono', monospace; }
+
+  .topic-setter {
+    background: var(--white); border-radius: 20px; padding: 20px;
+    margin: 0 20px 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  }
+  .topic-setter-label { font-family: 'Fredoka One', cursive; font-size: 17px; margin-bottom: 4px; }
+  .topic-setter-sub { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 14px; }
+
+  .current-topic-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(124,58,237,0.1); border: 2px solid rgba(124,58,237,0.3);
+    border-radius: 50px; padding: 6px 14px;
+    font-size: 12px; font-weight: 800; color: var(--deep-accent); margin-bottom: 14px;
+  }
+
+  .topic-input {
+    width: 100%; border: 2px solid #e8e0d8; border-radius: 12px;
+    padding: 12px 14px; font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--text);
+    outline: none; transition: border-color 0.2s; margin-bottom: 10px;
+  }
+  .topic-input:focus { border-color: var(--deep-accent); }
+
+  .topic-set-btn {
+    width: 100%; background: var(--deep-accent); color: white;
+    border: none; border-radius: 12px; padding: 12px;
+    font-family: 'Fredoka One', cursive; font-size: 16px;
+    cursor: pointer; transition: transform 0.2s;
+  }
+  .topic-set-btn:hover { transform: translateY(-1px); }
+
+  .deep-reads-section { padding: 0 20px; }
+  .deep-reads-title { font-family: 'Fredoka One', cursive; font-size: 19px; margin-bottom: 14px; }
+
+  .deep-read-card {
+    background: var(--white); border-radius: 20px; padding: 20px;
+    margin-bottom: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    cursor: pointer; transition: transform 0.2s;
+    border-left: 5px solid var(--deep-accent);
+  }
+  .deep-read-card:hover { transform: translateY(-2px); }
+  .deep-read-tag { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--deep-accent); margin-bottom: 6px; }
+  .deep-read-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
+  .deep-read-meta { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .deep-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; font-weight: 700; }
+  .deep-empty .big { font-size: 44px; margin-bottom: 10px; }
+
+  /* Article */
+  .article-view { display: none; animation: fadeUp 0.4s ease both; }
+  .article-header { background: var(--deep-bg); padding: 28px 20px 24px; position: relative; overflow: hidden; }
+  .article-header::before {
+    content: ''; position: absolute; top: -80px; right: -80px;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%);
+  }
+  .article-tag { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--deep-gold); margin-bottom: 10px; }
+  .article-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; line-height: 1.3; margin-bottom: 8px; }
+  .article-meta { font-size: 11px; color: rgba(255,255,255,0.35); font-family: 'Space Mono', monospace; }
+  .article-body { padding: 24px 20px; font-size: 15px; line-height: 1.85; color: var(--text); font-weight: 600; white-space: pre-wrap; max-width: 420px; margin: 0 auto; }
+  .article-body h2 { font-family: 'Playfair Display', serif; font-size: 19px; margin: 24px 0 10px; color: var(--deep-accent); font-weight: 700; }
+
+  /* Modals */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 200;
+    align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal-box {
+    background: var(--white); border-radius: 28px; padding: 32px 28px;
+    max-width: 360px; width: 90%;
+    animation: popIn 0.35s cubic-bezier(0.175,0.885,0.32,1.275) both;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-emoji { font-size: 48px; margin-bottom: 12px; display: block; text-align: center; }
+  .modal-title { font-family: 'Fredoka One', cursive; font-size: 22px; text-align: center; margin-bottom: 6px; }
+  .modal-sub { font-size: 13px; color: var(--muted); text-align: center; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+  .modal-input {
+    width: 100%; border: 2px solid #e8e0d8; border-radius: 14px;
+    padding: 14px 16px; font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--text); outline: none;
+    transition: border-color 0.2s; margin-bottom: 12px;
+  }
+  .modal-input:focus { border-color: var(--deep-accent); }
+  .modal-btn {
+    width: 100%; background: var(--deep-accent); color: white;
+    border: none; border-radius: 14px; padding: 14px;
+    font-family: 'Fredoka One', cursive; font-size: 18px; cursor: pointer; transition: transform 0.2s;
+  }
+  .modal-btn:hover { transform: translateY(-1px); }
+
+  /* Research Notification */
+  .notif-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65); z-index: 300;
+    align-items: center; justify-content: center; backdrop-filter: blur(6px);
+  }
+  .notif-overlay.show { display: flex; }
+
+  .notif-box {
+    background: var(--deep-bg); border-radius: 28px; padding: 36px 28px;
+    max-width: 340px; width: 90%; text-align: center;
+    border: 1px solid rgba(124,58,237,0.4);
+    animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;
+    position: relative; overflow: hidden;
+  }
+  .notif-box::before {
+    content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%);
+  }
+  .notif-icon { font-size: 56px; margin-bottom: 16px; display: block; }
+  .notif-title { font-family: 'Playfair Display', serif; font-size: 21px; color: white; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+  .notif-sub { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; margin-bottom: 24px; line-height: 1.5; }
+  .notif-btn {
+    width: 100%; background: var(--deep-accent); color: white;
+    border: none; border-radius: 14px; padding: 14px;
+    font-family: 'Fredoka One', cursive; font-size: 18px;
+    cursor: pointer; margin-bottom: 10px; transition: transform 0.2s;
+  }
+  .notif-btn:hover { transform: translateY(-1px); }
+  .notif-dismiss { background: none; border: none; color: rgba(255,255,255,0.35); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; padding: 8px; width: 100%; }
+
+  /* Skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite;
+    border-radius: 8px; height: 18px; margin-bottom: 12px;
+  }
+  .skeleton.short { width: 60%; }
+  .skeleton.tall { height: 120px; }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 90px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent); color: white;
+    padding: 11px 22px; border-radius: 50px;
+    font-weight: 700; font-size: 13px;
+    transition: transform 0.3s ease; z-index: 999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- HOME VIEW -->
+<div class="view active" id="homeViewWrap">
+  <div class="app">
+    <div class="header">
+      <div class="logo">Curious Brain <span>🧠</span></div>
+      <button onclick="showSyncId()" style="background:var(--soft);border:none;border-radius:50px;padding:7px 13px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:5px">🔗 Sync</button>
+    </div>
+    <div class="meta-bar">
+      <div class="streak"><span class="streak-fire">🔥</span> <span id="streakCount">1</span> day streak</div>
+      <div class="date-label" id="todayDate"></div>
+    </div>
+
+    <div id="homeView">
+      <div class="section-title">What tickles your brain today?</div>
+      <div class="section-sub" id="unseenLabel">Pick one to learn about 👇</div>
+      <div class="cards-container" id="cardsContainer"></div>
+      <button class="learn-btn" id="learnBtn" onclick="fetchLesson()" disabled>✨ Teach me!</button>
+    </div>
+
+    <div id="lessonView" class="lesson-view">
+      <div class="lesson-header" id="lessonHeader">
+        <button class="back-btn" id="lessonBackBtn" onclick="goBack()">← Back</button>
+        <span class="lesson-emoji" id="lessonEmoji"></span>
+        <div class="lesson-topic-tag" id="lessonTopic"></div>
+        <div class="lesson-title" id="lessonTitle"></div>
+      </div>
+      <div class="lesson-body" id="lessonBody"></div>
+      <button class="save-btn" id="saveBtn" onclick="saveConcept()">⭐ Save to My Library</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIBRARY VIEW -->
+<div class="view" id="libraryViewWrap">
+  <div class="app">
+    <div class="encyclo-header">
+      <div class="encyclo-title">My Library 📚</div>
+      <div class="encyclo-count" id="encycloCount">0</div>
+    </div>
+    <div id="encycloList"></div>
+  </div>
+</div>
+
+<!-- DEEP DIVE VIEW -->
+<div class="view" id="deepViewWrap">
+  <div id="deepView">
+    <div class="deep-header">
+      <div class="deep-title-row">
+        <span class="deep-icon">🔭</span>
+        <div class="deep-title">Deep Dive</div>
+      </div>
+      <div class="deep-subtitle">YOUR WEEKLY RESEARCH SYNTHESIS</div>
+    </div>
+
+    <div class="topic-setter" id="topicSetter">
+      <div class="topic-setter-label">This week's topic</div>
+      <div class="topic-setter-sub" id="topicSetterSub">Set a theme and get two advanced reads — Monday &amp; Friday</div>
+      <div id="currentTopicPill" style="display:none" class="current-topic-pill">
+        <span>🎯</span><span id="currentTopicText"></span>
+      </div>
+      <input class="topic-input" id="topicInput" placeholder="e.g. Music psychology of Fred again.." />
+      <button class="topic-set-btn" onclick="setWeeklyTopic()">Set this week's topic →</button>
+    </div>
+
+    <div class="deep-reads-section">
+      <div class="deep-reads-title">Your reads this week</div>
+      <div id="deepReadsList"></div>
+    </div>
+  </div>
+
+  <div id="articleView" class="article-view">
+    <div class="article-header">
+      <button class="back-btn light" onclick="closeArticle()">← Back</button>
+      <div class="article-tag" id="articleTag"></div>
+      <div class="article-title" id="articleTitle"></div>
+      <div class="article-meta" id="articleMeta"></div>
+    </div>
+    <div class="article-body" id="articleBody"></div>
+  </div>
+</div>
+
+<!-- WEEKLY TOPIC MODAL -->
+<div class="modal-overlay" id="weeklyModal">
+  <div class="modal-box">
+    <span class="modal-emoji">🗓️</span>
+    <div class="modal-title">New week, new deep dive!</div>
+    <div class="modal-sub">What topic should your two advanced research reads this week be about? Be as specific as you like.</div>
+    <input class="modal-input" id="modalTopicInput" placeholder="e.g. Harmonic theory in minimal techno…" />
+    <button class="modal-btn" onclick="setWeeklyTopicFromModal()">Let's go 🚀</button>
+  </div>
+</div>
+
+<!-- RESEARCH READY NOTIFICATION -->
+<div class="notif-overlay" id="researchNotif">
+  <div class="notif-box">
+    <span class="notif-icon">📖</span>
+    <div class="notif-title" id="notifTitle">Your in-depth research for today is ready</div>
+    <div class="notif-sub" id="notifSub">Your weekly deep dive is waiting.</div>
+    <button class="notif-btn" onclick="goToResearch()">Read now →</button>
+    <button class="notif-dismiss" onclick="dismissNotif()">Maybe later</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-tab active" id="tab-home" onclick="switchTab('home')">
+    <span class="nav-icon">🧠</span>Today
+  </button>
+  <button class="nav-tab" id="tab-library" onclick="switchTab('library')">
+    <span class="nav-icon">📚</span>Library
+  </button>
+  <button class="nav-tab" id="tab-deep" onclick="switchTab('deep')">
+    <span class="nav-icon">🔭</span>Deep Dive
+    <span class="research-badge" id="researchBadge" style="display:none">NEW</span>
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ════════════════════════════════
+// CONFIG
+// ════════════════════════════════
+const ANTHROPIC_API_KEY = "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";
+const SUPABASE_URL = "https://ebvvhgutvgwsqvizwbyv.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidnZoZ3V0dmd3c3F2aXp3Ynl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDc5ODUsImV4cCI6MjA4NzY4Mzk4NX0.VWOhDXbkQc6ExD2Goklkcw9Bx0pwn6XmTFSCKG9bmEc";
+
+// Init Supabase client
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── User identity ──
+// We use a stable anonymous user ID stored in localStorage.
+// Same device = same ID across sessions. Different device = different ID until sync.
+// For a personal app this is fine; upgrade to auth.signIn for multi-device identity.
+function getUserId() {
+  let uid = localStorage.getItem("cb_uid");
+  if (!uid) { uid = "user_" + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("cb_uid", uid); }
+  return uid;
+}
+const USER_ID = getUserId();
+
+// ── Local cache (fallback + fast reads) ──
+const local = {
+  get(k, fb) { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : fb; } catch(e) { return fb; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+};
+
+// ── Supabase helpers ──
+async function dbGet(table, fallback) {
+  try {
+    const { data, error } = await _supabase.from(table).select("*").eq("user_id", USER_ID).maybeSingle();
+    if (error) throw error;
+    return data || fallback;
+  } catch(e) { console.warn("dbGet failed", table, e); return fallback; }
+}
+
+async function dbUpsert(table, payload) {
+  try {
+    const { error } = await _supabase.from(table).upsert({ user_id: USER_ID, ...payload }, { onConflict: "user_id" });
+    if (error) throw error;
+  } catch(e) { console.warn("dbUpsert failed", table, e); }
+}
+
+async function dbGetLibrary() {
+  try {
+    const { data, error } = await _supabase.from("library").select("*").eq("user_id", USER_ID).order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data || []).map(row => ({
+      name: row.name, emoji: row.emoji, topic: row.topic,
+      lesson: row.lesson, isFact: row.is_fact, savedAt: row.saved_at, _id: row.id
+    }));
+  } catch(e) { console.warn("dbGetLibrary failed", e); return local.get("cb_library", []); }
+}
+
+async function dbAddLibraryItem(item) {
+  try {
+    const { error } = await _supabase.from("library").insert({
+      user_id: USER_ID, name: item.name, emoji: item.emoji,
+      topic: item.topic, lesson: item.lesson,
+      is_fact: item.isFact || false, saved_at: item.savedAt
+    });
+    if (error) throw error;
+    // Also update local cache
+    const lib = local.get("cb_library", []);
+    lib.unshift(item); local.set("cb_library", lib);
+  } catch(e) { console.warn("dbAddLibraryItem failed", e); const lib = local.get("cb_library", []); lib.unshift(item); local.set("cb_library", lib); }
+}
+
+async function dbGetSeen() {
+  try {
+    const { data, error } = await _supabase.from("seen_concepts").select("concept_name").eq("user_id", USER_ID);
+    if (error) throw error;
+    return (data || []).map(r => r.concept_name);
+  } catch(e) { return local.get("cb_seen", []); }
+}
+
+async function dbAddSeen(name) {
+  try {
+    await _supabase.from("seen_concepts").upsert({ user_id: USER_ID, concept_name: name }, { onConflict: "user_id,concept_name", ignoreDuplicates: true });
+  } catch(e) { console.warn("dbAddSeen failed", e); }
+  const seen = local.get("cb_seen", []);
+  if (!seen.includes(name)) { seen.push(name); local.set("cb_seen", seen); }
+}
+
+async function dbClearSeen() {
+  try {
+    await _supabase.from("seen_concepts").delete().eq("user_id", USER_ID);
+  } catch(e) { console.warn("dbClearSeen failed", e); }
+  local.set("cb_seen", []);
+}
+
+// ════════════════════════════════
+// DATA
+// ════════════════════════════════
+
+const CONCEPTS = [
+  { topic:"Science", emoji:"⚛️", name:"Quantum Entanglement", teaser:"Two particles that feel each other across the universe" },
+  { topic:"Science", emoji:"🌀", name:"General Relativity", teaser:"Gravity isn't a force — it's bent space" },
+  { topic:"Science", emoji:"🧬", name:"CRISPR Gene Editing", teaser:"Cut-and-paste surgery on your DNA" },
+  { topic:"Science", emoji:"🔋", name:"Gibbs Free Energy", teaser:"The secret formula for whether reactions happen" },
+  { topic:"Science", emoji:"🌡️", name:"The Second Law of Thermodynamics", teaser:"Why the universe is slowly falling apart" },
+  { topic:"Science", emoji:"💡", name:"The Photoelectric Effect", teaser:"Einstein's proof that light comes in packets" },
+  { topic:"Science", emoji:"🧲", name:"Maxwell's Equations", teaser:"Four lines that explain all of electricity and light" },
+  { topic:"Science", emoji:"🕳️", name:"Hawking Radiation", teaser:"How black holes slowly evaporate" },
+  { topic:"Science", emoji:"🔬", name:"The Standard Model of Particle Physics", teaser:"The complete ingredient list of the universe" },
+  { topic:"Science", emoji:"🧪", name:"Le Chatelier's Principle", teaser:"Why systems always push back when you prod them" },
+  { topic:"Science", emoji:"🌊", name:"Schrodinger's Wave Equation", teaser:"The maths that says particles are just probabilities" },
+  { topic:"Science", emoji:"🦠", name:"Epigenetics", teaser:"How your experiences can change what your genes do" },
+  { topic:"History", emoji:"⚙️", name:"The Industrial Revolution's Social Cost", teaser:"Progress that broke people before it helped them" },
+  { topic:"History", emoji:"🏛️", name:"The Fall of the Western Roman Empire", teaser:"A collapse 300 years in the making" },
+  { topic:"History", emoji:"📐", name:"The Congress of Vienna", teaser:"How Europe was redrawn like a board game in 1815" },
+  { topic:"History", emoji:"💀", name:"The Transatlantic Slave Trade's Economic Engine", teaser:"How slavery bankrolled the modern world" },
+  { topic:"History", emoji:"☢️", name:"Mutually Assured Destruction", teaser:"Why having nukes meant nobody used them" },
+  { topic:"History", emoji:"🌍", name:"Postcolonial Theory", teaser:"How empire reshaped the minds of the colonised" },
+  { topic:"History", emoji:"📜", name:"The Reformation's Political Fallout", teaser:"How Luther's 95 theses rewrote European power" },
+  { topic:"History", emoji:"🧭", name:"The Scramble for Africa", teaser:"A continent divided in a single Berlin meeting" },
+  { topic:"History", emoji:"🔴", name:"The Origins of the Cold War", teaser:"How allies became enemies in four years" },
+  { topic:"Economics", emoji:"📉", name:"The Efficient Market Hypothesis", teaser:"Why you probably can't beat the stock market" },
+  { topic:"Economics", emoji:"🤝", name:"The Nash Equilibrium", teaser:"When everyone's rational choice makes everyone worse off" },
+  { topic:"Economics", emoji:"🏦", name:"Fractional Reserve Banking", teaser:"How banks conjure money from thin air" },
+  { topic:"Economics", emoji:"📊", name:"Keynesian vs Monetarist Economics", teaser:"The great argument about what governments should do" },
+  { topic:"Economics", emoji:"🌐", name:"Comparative Advantage", teaser:"Why countries should trade even if one is better at everything" },
+  { topic:"Economics", emoji:"💸", name:"Moral Hazard", teaser:"Why being rescued makes people take more risks" },
+  { topic:"Economics", emoji:"📈", name:"The Laffer Curve", teaser:"The idea that cutting taxes can raise more tax" },
+  { topic:"Economics", emoji:"🔄", name:"Creative Destruction", teaser:"Why progress always kills something first" },
+  { topic:"Economics", emoji:"🧮", name:"Asymmetric Information", teaser:"Why the used car market is a disaster" },
+  { topic:"Music", emoji:"🎼", name:"Serialism & the 12-Tone Technique", teaser:"Schoenberg's radical rejection of all keys" },
+  { topic:"Music", emoji:"🎹", name:"The Circle of Fifths", teaser:"The map that connects every key ever written" },
+  { topic:"Music", emoji:"🎷", name:"The Harmonic Series", teaser:"Why every note is secretly a chord" },
+  { topic:"Music", emoji:"🎻", name:"Counterpoint", teaser:"Bach's art of making melodies argue beautifully" },
+  { topic:"Music", emoji:"🥁", name:"Polyrhythm", teaser:"Two conflicting beats that somehow coexist" },
+  { topic:"Music", emoji:"🎵", name:"The Tritone & Its History", teaser:"The chord the church called the devil's interval" },
+  { topic:"Music", emoji:"🎸", name:"Spectral Music Theory", teaser:"Composing from the physics of sound itself" },
+  { topic:"Music", emoji:"🎺", name:"Modal Harmony", teaser:"The ancient scales hiding inside modern songs" },
+  { topic:"Nature", emoji:"🧬", name:"The Selfish Gene Theory", teaser:"Dawkins' idea that you exist to serve your DNA" },
+  { topic:"Nature", emoji:"🌿", name:"The Krebs Cycle", teaser:"The microscopic engine that runs every living thing" },
+  { topic:"Nature", emoji:"🐚", name:"Punctuated Equilibrium", teaser:"Evolution doesn't crawl — it naps then sprints" },
+  { topic:"Nature", emoji:"🌍", name:"The Gaia Hypothesis", teaser:"Earth as one giant self-regulating organism" },
+  { topic:"Nature", emoji:"🦠", name:"The Microbiome", teaser:"The trillion bacteria inside you that run the show" },
+  { topic:"Nature", emoji:"🌊", name:"Thermohaline Circulation", teaser:"The ocean conveyor belt that controls your climate" },
+  { topic:"Nature", emoji:"🧪", name:"Enzyme Kinetics", teaser:"How your body's tiny machines know when to speed up" },
+  { topic:"Nature", emoji:"🐜", name:"Kin Selection & Altruism", teaser:"Why animals sacrifice themselves for their relatives" },
+];
+
+const FUN_FACTS = [
+  { emoji:"🦈", fact:"Sharks are older than trees. Sharks evolved ~450 million years ago; trees didn't appear until ~350 million years ago.", memory:"Sharks predate forests." },
+  { emoji:"🌌", fact:"There are more possible iterations of a game of chess than there are atoms in the observable universe.", memory:"Chess > atoms in universe." },
+  { emoji:"🐙", fact:"Octopuses have three hearts, blue blood, and their arms can taste what they touch — each arm has its own mini-brain.", memory:"Octopus: 3 hearts, 9 brains." },
+  { emoji:"⏱️", fact:"Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid.", memory:"Cleo: closer to Moon than pyramids." },
+  { emoji:"🧠", fact:"Your brain generates enough electricity while you're awake to power a small LED lightbulb.", memory:"Your brain = lightbulb." },
+  { emoji:"🌍", fact:"If you removed all the empty space from atoms in every human on Earth, all 8 billion of us would fit in a sugar cube.", memory:"8bn people = sugar cube." },
+  { emoji:"🎵", fact:"The musical note A above middle C was standardised at 440Hz only in 1939. Before that, orchestras across Europe used completely different pitches.", memory:"A=440Hz only since 1939." },
+  { emoji:"🦋", fact:"Inside a chrysalis, a caterpillar essentially dissolves into liquid soup before reorganising into a butterfly — it doesn't just grow wings.", memory:"Butterflies are reformed soup." },
+  { emoji:"🌙", fact:"The Moon is moving away from Earth at 3.8cm per year — the same rate your fingernails grow.", memory:"Moon drifts at fingernail speed." },
+  { emoji:"🔥", fact:"Oxford University is older than the Aztec Empire. Teaching began at Oxford around 1096; the Aztec Empire was founded in 1428.", memory:"Oxford older than Aztec Empire." },
+  { emoji:"💧", fact:"Hot water can freeze faster than cold water under certain conditions — a phenomenon called the Mpemba Effect that still isn't fully explained.", memory:"Hot water freezes faster (Mpemba)." },
+  { emoji:"🐘", fact:"Elephants are the only animals known to have death rituals — they mourn, hold vigils, and return to bones of dead relatives for years.", memory:"Elephants hold funerals." },
+  { emoji:"🌿", fact:"Grass screams. When cut, it releases airborne chemicals called green leaf volatiles — distress signals to nearby plants.", memory:"Fresh cut grass = plant screams." },
+  { emoji:"⚡", fact:"Lightning strikes the Earth about 100 times per second — that's 8 million times a day.", memory:"100 lightning strikes/second." },
+  { emoji:"🎭", fact:"Shakespeare invented over 1,700 words we still use today, including 'bedroom', 'lonely', 'generous', and 'obscene'.", memory:"Shakespeare coined 1,700 words." },
+  { emoji:"🧊", fact:"Ice is less dense than water — almost uniquely weird in chemistry. Most solids sink in their liquid form. This is why life survived ice ages.", memory:"Ice floats = life exists." },
+  { emoji:"🐬", fact:"Dolphins have names for each other — unique signature whistles they use to call specific individuals, even after years apart.", memory:"Dolphins have names." },
+  { emoji:"🌺", fact:"There are more species of beetles on Earth than there are species of plants. God, apparently, is inordinately fond of beetles.", memory:"More beetles than plants." },
+  { emoji:"🍄", fact:"The largest living organism on Earth isn't a whale or a sequoia — it's a single honey fungus in Oregon covering 2,385 acres.", memory:"World's biggest thing: fungus, Oregon." },
+  { emoji:"🔭", fact:"When you look at the Andromeda Galaxy with the naked eye, you're seeing light that left it 2.5 million years ago — before humans existed.", memory:"Andromeda light is pre-human." },
+];
+
+const TOPIC_COLORS = { Science:"#FF6B6B", History:"#C084FC", Economics:"#34D399", Music:"#FB923C", Nature:"#4ECDC4" };
+const CARD_COLORS = ["#FF6B6B","#4ECDC4","#FFE66D"];
+
+// ════════════════════════════════
+// STATE
+// ════════════════════════════════
+let selectedCard = null, currentConcept = null, currentLesson = "", isFact = false, currentFact = null, currentTab = "home";
+let _seenCache = null; // in-memory cache for seen concepts this session
+
+// ── Seen concepts ──
+async function getSeenConcepts() {
+  if (_seenCache !== null) return _seenCache;
+  _seenCache = await dbGetSeen();
+  local.set("cb_seen", _seenCache);
+  return _seenCache;
+}
+
+async function markConceptSeen(name) {
+  try {
+    const seen = await getSeenConcepts();
+    if (!seen.includes(name)) {
+      seen.push(name);
+      _seenCache = seen;
+      await dbAddSeen(name);
+    }
+    if (CONCEPTS.filter(c => !seen.includes(c.name)).length < 4) {
+      await dbClearSeen();
+      _seenCache = [];
+      showToast("You've seen them all! Reshuffling...");
+    }
+  } catch(e) {}
+}
+
+async function getUnseenConcepts() {
+  try {
+    const seen = await getSeenConcepts();
+    const u = CONCEPTS.filter(c => !seen.includes(c.name));
+    return u.length >= 3 ? u : CONCEPTS;
+  } catch(e) { return CONCEPTS; }
+}
+
+// ── Streak ──
+function getTodayStr() { return new Date().toISOString().split("T")[0]; }
+function getYesterdayStr() { const d = new Date(); d.setDate(d.getDate()-1); return d.toISOString().split("T")[0]; }
+
+async function getStreak() {
+  try {
+    const row = await dbGet("streaks", null);
+    const today = getTodayStr();
+    let count = 1, last = "";
+    if (row) { count = row.count || 1; last = row.last_date || ""; }
+    if (last === today) return count;
+    if (last === getYesterdayStr()) { count++; }
+    else if (last !== "") { count = 1; }
+    await dbUpsert("streaks", { count, last_date: today });
+    local.set("cb_streak", { count, last: today });
+    return count;
+  } catch(e) {
+    const s = local.get("cb_streak", {count:1, last:""});
+    const today = getTodayStr();
+    if (s.last === today) return s.count;
+    if (s.last === getYesterdayStr()) { s.count++; s.last = today; }
+    else { s.count = 1; s.last = today; }
+    local.set("cb_streak", s); return s.count;
+  }
+}
+
+// ── Momentum Sync ──
+// Writes today's Curious Brain session data to Supabase app_sync
+// so MOMENTUM can display it in the Connected Apps panel.
+// Called after a lesson loads and after saving to library.
+let _momentumSyncTimer = null;
+async function syncToMomentum() {
+  clearTimeout(_momentumSyncTimer);
+  _momentumSyncTimer = setTimeout(async function() {
+    try {
+      const today = getTodayStr();
+      const streak = local.get("cb_streak", {count:1}).count || 1;
+      const topic  = isFact ? "Weird & Wonderful" : (currentConcept?.topic || "Learning");
+      const name   = isFact ? (currentFact?.memory || "Fact") : (currentConcept?.name || "Concept");
+      await fetch(SUPABASE_URL + '/rest/v1/app_sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify({
+          app_id: 'curious_brain',
+          date: today,
+          payload: {
+            topic:  topic,
+            name:   name,
+            streak: streak,
+            value:  name + ' · ' + streak + ' day streak'
+          }
+        })
+      });
+    } catch(e) { console.warn('Momentum sync failed:', e); }
+  }, 1500);
+}
+
+// ── Library ──
+async function getLibrary() {
+  return await dbGetLibrary();
+}
+
+async function addToLibrary(item) {
+  await dbAddLibraryItem(item);
+}
+
+// ── Weekly data ──
+function getWeekStr() {
+  const d = new Date(), jan1 = new Date(d.getFullYear(),0,1);
+  return `${d.getFullYear()}-W${Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7)}`;
+}
+
+async function getWeeklyData() {
+  try {
+    const row = await dbGet("weekly_data", null);
+    if (row) return { topic: row.topic || "", weekStr: row.week_str || "", reads: row.reads || [] };
+    return { topic: "", weekStr: "", reads: [] };
+  } catch(e) { return local.get("cb_weekly", {topic:"", weekStr:"", reads:[]}); }
+}
+
+async function saveWeeklyData(data) {
+  try {
+    await dbUpsert("weekly_data", { topic: data.topic, week_str: data.weekStr, reads: data.reads });
+    local.set("cb_weekly", data);
+  } catch(e) { local.set("cb_weekly", data); }
+}
+
+function getDayOfWeek() { return new Date().getDay(); }
+
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+async function init() {
+  // Show loading spinner while we fetch from Supabase
+  document.getElementById("cardsContainer").innerHTML = `
+    <div style="text-align:center;padding:40px 0;color:var(--muted)">
+      <div style="font-size:36px;margin-bottom:12px;animation:wiggle 1s ease-in-out infinite">🧠</div>
+      <div style="font-weight:700;font-size:14px">Syncing your brain...</div>
+    </div>`;
+
+  const d = new Date();
+  document.getElementById("todayDate").textContent = d.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"});
+
+  // Load streak from Supabase
+  const streak = await getStreak();
+  document.getElementById("streakCount").textContent = streak;
+
+  // Render cards (needs seen concepts from Supabase)
+  await renderCards();
+  await checkWeeklyLogic();
+}
+
+async function checkWeeklyLogic() {
+  const weekly = await getWeeklyData();
+  const thisWeek = getWeekStr();
+  const day = getDayOfWeek();
+  const isMonday = day === 1, isFriday = day === 5;
+
+  if (isMonday && weekly.weekStr !== thisWeek) {
+    await saveWeeklyData({topic:"", weekStr:thisWeek, reads:[]});
+    setTimeout(() => document.getElementById("weeklyModal").classList.add("show"), 900);
+    return;
+  }
+
+  if (weekly.topic && weekly.weekStr === thisWeek) {
+    updateDeepDiveUI(weekly);
+    const reads = weekly.reads || [];
+    const hasMon = reads.some(r => r.slot === "monday");
+    const hasFri = reads.some(r => r.slot === "friday");
+
+    if (isMonday && !hasMon) { generateDeepRead("monday", weekly.topic); return; }
+    if (isFriday && !hasFri) { generateDeepRead("friday", weekly.topic); return; }
+
+    const slot = isMonday ? "monday" : isFriday ? "friday" : null;
+    if (slot) {
+      const read = reads.find(r => r.slot === slot);
+      const dismissed = local.get(`cb_notif_${getTodayStr()}`, false);
+      if (read && read.ready && !dismissed) showResearchNotif(read);
+    }
+  }
+}
+
+// ════════════════════════════════
+// CARDS
+// ════════════════════════════════
+function pickRandom(arr, n) { return [...arr].sort(() => Math.random()-0.5).slice(0, n); }
+
+async function renderCards() {
+  const pool = await getUnseenConcepts(), picked = pickRandom(pool, 3);
+  const container = document.getElementById("cardsContainer");
+  container.innerHTML = "";
+  selectedCard = null;
+  document.getElementById("learnBtn").disabled = true;
+
+  const seen = await getSeenConcepts();
+  const unseenCount = CONCEPTS.filter(c => !seen.includes(c.name)).length;
+  const total = CONCEPTS.length;
+  document.getElementById("unseenLabel").textContent =
+    unseenCount === total ? "Pick one to learn about 👇" : `${unseenCount} of ${total} concepts still to discover 👇`;
+
+  picked.forEach((concept, i) => {
+    const div = document.createElement("div");
+    div.className = "concept-card";
+    div.style.background = CARD_COLORS[i];
+    div.innerHTML = `<span class="card-emoji">${concept.emoji}</span><div class="card-topic">${concept.topic}</div><div class="card-concept">${concept.name}</div><div class="card-teaser">${concept.teaser}</div><span class="card-arrow">→</span>`;
+    div.onclick = () => selectCard(div, concept, false);
+    container.appendChild(div);
+  });
+
+  // Fun fact card
+  const fact = pickRandom(FUN_FACTS, 1)[0];
+  currentFact = fact;
+  const factDiv = document.createElement("div");
+  factDiv.className = "fact-card";
+  factDiv.id = "factCard";
+  factDiv.innerHTML = `
+    <div class="fact-label">✦ Weird &amp; wonderful</div>
+    <span class="fact-emoji">${fact.emoji}</span>
+    <div class="fact-text">${fact.fact}</div>
+    <div class="fact-remember">💡 Remember: ${fact.memory}</div>
+  `;
+  factDiv.onclick = () => selectFact(factDiv, fact);
+  container.appendChild(factDiv);
+}
+
+function selectCard(el, concept, factMode) {
+  document.querySelectorAll(".concept-card, .fact-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedCard = true; currentConcept = concept; isFact = !!factMode;
+  const btn = document.getElementById("learnBtn");
+  btn.disabled = false;
+  btn.innerHTML = isFact ? "✨ Tell me more!" : "✨ Teach me!";
+}
+
+function selectFact(el, fact) {
+  document.querySelectorAll(".concept-card, .fact-card").forEach(c => c.classList.remove("selected"));
+  el.classList.add("selected");
+  isFact = true; currentFact = fact; selectedCard = true; currentConcept = null;
+  const btn = document.getElementById("learnBtn");
+  btn.disabled = false;
+  btn.innerHTML = "✨ Expand this fact!";
+}
+
+// ════════════════════════════════
+// LESSON
+// ════════════════════════════════
+async function fetchLesson() {
+  if (!selectedCard) return;
+  const btn = document.getElementById("learnBtn");
+  btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  btn.disabled = true;
+
+  document.getElementById("homeView").style.display = "none";
+  document.getElementById("lessonView").style.display = "block";
+
+  const header = document.getElementById("lessonHeader");
+  const titleEl = document.getElementById("lessonTitle");
+  const backBtn = document.getElementById("lessonBackBtn");
+  const body = document.getElementById("lessonBody");
+
+  if (isFact) {
+    header.style.background = "#1a1a2e";
+    document.getElementById("lessonEmoji").textContent = currentFact.emoji;
+    document.getElementById("lessonTopic").textContent = "✦ Weird & Wonderful";
+    titleEl.textContent = currentFact.memory;
+    titleEl.classList.add("light"); backBtn.classList.add("light"); body.classList.add("fact-body");
+  } else {
+    const idx = getCurrentCardIndex();
+    header.style.background = CARD_COLORS[idx] || CARD_COLORS[0];
+    document.getElementById("lessonEmoji").textContent = currentConcept.emoji;
+    document.getElementById("lessonTopic").textContent = currentConcept.topic;
+    titleEl.textContent = currentConcept.name;
+    titleEl.classList.remove("light"); backBtn.classList.remove("light"); body.classList.remove("fact-body");
+    markConceptSeen(currentConcept.name);
+  }
+
+  body.innerHTML = `<div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall"></div><div class="skeleton short"></div>`;
+  document.getElementById("saveBtn").disabled = true;
+  document.getElementById("saveBtn").textContent = "⏳ Loading...";
+
+  const systemPrompt = isFact
+    ? `You are a brilliant science communicator. The user has been shown a fascinating fact. Expand on it in a vivid, surprising way. Give the history, the deeper science, one counterintuitive implication, and end with why this fact matters. Under 200 words. Be memorable and engaging — write for a smart, curious adult with no assumed background knowledge.`
+    : `You are a brilliant lecturer giving someone their very first encounter with this concept. The reader is highly intelligent but has no prior knowledge of this topic — no A-level background, no assumed context. Your job is to build genuine understanding from the ground up, without dumbing it down or using baby talk.
+
+Explain every term you introduce. Use real-world examples and concrete illustrations rather than abstract descriptions. Write the way a great university lecturer talks on the first day of term — clear, intellectually stimulating, and accessible without being patronising.
+
+Structure your explanation like this:
+1. Open with a crisp, intriguing statement of what this concept actually is (1-2 sentences)
+2. Build the core idea step by step, defining terms as you go and using a well-chosen real-world example (4-6 sentences)
+3. Explain one genuinely surprising or important consequence of this concept (2-3 sentences)
+4. End with: "And that's the essence of [concept]. 🌟"
+
+Under 250 words. Write for a smart, curious adult — intellectually rigorous but never assuming prior knowledge.`;
+
+  const userMsg = isFact
+    ? `Expand on this fact: "${currentFact.fact}"`
+    : `Explain "${currentConcept.name}" (topic: ${currentConcept.topic}) with vivid analogies.`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type":"application/json", "x-api-key":ANTHROPIC_API_KEY, "anthropic-version":"2023-06-01", "anthropic-dangerous-direct-browser-access":"true" },
+      body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system:systemPrompt, messages:[{role:"user",content:userMsg}] })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || "Something went wrong. Try again!";
+    currentLesson = text;
+    body.textContent = text;
+    document.getElementById("saveBtn").disabled = false;
+    syncToMomentum();
+
+    const lib = await getLibrary();
+    const key = isFact ? currentFact.memory : currentConcept.name;
+    const saved = lib.some(item => item.name === key);
+    document.getElementById("saveBtn").innerHTML = saved ? "✅ Saved to Library" : "⭐ Save to My Library";
+    document.getElementById("saveBtn").className = "save-btn" + (saved ? " saved" : "");
+  } catch(e) {
+    body.textContent = "Oops! Check your API key and connection. 🙈";
+    document.getElementById("saveBtn").disabled = true;
+  }
+
+  btn.innerHTML = isFact ? "✨ Expand this fact!" : "✨ Teach me!";
+  btn.disabled = false;
+}
+
+function getCurrentCardIndex() {
+  const cards = document.querySelectorAll(".concept-card");
+  for (let i = 0; i < cards.length; i++) { if (cards[i].classList.contains("selected")) return i; }
+  return 0;
+}
+
+function goBack() {
+  document.getElementById("lessonView").style.display = "none";
+  document.getElementById("homeView").style.display = "block";
+}
+
+async function saveConcept() {
+  const lib = await getLibrary();
+  const key = isFact ? currentFact?.memory : currentConcept?.name;
+  if (!key) return;
+  if (lib.some(i => i.name === key)) { showToast("Already in your library! 📚"); return; }
+  const item = { name:key, emoji:isFact?currentFact.emoji:currentConcept.emoji, topic:isFact?"Weird & Wonderful":currentConcept.topic, lesson:currentLesson, isFact, savedAt:new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) };
+  await addToLibrary(item);
+  document.getElementById("saveBtn").innerHTML = "✅ Saved to Library!";
+  document.getElementById("saveBtn").classList.add("saved");
+  showToast("Added to your library! 🌟");
+  syncToMomentum();
+}
+
+// ════════════════════════════════
+// LIBRARY
+// ════════════════════════════════
+async function renderLibrary() {
+  document.getElementById("encycloList").innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-weight:700;font-size:13px">Syncing library...</div>`;
+  const lib = await getLibrary();
+  document.getElementById("encycloCount").textContent = lib.length;
+  const list = document.getElementById("encycloList");
+  if (lib.length === 0) { list.innerHTML = `<div class="encyclo-empty"><div class="big">📖</div>Your library is empty!<br>Learn your first concept to get started.</div>`; return; }
+  list.innerHTML = lib.map((item, i) => `
+    <div class="encyclo-item ${item.isFact?"fact-item":""}" onclick="showLibraryItem(${i})">
+      <div class="topic-dot" style="background:${item.isFact?"#e94560":(TOPIC_COLORS[item.topic]||"#ccc")}"></div>
+      <div class="encyclo-item-emoji">${item.emoji}</div>
+      <div class="encyclo-item-info">
+        <div class="encyclo-item-concept">${item.name}</div>
+        <div class="encyclo-item-meta">${item.topic} · ${item.savedAt}</div>
+      </div>
+      <div style="color:var(--muted);font-size:15px">→</div>
+    </div>`).join("");
+}
+
+async function showLibraryItem(index) {
+  const lib = await getLibrary();
+  const item = lib[index];
+  currentConcept = item.isFact ? null : item;
+  currentFact = item.isFact ? {emoji:item.emoji, memory:item.name, fact:""} : null;
+  isFact = item.isFact; currentLesson = item.lesson;
+  switchTab("home");
+  document.getElementById("homeView").style.display = "none";
+  document.getElementById("lessonView").style.display = "block";
+  const header = document.getElementById("lessonHeader"), titleEl = document.getElementById("lessonTitle"), backBtn = document.getElementById("lessonBackBtn"), body = document.getElementById("lessonBody");
+  if (item.isFact) { header.style.background="#1a1a2e"; titleEl.classList.add("light"); backBtn.classList.add("light"); body.classList.add("fact-body"); }
+  else { header.style.background=TOPIC_COLORS[item.topic]||"#FFE66D"; titleEl.classList.remove("light"); backBtn.classList.remove("light"); body.classList.remove("fact-body"); }
+  document.getElementById("lessonEmoji").textContent = item.emoji;
+  document.getElementById("lessonTopic").textContent = item.topic;
+  titleEl.textContent = item.name;
+  body.textContent = item.lesson;
+  const saveBtn = document.getElementById("saveBtn");
+  saveBtn.innerHTML = "✅ Saved to Library"; saveBtn.className = "save-btn saved"; saveBtn.disabled = false;
+}
+
+// ════════════════════════════════
+// DEEP DIVE
+// ════════════════════════════════
+function setWeeklyTopicFromModal() {
+  const input = document.getElementById("modalTopicInput").value.trim();
+  if (!input) return;
+  document.getElementById("weeklyModal").classList.remove("show");
+  document.getElementById("topicInput").value = input;
+  commitWeeklyTopic(input);
+}
+
+function setWeeklyTopic() {
+  const input = document.getElementById("topicInput").value.trim();
+  if (!input) { showToast("Please enter a topic first!"); return; }
+  commitWeeklyTopic(input);
+}
+
+async function commitWeeklyTopic(topic) {
+  const day = getDayOfWeek();
+  const weekly = {topic, weekStr:getWeekStr(), reads:[]};
+  await saveWeeklyData(weekly);
+  updateDeepDiveUI(weekly);
+  showToast("Topic set! Generating your first read... 📖");
+  generateDeepRead(day === 5 ? "friday" : "monday", topic);
+}
+
+async function generateDeepRead(slot, topic) {
+  const weekly = await getWeeklyData();
+  const reads = weekly.reads || [];
+  const placeholder = { slot, title:`Generating your ${slot==="monday"?"Monday":"Friday"} read...`, body:"", ready:false, generatedAt:new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short"}) };
+  reads.push(placeholder);
+  weekly.reads = reads;
+  await saveWeeklyData(weekly);
+  updateDeepDiveUI(weekly);
+
+  try {
+    const isMon = slot === "monday";
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514", max_tokens:4000,
+        system:`You are an expert academic writer producing a long-form research synthesis for a highly educated reader with a music degree who is comfortable with complex musical, psychological, scientific and theoretical ideas. Write at the level of a well-researched journal feature or intellectual long-read (think Aeon, The Atlantic, a graduate seminar paper). Use a compelling title on the first line (no # prefix). Then use ## for section headings. Include specific theories, named researchers, technical terminology, and real examples. Be argumentative — have a thesis. Aim for 1,200-1,800 words. This is a genuine 10-15 minute read. ${isMon ? "This is the MONDAY read — introduce the topic broadly, lay theoretical foundations, set up key tensions and debates." : "This is the FRIDAY read — go deeper. Assume Monday context. Explore a specific contested angle or advanced application."}`,
+        messages:[{role:"user",content:`Write a ${isMon?"Monday (foundational)":"Friday (advanced)"} long-read research synthesis on: "${topic}"`}]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text || "";
+    const lines = text.split("\n");
+    let title = `${isMon?"Monday":"Friday"} Read: ${topic}`;
+    let body = text;
+    const first = lines[0].replace(/^#+\s*/, "").trim();
+    if (first && !first.startsWith("##")) { title = first; body = lines.slice(1).join("\n").trim(); }
+
+    const updated = await getWeeklyData();
+    const idx = updated.reads.findIndex(r => r.slot === slot && !r.ready);
+    if (idx !== -1) { updated.reads[idx] = {slot, title, body, ready:true, generatedAt:placeholder.generatedAt}; }
+    await saveWeeklyData(updated);
+    updateDeepDiveUI(updated);
+    document.getElementById("researchBadge").style.display = "block";
+    showResearchNotif(updated.reads[idx !== -1 ? idx : 0]);
+  } catch(e) {
+    console.error(e);
+    showToast("Error generating read. Check API key. 🙈");
+  }
+}
+
+function updateDeepDiveUI(weekly) {
+  const topic = weekly.topic;
+  if (topic) {
+    document.getElementById("currentTopicPill").style.display = "inline-flex";
+    document.getElementById("currentTopicText").textContent = topic;
+    document.getElementById("topicInput").value = topic;
+    document.getElementById("topicSetterSub").textContent = "Update topic for next week, or keep going with this one.";
+  }
+  const reads = weekly.reads || [];
+  const list = document.getElementById("deepReadsList");
+  if (reads.length === 0) { list.innerHTML = `<div class="deep-empty"><div class="big">🔭</div>Set a topic above to generate<br>your first deep dive read.</div>`; return; }
+  list.innerHTML = reads.map((r, i) => `
+    <div class="deep-read-card" onclick="${r.ready?`openArticle(${i})`:"void(0)"}">
+      <div class="deep-read-tag">${r.slot==="monday"?"📅 Monday Read":"📅 Friday Read"}${r.ready?"":" — Generating…"}</div>
+      <div class="deep-read-title">${r.title}</div>
+      <div class="deep-read-meta">${r.generatedAt} · ${r.ready?"~10-15 min read":"⏳ Please wait…"}</div>
+    </div>`).join("");
+}
+
+async function openArticle(index) {
+  const weekly = await getWeeklyData(), read = weekly.reads[index];
+  if (!read || !read.ready) return;
+  document.getElementById("deepView").style.display = "none";
+  document.getElementById("articleView").style.display = "block";
+  document.getElementById("articleTag").textContent = read.slot==="monday"?"📅 Monday Read":"📅 Friday Read";
+  document.getElementById("articleTitle").textContent = read.title;
+  document.getElementById("articleMeta").textContent = `${read.generatedAt} · ~10-15 min read`;
+  const formatted = read.body.split("\n").map(line => line.startsWith("## ") ? `<h2>${line.replace("## ","")}</h2>` : line).join("\n");
+  document.getElementById("articleBody").innerHTML = formatted;
+}
+
+function closeArticle() {
+  document.getElementById("articleView").style.display = "none";
+  document.getElementById("deepView").style.display = "block";
+}
+
+// ════════════════════════════════
+// NOTIFICATIONS
+// ════════════════════════════════
+function showResearchNotif(read) {
+  const day = getDayOfWeek(), label = day===1?"Monday":"Friday";
+  document.getElementById("notifTitle").textContent = `Your ${label} deep dive is ready 📖`;
+  document.getElementById("notifSub").textContent = `"${read.title}" is waiting for you.`;
+  document.getElementById("researchNotif").classList.add("show");
+}
+
+function dismissNotif() {
+  document.getElementById("researchNotif").classList.remove("show");
+  local.set(`cb_notif_${getTodayStr()}`, true);
+}
+
+function goToResearch() { dismissNotif(); switchTab("deep"); }
+
+// ════════════════════════════════
+// NAV
+// ════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+  document.getElementById(`${tab}ViewWrap`).classList.add("active");
+  document.getElementById(`tab-${tab}`).classList.add("active");
+  if (tab==="library") renderLibrary();
+  if (tab==="deep") {
+    document.getElementById("researchBadge").style.display = "none";
+    document.getElementById("articleView").style.display = "none";
+    document.getElementById("deepView").style.display = "block";
+    getWeeklyData().then(weekly => updateDeepDiveUI(weekly));
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+// ── Cross-device sync helper ──
+// Show user their sync ID so they can copy it to another device
+function showSyncId() {
+  const id = USER_ID;
+  const box = document.createElement("div");
+  box.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)";
+  box.innerHTML = `
+    <div style="background:white;border-radius:24px;padding:28px 24px;max-width:340px;width:90%;text-align:center">
+      <div style="font-size:36px;margin-bottom:10px">🔗</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:20px;margin-bottom:8px">Sync to another device</div>
+      <div style="font-size:13px;color:#888;font-weight:600;margin-bottom:16px;line-height:1.5">Copy this ID and paste it into the sync field on your other device to share your progress.</div>
+      <div style="background:#f5f0e8;border-radius:10px;padding:12px;font-family:'Space Mono',monospace;font-size:11px;word-break:break-all;margin-bottom:14px;color:#2D2D2D">${id}</div>
+      <button onclick="navigator.clipboard.writeText('${id}').then(()=>showToast('ID copied!'))" style="width:100%;background:#7c3aed;color:white;border:none;border-radius:12px;padding:12px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-bottom:10px">Copy ID</button>
+      <div style="font-size:12px;color:#aaa;font-weight:700;margin-bottom:10px">— or paste an ID from another device —</div>
+      <input id="syncIdInput" placeholder="Paste sync ID here..." style="width:100%;border:2px solid #e8e0d8;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;outline:none;margin-bottom:10px"/>
+      <button onclick="applySyncId()" style="width:100%;background:#2D2D2D;color:white;border:none;border-radius:12px;padding:12px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-bottom:10px">Use this ID</button>
+      <button onclick="this.closest('div[style]').remove()" style="background:none;border:none;color:#aaa;font-size:13px;font-weight:700;cursor:pointer;padding:6px">Close</button>
+    </div>`;
+  document.body.appendChild(box);
+}
+
+function applySyncId() {
+  const input = document.getElementById("syncIdInput")?.value.trim();
+  if (!input || !input.startsWith("user_")) { showToast("Invalid ID — must start with user_"); return; }
+  localStorage.setItem("cb_uid", input);
+  showToast("Sync ID applied! Reloading...");
+  setTimeout(() => location.reload(), 1200);
+}
+
+try { init(); } catch(e) { console.error("Init error:", e); }
+</script>
+</body>
+</html>
