@@ -472,6 +472,49 @@
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
+  /* Topic picker modal */
+  #topicPickerInner { background: #1a1a2e; min-height: 100vh; }
+  #topicPickerHeader {
+    padding: 50px 24px 24px; text-align: center;
+  }
+  #topicPickerTitle {
+    font-family: 'Fredoka One', cursive; font-size: 26px;
+    color: white; margin-bottom: 6px;
+  }
+  #topicPickerSub {
+    font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.5);
+  }
+  #topicPickerGrid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; padding: 8px 20px 24px;
+  }
+  .topic-pill {
+    padding: 14px 12px; border-radius: 14px;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    cursor: pointer; text-align: center;
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+  }
+  .topic-pill.selected {
+    border-color: white; background: rgba(255,255,255,0.15);
+  }
+  .topic-pill-emoji { font-size: 24px; margin-bottom: 6px; }
+  .topic-pill-label {
+    font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.8);
+    line-height: 1.3; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .topic-pill.selected .topic-pill-label { color: white; }
+  #topicPickerConfirm {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: none; border-radius: 14px; color: white;
+    font-family: 'Fredoka One', cursive; font-size: 20px;
+    cursor: pointer; transition: opacity 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #topicPickerConfirm:disabled { opacity: 0.3; cursor: default; }
+  #topicPickerConfirm:not(:disabled):active { opacity: 0.85; }
+
   /* Quiz Me button */
   .quiz-btn {
     width: 100%; margin-top: 12px; padding: 14px;
@@ -593,6 +636,20 @@
         <button class="weekly-quiz-btn" onclick="startWeeklyRoundup()">📅 Weekly Roundup Quiz</button>
       </div>
     </div>
+
+  <!-- TOPIC PICKER MODAL — shown once per day on first open -->
+  <div id="topicPickerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;overflow-y:auto;-webkit-overflow-scrolling:touch">
+    <div id="topicPickerInner">
+      <div id="topicPickerHeader">
+        <div id="topicPickerTitle">🧠 What's on your mind today?</div>
+        <div id="topicPickerSub">Pick 1–5 topics to explore</div>
+      </div>
+      <div id="topicPickerGrid"></div>
+      <div style="padding:0 20px 40px">
+        <button id="topicPickerConfirm" onclick="confirmTopics()" disabled>Let's go →</button>
+      </div>
+    </div>
+  </div>
 
   <!-- QUIZ MODAL -->
   <div id="quizModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch">
@@ -804,53 +861,130 @@ async function dbClearSeen() {
 // DATA
 // ════════════════════════════════
 
+const TOPIC_META = [
+  { id:"psychology",   label:"Psychology & Behaviour",    emoji:"🧠", color:"#8B5CF6" },
+  { id:"philosophy",   label:"Philosophy & Ethics",       emoji:"🦉", color:"#6366F1" },
+  { id:"economics",    label:"Economics & Markets",       emoji:"📈", color:"#34D399" },
+  { id:"history",      label:"History & Civilisation",    emoji:"🏛️", color:"#C084FC" },
+  { id:"neuroscience", label:"Neuroscience & the Brain",  emoji:"🔬", color:"#F472B6" },
+  { id:"physics",      label:"Physics & the Universe",    emoji:"⚛️", color:"#FF6B6B" },
+  { id:"biology",      label:"Biology & Evolution",       emoji:"🧬", color:"#4ECDC4" },
+  { id:"mathematics",  label:"Mathematics & Logic",       emoji:"📐", color:"#FBBF24" },
+  { id:"technology",   label:"Technology & AI",           emoji:"💻", color:"#38BDF8" },
+  { id:"politics",     label:"Political Science & Power", emoji:"⚖️", color:"#FB923C" },
+  { id:"sociology",    label:"Sociology & Culture",       emoji:"🌍", color:"#A3E635" },
+  { id:"literature",   label:"Literature & Storytelling", emoji:"📖", color:"#F9A8D4" },
+  { id:"art",          label:"Art & Aesthetics",          emoji:"🎨", color:"#FCD34D" },
+  { id:"health",       label:"Health & Medicine",         emoji:"❤️", color:"#F87171" },
+  { id:"environment",  label:"Environment & Systems",     emoji:"🌿", color:"#6EE7B7" },
+];
+
 const CONCEPTS = [
-  { topic:"Science", emoji:"⚛️", name:"Quantum Entanglement", teaser:"Two particles that feel each other across the universe" },
-  { topic:"Science", emoji:"🌀", name:"General Relativity", teaser:"Gravity isn't a force — it's bent space" },
-  { topic:"Science", emoji:"🧬", name:"CRISPR Gene Editing", teaser:"Cut-and-paste surgery on your DNA" },
-  { topic:"Science", emoji:"🔋", name:"Gibbs Free Energy", teaser:"The secret formula for whether reactions happen" },
-  { topic:"Science", emoji:"🌡️", name:"The Second Law of Thermodynamics", teaser:"Why the universe is slowly falling apart" },
-  { topic:"Science", emoji:"💡", name:"The Photoelectric Effect", teaser:"Einstein's proof that light comes in packets" },
-  { topic:"Science", emoji:"🧲", name:"Maxwell's Equations", teaser:"Four lines that explain all of electricity and light" },
-  { topic:"Science", emoji:"🕳️", name:"Hawking Radiation", teaser:"How black holes slowly evaporate" },
-  { topic:"Science", emoji:"🔬", name:"The Standard Model of Particle Physics", teaser:"The complete ingredient list of the universe" },
-  { topic:"Science", emoji:"🧪", name:"Le Chatelier's Principle", teaser:"Why systems always push back when you prod them" },
-  { topic:"Science", emoji:"🌊", name:"Schrodinger's Wave Equation", teaser:"The maths that says particles are just probabilities" },
-  { topic:"Science", emoji:"🦠", name:"Epigenetics", teaser:"How your experiences can change what your genes do" },
-  { topic:"History", emoji:"⚙️", name:"The Industrial Revolution's Social Cost", teaser:"Progress that broke people before it helped them" },
-  { topic:"History", emoji:"🏛️", name:"The Fall of the Western Roman Empire", teaser:"A collapse 300 years in the making" },
-  { topic:"History", emoji:"📐", name:"The Congress of Vienna", teaser:"How Europe was redrawn like a board game in 1815" },
-  { topic:"History", emoji:"💀", name:"The Transatlantic Slave Trade's Economic Engine", teaser:"How slavery bankrolled the modern world" },
-  { topic:"History", emoji:"☢️", name:"Mutually Assured Destruction", teaser:"Why having nukes meant nobody used them" },
-  { topic:"History", emoji:"🌍", name:"Postcolonial Theory", teaser:"How empire reshaped the minds of the colonised" },
-  { topic:"History", emoji:"📜", name:"The Reformation's Political Fallout", teaser:"How Luther's 95 theses rewrote European power" },
-  { topic:"History", emoji:"🧭", name:"The Scramble for Africa", teaser:"A continent divided in a single Berlin meeting" },
-  { topic:"History", emoji:"🔴", name:"The Origins of the Cold War", teaser:"How allies became enemies in four years" },
-  { topic:"Economics", emoji:"📉", name:"The Efficient Market Hypothesis", teaser:"Why you probably can't beat the stock market" },
-  { topic:"Economics", emoji:"🤝", name:"The Nash Equilibrium", teaser:"When everyone's rational choice makes everyone worse off" },
-  { topic:"Economics", emoji:"🏦", name:"Fractional Reserve Banking", teaser:"How banks conjure money from thin air" },
-  { topic:"Economics", emoji:"📊", name:"Keynesian vs Monetarist Economics", teaser:"The great argument about what governments should do" },
-  { topic:"Economics", emoji:"🌐", name:"Comparative Advantage", teaser:"Why countries should trade even if one is better at everything" },
-  { topic:"Economics", emoji:"💸", name:"Moral Hazard", teaser:"Why being rescued makes people take more risks" },
-  { topic:"Economics", emoji:"📈", name:"The Laffer Curve", teaser:"The idea that cutting taxes can raise more tax" },
-  { topic:"Economics", emoji:"🔄", name:"Creative Destruction", teaser:"Why progress always kills something first" },
-  { topic:"Economics", emoji:"🧮", name:"Asymmetric Information", teaser:"Why the used car market is a disaster" },
-  { topic:"Music", emoji:"🎼", name:"Serialism & the 12-Tone Technique", teaser:"Schoenberg's radical rejection of all keys" },
-  { topic:"Music", emoji:"🎹", name:"The Circle of Fifths", teaser:"The map that connects every key ever written" },
-  { topic:"Music", emoji:"🎷", name:"The Harmonic Series", teaser:"Why every note is secretly a chord" },
-  { topic:"Music", emoji:"🎻", name:"Counterpoint", teaser:"Bach's art of making melodies argue beautifully" },
-  { topic:"Music", emoji:"🥁", name:"Polyrhythm", teaser:"Two conflicting beats that somehow coexist" },
-  { topic:"Music", emoji:"🎵", name:"The Tritone & Its History", teaser:"The chord the church called the devil's interval" },
-  { topic:"Music", emoji:"🎸", name:"Spectral Music Theory", teaser:"Composing from the physics of sound itself" },
-  { topic:"Music", emoji:"🎺", name:"Modal Harmony", teaser:"The ancient scales hiding inside modern songs" },
-  { topic:"Nature", emoji:"🧬", name:"The Selfish Gene Theory", teaser:"Dawkins' idea that you exist to serve your DNA" },
-  { topic:"Nature", emoji:"🌿", name:"The Krebs Cycle", teaser:"The microscopic engine that runs every living thing" },
-  { topic:"Nature", emoji:"🐚", name:"Punctuated Equilibrium", teaser:"Evolution doesn't crawl — it naps then sprints" },
-  { topic:"Nature", emoji:"🌍", name:"The Gaia Hypothesis", teaser:"Earth as one giant self-regulating organism" },
-  { topic:"Nature", emoji:"🦠", name:"The Microbiome", teaser:"The trillion bacteria inside you that run the show" },
-  { topic:"Nature", emoji:"🌊", name:"Thermohaline Circulation", teaser:"The ocean conveyor belt that controls your climate" },
-  { topic:"Nature", emoji:"🧪", name:"Enzyme Kinetics", teaser:"How your body's tiny machines know when to speed up" },
-  { topic:"Nature", emoji:"🐜", name:"Kin Selection & Altruism", teaser:"Why animals sacrifice themselves for their relatives" },
+  // Psychology & Behaviour
+  { topic:"Psychology & Behaviour", emoji:"🪞", name:"Cognitive Dissonance", teaser:"Why we twist facts to protect our beliefs" },
+  { topic:"Psychology & Behaviour", emoji:"🎭", name:"The Fundamental Attribution Error", teaser:"Why we blame people but excuse ourselves" },
+  { topic:"Psychology & Behaviour", emoji:"🐑", name:"Conformity & the Asch Experiments", teaser:"How strangers convinced people to deny reality" },
+  { topic:"Psychology & Behaviour", emoji:"🔁", name:"Operant Conditioning", teaser:"Skinner's boxes and the mechanics of behaviour" },
+  { topic:"Psychology & Behaviour", emoji:"😰", name:"The Bystander Effect", teaser:"Why crowds watch and no one acts" },
+  { topic:"Psychology & Behaviour", emoji:"🧩", name:"Flow State", teaser:"Csikszentmihalyi's science of peak experience" },
+  // Philosophy & Ethics
+  { topic:"Philosophy & Ethics", emoji:"⚖️", name:"Utilitarianism", teaser:"Is the right act always the one that helps the most people?" },
+  { topic:"Philosophy & Ethics", emoji:"🪬", name:"Kantian Ethics", teaser:"Morality as a universal law, not a calculation" },
+  { topic:"Philosophy & Ethics", emoji:"🌑", name:"The Problem of Evil", teaser:"If God is good, why does suffering exist?" },
+  { topic:"Philosophy & Ethics", emoji:"🪟", name:"Plato's Allegory of the Cave", teaser:"Are you seeing reality or just its shadow?" },
+  { topic:"Philosophy & Ethics", emoji:"♾️", name:"Existentialism", teaser:"Sartre's radical idea that existence precedes essence" },
+  { topic:"Philosophy & Ethics", emoji:"🤔", name:"The Trolley Problem", teaser:"A thought experiment that reveals how you actually think about ethics" },
+  // Economics & Markets
+  { topic:"Economics & Markets", emoji:"📉", name:"The Efficient Market Hypothesis", teaser:"Why you probably can't beat the stock market" },
+  { topic:"Economics & Markets", emoji:"🤝", name:"The Nash Equilibrium", teaser:"When everyone's rational choice makes everyone worse off" },
+  { topic:"Economics & Markets", emoji:"🏦", name:"Fractional Reserve Banking", teaser:"How banks conjure money from thin air" },
+  { topic:"Economics & Markets", emoji:"💸", name:"Moral Hazard", teaser:"Why being rescued makes people take more risks" },
+  { topic:"Economics & Markets", emoji:"🔄", name:"Creative Destruction", teaser:"Why progress always kills something first" },
+  { topic:"Economics & Markets", emoji:"🧮", name:"Asymmetric Information", teaser:"Why the used car market is a disaster" },
+  // History & Civilisation
+  { topic:"History & Civilisation", emoji:"🏛️", name:"The Fall of the Western Roman Empire", teaser:"A collapse 300 years in the making" },
+  { topic:"History & Civilisation", emoji:"💀", name:"The Transatlantic Slave Trade's Economic Engine", teaser:"How slavery bankrolled the modern world" },
+  { topic:"History & Civilisation", emoji:"☢️", name:"Mutually Assured Destruction", teaser:"Why having nukes meant nobody used them" },
+  { topic:"History & Civilisation", emoji:"📜", name:"The Reformation's Political Fallout", teaser:"How Luther's 95 theses rewrote European power" },
+  { topic:"History & Civilisation", emoji:"🔴", name:"The Origins of the Cold War", teaser:"How allies became enemies in four years" },
+  { topic:"History & Civilisation", emoji:"🧭", name:"The Scramble for Africa", teaser:"A continent divided in a single Berlin meeting" },
+  // Neuroscience & the Brain
+  { topic:"Neuroscience & the Brain", emoji:"💤", name:"Memory Consolidation During Sleep", teaser:"Why pulling an all-nighter destroys what you learned" },
+  { topic:"Neuroscience & the Brain", emoji:"⚡", name:"Neuroplasticity", teaser:"Your brain physically rewires itself every time you learn" },
+  { topic:"Neuroscience & the Brain", emoji:"😊", name:"The Dopamine System", teaser:"It's not the pleasure chemical — it's the anticipation chemical" },
+  { topic:"Neuroscience & the Brain", emoji:"😱", name:"The Amygdala & Fear Response", teaser:"How a walnut-sized structure hijacks your entire body" },
+  { topic:"Neuroscience & the Brain", emoji:"🪞", name:"Mirror Neurons", teaser:"The cells that make you wince when someone else gets hurt" },
+  { topic:"Neuroscience & the Brain", emoji:"🧠", name:"The Default Mode Network", teaser:"What your brain does when you think it's doing nothing" },
+  // Physics & the Universe
+  { topic:"Physics & the Universe", emoji:"🌀", name:"General Relativity", teaser:"Gravity isn't a force — it's bent space" },
+  { topic:"Physics & the Universe", emoji:"🔋", name:"Gibbs Free Energy", teaser:"The secret formula for whether reactions happen" },
+  { topic:"Physics & the Universe", emoji:"🌡️", name:"The Second Law of Thermodynamics", teaser:"Why the universe is slowly falling apart" },
+  { topic:"Physics & the Universe", emoji:"🕳️", name:"Hawking Radiation", teaser:"How black holes slowly evaporate" },
+  { topic:"Physics & the Universe", emoji:"🌊", name:"Schrödinger's Wave Equation", teaser:"The maths that says particles are just probabilities" },
+  { topic:"Physics & the Universe", emoji:"💡", name:"The Photoelectric Effect", teaser:"Einstein's proof that light comes in packets" },
+  // Biology & Evolution
+  { topic:"Biology & Evolution", emoji:"🧬", name:"The Selfish Gene Theory", teaser:"Dawkins' idea that you exist to serve your DNA" },
+  { topic:"Biology & Evolution", emoji:"🐚", name:"Punctuated Equilibrium", teaser:"Evolution doesn't crawl — it naps then sprints" },
+  { topic:"Biology & Evolution", emoji:"🦠", name:"The Microbiome", teaser:"The trillion bacteria inside you that run the show" },
+  { topic:"Biology & Evolution", emoji:"🧪", name:"CRISPR Gene Editing", teaser:"Cut-and-paste surgery on your DNA" },
+  { topic:"Biology & Evolution", emoji:"🐜", name:"Kin Selection & Altruism", teaser:"Why animals sacrifice themselves for their relatives" },
+  { topic:"Biology & Evolution", emoji:"🌿", name:"Epigenetics", teaser:"How your experiences can change what your genes do" },
+  // Mathematics & Logic
+  { topic:"Mathematics & Logic", emoji:"∞", name:"Gödel's Incompleteness Theorems", teaser:"Some truths can never be proven — even in maths" },
+  { topic:"Mathematics & Logic", emoji:"🎲", name:"Bayes' Theorem", teaser:"How to update your beliefs when evidence arrives" },
+  { topic:"Mathematics & Logic", emoji:"🌀", name:"Chaos Theory", teaser:"Why tiny differences create wildly different outcomes" },
+  { topic:"Mathematics & Logic", emoji:"📐", name:"Euclid's Elements", teaser:"The book that defined logical proof for 2,000 years" },
+  { topic:"Mathematics & Logic", emoji:"🔢", name:"Prime Numbers & the Riemann Hypothesis", teaser:"The deepest unsolved problem in mathematics" },
+  { topic:"Mathematics & Logic", emoji:"🧮", name:"Game Theory", teaser:"The mathematics of strategic decision-making" },
+  // Technology & AI
+  { topic:"Technology & AI", emoji:"🤖", name:"How Large Language Models Work", teaser:"Prediction machines pretending to understand" },
+  { topic:"Technology & AI", emoji:"🔐", name:"Public Key Cryptography", teaser:"The maths keeping every secret on the internet" },
+  { topic:"Technology & AI", emoji:"🕸️", name:"How the Internet Actually Works", teaser:"Packets, protocols, and the physical cables under oceans" },
+  { topic:"Technology & AI", emoji:"⚖️", name:"Algorithmic Bias", teaser:"When the machine inherits human prejudice" },
+  { topic:"Technology & AI", emoji:"🧠", name:"Reinforcement Learning", teaser:"How AI learned to beat humans at every game" },
+  { topic:"Technology & AI", emoji:"💾", name:"Moore's Law & Its Limits", teaser:"The prediction that built the modern world — and its end" },
+  // Political Science & Power
+  { topic:"Political Science & Power", emoji:"👑", name:"The Social Contract", teaser:"Hobbes, Locke, Rousseau — why we gave up freedom for order" },
+  { topic:"Political Science & Power", emoji:"🏛️", name:"Separation of Powers", teaser:"Montesquieu's idea that still shapes every democracy" },
+  { topic:"Political Science & Power", emoji:"📢", name:"Propaganda & Manufactured Consent", teaser:"Chomsky's theory of how media shapes what you think" },
+  { topic:"Political Science & Power", emoji:"🗳️", name:"Voting Systems & Their Flaws", teaser:"Why democracy is harder to design than you think" },
+  { topic:"Political Science & Power", emoji:"🌐", name:"Realism vs Liberalism in International Relations", teaser:"Two theories of why nations do what they do" },
+  { topic:"Political Science & Power", emoji:"⚡", name:"Revolution Theory", teaser:"What actually causes societies to overturn themselves" },
+  // Sociology & Culture
+  { topic:"Sociology & Culture", emoji:"🪞", name:"The Looking-Glass Self", teaser:"You are who you think others think you are" },
+  { topic:"Sociology & Culture", emoji:"🏙️", name:"Urbanisation & Social Atomisation", teaser:"Why cities make us lonely even in crowds" },
+  { topic:"Sociology & Culture", emoji:"🎭", name:"Goffman's Dramaturgical Theory", teaser:"Life as performance — we're all acting all the time" },
+  { topic:"Sociology & Culture", emoji:"💰", name:"Bourdieu's Cultural Capital", teaser:"The invisible currency that controls social mobility" },
+  { topic:"Sociology & Culture", emoji:"🌍", name:"Postcolonial Theory", teaser:"How empire reshaped the minds of the colonised" },
+  { topic:"Sociology & Culture", emoji:"🔗", name:"Social Network Theory", teaser:"Why weak ties get you jobs and strong ties don't" },
+  // Literature & Storytelling
+  { topic:"Literature & Storytelling", emoji:"🏔️", name:"The Hero's Journey", teaser:"Campbell's template hidden in every story ever told" },
+  { topic:"Literature & Storytelling", emoji:"🎭", name:"Tragic Structure & Hamartia", teaser:"The fatal flaw that makes great characters fall" },
+  { topic:"Literature & Storytelling", emoji:"🔮", name:"Magical Realism", teaser:"García Márquez's world where the impossible is mundane" },
+  { topic:"Literature & Storytelling", emoji:"📖", name:"Unreliable Narration", teaser:"When you can't trust the person telling the story" },
+  { topic:"Literature & Storytelling", emoji:"🖤", name:"Gothic Literature & the Sublime", teaser:"Terror, beauty, and the landscapes of dread" },
+  { topic:"Literature & Storytelling", emoji:"✍️", name:"Show Don't Tell", teaser:"The craft principle that separates good writing from bad" },
+  // Art & Aesthetics
+  { topic:"Art & Aesthetics", emoji:"🎨", name:"The Sublime vs The Beautiful", teaser:"Burke and Kant's ideas on why art overwhelms us" },
+  { topic:"Art & Aesthetics", emoji:"🖼️", name:"Modernism & the Rejection of Tradition", teaser:"Why early 20th century art deliberately broke everything" },
+  { topic:"Art & Aesthetics", emoji:"📸", name:"How Photography Changed Painting", teaser:"The technology that forced artists to stop being realistic" },
+  { topic:"Art & Aesthetics", emoji:"🏛️", name:"The Golden Ratio in Art & Architecture", teaser:"The proportion that humans find mysteriously beautiful" },
+  { topic:"Art & Aesthetics", emoji:"🎭", name:"Symbolism & Semiotics", teaser:"How meaning lives in images, not just words" },
+  { topic:"Art & Aesthetics", emoji:"🎬", name:"Auteur Theory in Film", teaser:"Why some directors stamp every frame with their identity" },
+  // Health & Medicine
+  { topic:"Health & Medicine", emoji:"❤️", name:"The Inflammation Theory of Disease", teaser:"How the immune system secretly causes most chronic illness" },
+  { topic:"Health & Medicine", emoji:"💤", name:"Sleep Architecture", teaser:"What actually happens in your body during each sleep stage" },
+  { topic:"Health & Medicine", emoji:"🧬", name:"The Gut-Brain Axis", teaser:"How your stomach talks to your mind — and wins" },
+  { topic:"Health & Medicine", emoji:"⚖️", name:"Placebo & Nocebo Effects", teaser:"Belief can heal — and belief can kill" },
+  { topic:"Health & Medicine", emoji:"🏃", name:"The Science of VO2 Max", teaser:"The single best predictor of how long you'll live" },
+  { topic:"Health & Medicine", emoji:"🧪", name:"mRNA Vaccine Technology", teaser:"The platform that changed immunology forever" },
+  // Environment & Systems
+  { topic:"Environment & Systems", emoji:"🌊", name:"Thermohaline Circulation", teaser:"The ocean conveyor belt that controls your climate" },
+  { topic:"Environment & Systems", emoji:"🌍", name:"The Gaia Hypothesis", teaser:"Earth as one giant self-regulating organism" },
+  { topic:"Environment & Systems", emoji:"🔄", name:"Feedback Loops & Tipping Points", teaser:"Why climate change could accelerate beyond our control" },
+  { topic:"Environment & Systems", emoji:"🐝", name:"Biodiversity & Ecosystem Collapse", teaser:"What happens when you pull one thread from nature's web" },
+  { topic:"Environment & Systems", emoji:"⚡", name:"The Energy Transition", teaser:"The economics and physics of moving off fossil fuels" },
+  { topic:"Environment & Systems", emoji:"🌱", name:"Tragedy of the Commons", teaser:"Why shared resources always get destroyed without rules" },
 ];
 
 const FUN_FACTS = [
@@ -876,7 +1010,7 @@ const FUN_FACTS = [
   { emoji:"🔭", fact:"When you look at the Andromeda Galaxy with the naked eye, you're seeing light that left it 2.5 million years ago — before humans existed.", memory:"Andromeda light is pre-human." },
 ];
 
-const TOPIC_COLORS = { Science:"#FF6B6B", History:"#C084FC", Economics:"#34D399", Music:"#FB923C", Nature:"#4ECDC4" };
+const TOPIC_COLORS = Object.fromEntries(TOPIC_META.map(t => [t.label, t.color]));
 const CARD_COLORS = ["#FF6B6B","#4ECDC4","#FFE66D"];
 
 // ════════════════════════════════
@@ -909,12 +1043,13 @@ async function markConceptSeen(name) {
   } catch(e) {}
 }
 
-async function getUnseenConcepts() {
+async function getUnseenConcepts(pool) {
   try {
+    const p = pool || CONCEPTS;
     const seen = await getSeenConcepts();
-    const u = CONCEPTS.filter(c => !seen.includes(c.name));
-    return u.length >= 3 ? u : CONCEPTS;
-  } catch(e) { return CONCEPTS; }
+    const u = p.filter(c => !seen.includes(c.name));
+    return u.length >= 3 ? u : p;
+  } catch(e) { return pool || CONCEPTS; }
 }
 
 // ── Streak ──
@@ -1033,6 +1168,8 @@ async function init() {
   await renderCards();
   await checkWeeklyLogic();
   checkWeeklyRoundup();
+  // Show topic picker if first open today
+  if (shouldShowTopicPicker()) showTopicPicker();
 }
 
 async function checkWeeklyLogic() {
@@ -1071,22 +1208,29 @@ async function checkWeeklyLogic() {
 function pickRandom(arr, n) { return [...arr].sort(() => Math.random()-0.5).slice(0, n); }
 
 async function renderCards() {
-  const pool = await getUnseenConcepts(), picked = pickRandom(pool, 3);
+  const todayTopics = getTodayTopics();
+  const filteredConcepts = todayTopics
+    ? CONCEPTS.filter(c => todayTopics.includes(c.topic))
+    : CONCEPTS;
+
+  const pool = await getUnseenConcepts(filteredConcepts), picked = pickRandom(pool, 3);
   const container = document.getElementById("cardsContainer");
   container.innerHTML = "";
   selectedCard = null;
   document.getElementById("learnBtn").disabled = true;
 
   const seen = await getSeenConcepts();
-  const unseenCount = CONCEPTS.filter(c => !seen.includes(c.name)).length;
-  const total = CONCEPTS.length;
+  const unseenCount = filteredConcepts.filter(c => !seen.includes(c.name)).length;
+  const total = filteredConcepts.length;
   document.getElementById("unseenLabel").textContent =
-    unseenCount === total ? "Pick one to learn about 👇" : `${unseenCount} of ${total} concepts still to discover 👇`;
+    todayTopics
+      ? `${todayTopics.length} topic${todayTopics.length > 1 ? 's' : ''} selected · ${unseenCount} concepts to discover 👇`
+      : unseenCount === total ? "Pick one to learn about 👇" : `${unseenCount} of ${total} concepts still to discover 👇`;
 
   picked.forEach((concept, i) => {
     const div = document.createElement("div");
     div.className = "concept-card";
-    div.style.background = CARD_COLORS[i];
+    div.style.background = TOPIC_COLORS[concept.topic] || CARD_COLORS[i];
     div.innerHTML = `<span class="card-emoji">${concept.emoji}</span><div class="card-topic">${concept.topic}</div><div class="card-concept">${concept.name}</div><div class="card-teaser">${concept.teaser}</div><span class="card-arrow">→</span>`;
     div.onclick = () => selectCard(div, concept, false);
     container.appendChild(div);
@@ -1450,7 +1594,64 @@ function applySyncId() {
 }
 
 // ════════════════════════════════
-// QUIZ SYSTEM
+// TOPIC PICKER
+// Shows once per day on first open.
+// Stores selected topics in localStorage under cb_topics.
+// renderCards filters CONCEPTS to selected topics only.
+// ════════════════════════════════
+let selectedTopics = [];
+
+function shouldShowTopicPicker() {
+  const stored = local.get('cb_topics', null);
+  if (!stored) return true;
+  return stored.date !== getTodayStr();
+}
+
+function showTopicPicker() {
+  selectedTopics = [];
+  const grid = document.getElementById('topicPickerGrid');
+  grid.innerHTML = '';
+  TOPIC_META.forEach(t => {
+    const pill = document.createElement('div');
+    pill.className = 'topic-pill';
+    pill.dataset.id = t.id;
+    pill.innerHTML = `<div class="topic-pill-emoji">${t.emoji}</div><div class="topic-pill-label">${t.label}</div>`;
+    pill.onclick = () => toggleTopicPill(pill, t);
+    grid.appendChild(pill);
+  });
+  document.getElementById('topicPickerModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function toggleTopicPill(pill, topic) {
+  const idx = selectedTopics.findIndex(t => t.id === topic.id);
+  if (idx > -1) {
+    selectedTopics.splice(idx, 1);
+    pill.classList.remove('selected');
+  } else if (selectedTopics.length < 5) {
+    selectedTopics.push(topic);
+    pill.classList.add('selected');
+  }
+  const btn = document.getElementById('topicPickerConfirm');
+  btn.disabled = selectedTopics.length === 0;
+  btn.textContent = selectedTopics.length > 0
+    ? `Explore ${selectedTopics.length} topic${selectedTopics.length > 1 ? 's' : ''} →`
+    : 'Pick at least one →';
+}
+
+function confirmTopics() {
+  if (selectedTopics.length === 0) return;
+  local.set('cb_topics', { date: getTodayStr(), topics: selectedTopics.map(t => t.label) });
+  document.getElementById('topicPickerModal').style.display = 'none';
+  document.body.style.overflow = '';
+  renderCards();
+}
+
+function getTodayTopics() {
+  const stored = local.get('cb_topics', null);
+  if (stored && stored.date === getTodayStr()) return stored.topics;
+  return null;
+}
 // Daily: 5 questions on current lesson
 // Weekly: 20 questions across week's lessons (Sundays)
 // ════════════════════════════════
