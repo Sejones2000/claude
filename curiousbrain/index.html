@@ -471,7 +471,104 @@
     transition: transform 0.3s ease; z-index: 999; white-space: nowrap;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
-</style>
+
+  /* Quiz Me button */
+  .quiz-btn {
+    width: 100%; margin-top: 12px; padding: 14px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: none; border-radius: 14px; color: white;
+    font-family: 'Fredoka One', cursive; font-size: 18px;
+    letter-spacing: 1px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .quiz-btn:active { opacity: 0.85; }
+
+  /* Weekly roundup button */
+  .weekly-quiz-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    border: none; border-radius: 14px; color: white;
+    font-family: 'Fredoka One', cursive; font-size: 17px;
+    letter-spacing: 1px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .weekly-quiz-btn:active { opacity: 0.85; }
+
+  /* Quiz modal */
+  #quizInner {
+    background: white; min-height: 100vh;
+    padding: 0 0 40px 0;
+  }
+  #quizHeader {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    padding: 50px 24px 24px; color: white;
+  }
+  #quizTitle {
+    font-family: 'Fredoka One', cursive; font-size: 24px; margin-bottom: 4px;
+  }
+  #quizProgress {
+    font-size: 13px; font-weight: 700; opacity: 0.8;
+  }
+  #quizBody { padding: 24px; }
+
+  .quiz-question {
+    font-family: 'Fredoka One', cursive; font-size: 18px;
+    color: #2D2D2D; margin-bottom: 20px; line-height: 1.4;
+  }
+  .quiz-option {
+    width: 100%; margin-bottom: 12px; padding: 14px 16px;
+    background: #f5f0e8; border: 2px solid #e8e0d8;
+    border-radius: 12px; text-align: left;
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+    color: #2D2D2D; cursor: pointer; transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .quiz-option:active { background: #ede9fe; border-color: #7c3aed; }
+  .quiz-option.correct { background: #d1fae5; border-color: #10b981; color: #065f46; }
+  .quiz-option.wrong   { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+  .quiz-option.reveal  { background: #d1fae5; border-color: #10b981; color: #065f46; }
+  .quiz-option:disabled { cursor: default; }
+
+  .quiz-explanation {
+    background: #ede9fe; border-radius: 12px; padding: 14px 16px;
+    font-size: 13px; font-weight: 700; color: #5b21b6;
+    margin-bottom: 20px; line-height: 1.5;
+  }
+  .quiz-next-btn {
+    width: 100%; padding: 14px;
+    background: #2D2D2D; border: none; border-radius: 12px;
+    color: white; font-family: 'Fredoka One', cursive; font-size: 18px;
+    cursor: pointer; margin-top: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .quiz-score {
+    text-align: center; padding: 20px 0 30px;
+  }
+  .quiz-score-num {
+    font-family: 'Fredoka One', cursive; font-size: 64px; color: #7c3aed;
+  }
+  .quiz-score-label {
+    font-size: 16px; font-weight: 700; color: #888; margin-bottom: 20px;
+  }
+  .quiz-perfect {
+    font-size: 40px; margin-bottom: 8px; animation: pop 0.4s ease;
+  }
+  .quiz-close-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: none; border-radius: 12px; color: white;
+    font-family: 'Fredoka One', cursive; font-size: 18px;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  @keyframes pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .quiz-loading {
+    text-align: center; padding: 60px 20px;
+    font-family: 'Fredoka One', cursive; font-size: 20px; color: #7c3aed;
+  }</style>
 </head>
 <body>
 
@@ -492,7 +589,21 @@
       <div class="section-sub" id="unseenLabel">Pick one to learn about 👇</div>
       <div class="cards-container" id="cardsContainer"></div>
       <button class="learn-btn" id="learnBtn" onclick="fetchLesson()" disabled>✨ Teach me!</button>
+      <div id="weeklyRoundupWrap" style="display:none;margin-top:16px">
+        <button class="weekly-quiz-btn" onclick="startWeeklyRoundup()">📅 Weekly Roundup Quiz</button>
+      </div>
     </div>
+
+  <!-- QUIZ MODAL -->
+  <div id="quizModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch">
+    <div id="quizInner">
+      <div id="quizHeader">
+        <div id="quizTitle">Quiz Time 🧩</div>
+        <div id="quizProgress">Question 1 of 5</div>
+      </div>
+      <div id="quizBody"></div>
+    </div>
+  </div>
 
     <div id="lessonView" class="lesson-view">
       <div class="lesson-header" id="lessonHeader">
@@ -503,6 +614,7 @@
       </div>
       <div class="lesson-body" id="lessonBody"></div>
       <button class="save-btn" id="saveBtn" onclick="saveConcept()">⭐ Save to My Library</button>
+      <button class="quiz-btn" id="quizBtn" onclick="startQuiz()" style="display:none">🧩 Quiz Me</button>
     </div>
   </div>
 </div>
@@ -920,6 +1032,7 @@ async function init() {
   // Render cards (needs seen concepts from Supabase)
   await renderCards();
   await checkWeeklyLogic();
+  checkWeeklyRoundup();
 }
 
 async function checkWeeklyLogic() {
@@ -1079,6 +1192,7 @@ Under 250 words. Write for a smart, curious adult — intellectually rigorous bu
     currentLesson = text;
     body.textContent = text;
     document.getElementById("saveBtn").disabled = false;
+    showQuizBtn();
     syncToMomentum();
 
     const lib = await getLibrary();
@@ -1104,6 +1218,8 @@ function getCurrentCardIndex() {
 function goBack() {
   document.getElementById("lessonView").style.display = "none";
   document.getElementById("homeView").style.display = "block";
+  const qBtn = document.getElementById('quizBtn');
+  if (qBtn) qBtn.style.display = 'none';
 }
 
 async function saveConcept() {
@@ -1331,6 +1447,181 @@ function applySyncId() {
   localStorage.setItem("cb_uid", input);
   showToast("Sync ID applied! Reloading...");
   setTimeout(() => location.reload(), 1200);
+}
+
+// ════════════════════════════════
+// QUIZ SYSTEM
+// Daily: 5 questions on current lesson
+// Weekly: 20 questions across week's lessons (Sundays)
+// ════════════════════════════════
+let quizQuestions = [];
+let quizIndex     = 0;
+let quizScore     = 0;
+let quizTotal     = 5;
+
+// Show Quiz Me button after lesson loads
+function showQuizBtn() {
+  const btn = document.getElementById('quizBtn');
+  if (btn) btn.style.display = 'block';
+}
+
+// Show Weekly Roundup button on Sundays
+function checkWeeklyRoundup() {
+  const day = new Date().getDay(); // 0 = Sunday
+  const wrap = document.getElementById('weeklyRoundupWrap');
+  if (wrap) wrap.style.display = day === 0 ? 'block' : 'none';
+}
+
+// Generate quiz questions via proxy
+async function generateQuiz(context, count) {
+  const prompt = `You are a quiz master. Based on the following educational content, generate exactly ${count} multiple choice questions to test comprehension.
+
+Content:
+${context}
+
+Return ONLY valid JSON in this exact format, no markdown:
+{"questions":[{"q":"Question text?","options":["A) option","B) option","C) option","D) option"],"answer":"A","explanation":"Why A is correct in 1-2 sentences."}]}
+
+Rules:
+- All 4 options must be plausible
+- Answer must be one of: A, B, C, D
+- Explanations must be concise and educational
+- Questions must test genuine understanding, not just recall`;
+
+  const resp = await fetch(ANTHROPIC_PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: count === 5 ? 1500 : 5000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await resp.json();
+  const raw  = data.content?.[0]?.text?.trim().replace(/^```json\s*/i,'').replace(/```\s*$/i,'').trim();
+  const parsed = JSON.parse(raw);
+  return parsed.questions;
+}
+
+// Start daily quiz (5 questions on current lesson)
+async function startQuiz() {
+  if (!currentLesson) return;
+  const title = isFact ? currentFact?.memory : currentConcept?.name;
+  openQuizModal(`Quiz: ${title}`, 5);
+  try {
+    const context = `Topic: ${title}\n\n${currentLesson}`;
+    quizQuestions = await generateQuiz(context, 5);
+    quizTotal = quizQuestions.length;
+    renderQuizQuestion();
+  } catch(e) {
+    document.getElementById('quizBody').innerHTML = `<div class="quiz-loading">❌ Couldn't generate quiz. Try again!</div>`;
+    console.error(e);
+  }
+}
+
+// Start weekly roundup (20 questions across week's lessons)
+async function startWeeklyRoundup() {
+  openQuizModal('Weekly Roundup 📅', 20);
+  try {
+    const lib = await getLibrary();
+    // Get items saved in the last 7 days
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+    const recent = lib.slice(0, 10); // Use up to 10 most recent
+    if (recent.length === 0) {
+      document.getElementById('quizBody').innerHTML = `<div class="quiz-loading">📚 Read some lessons first, then come back on Sunday!</div>`;
+      return;
+    }
+    const context = recent.map(item => `${item.name} (${item.topic}):\n${item.lesson || 'No lesson content saved.'}`).join('\n\n---\n\n');
+    quizQuestions = await generateQuiz(context, 20);
+    quizTotal = quizQuestions.length;
+    renderQuizQuestion();
+  } catch(e) {
+    document.getElementById('quizBody').innerHTML = `<div class="quiz-loading">❌ Couldn't generate quiz. Try again!</div>`;
+    console.error(e);
+  }
+}
+
+function openQuizModal(title, total) {
+  quizQuestions = [];
+  quizIndex     = 0;
+  quizScore     = 0;
+  quizTotal     = total;
+  document.getElementById('quizTitle').textContent    = title;
+  document.getElementById('quizProgress').textContent = `Generating ${total} questions...`;
+  document.getElementById('quizBody').innerHTML       = `<div class="quiz-loading">🧠 Crafting your quiz...</div>`;
+  document.getElementById('quizModal').style.display  = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQuizModal() {
+  document.getElementById('quizModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function renderQuizQuestion() {
+  if (quizIndex >= quizQuestions.length) { renderQuizScore(); return; }
+  const q = quizQuestions[quizIndex];
+  document.getElementById('quizProgress').textContent = `Question ${quizIndex + 1} of ${quizTotal}`;
+  document.getElementById('quizBody').innerHTML = `
+    <div class="quiz-question">${q.q}</div>
+    ${q.options.map((opt, i) => `
+      <button class="quiz-option" onclick="answerQuiz(${i}, '${['A','B','C','D'][i]}')">${opt}</button>
+    `).join('')}
+  `;
+}
+
+function answerQuiz(idx, letter) {
+  const q       = quizQuestions[quizIndex];
+  const correct = q.answer;
+  const buttons = document.querySelectorAll('.quiz-option');
+  const letters = ['A','B','C','D'];
+
+  // Disable all buttons
+  buttons.forEach(b => b.disabled = true);
+
+  // Reveal correct/wrong
+  buttons.forEach((b, i) => {
+    if (letters[i] === correct) b.classList.add('correct');
+    else if (i === idx)         b.classList.add('wrong');
+  });
+
+  if (letter === correct) quizScore++;
+
+  // Show explanation + next button
+  const body = document.getElementById('quizBody');
+  const exp  = document.createElement('div');
+  exp.className = 'quiz-explanation';
+  exp.textContent = '💡 ' + q.explanation;
+  body.appendChild(exp);
+
+  const next = document.createElement('button');
+  next.className   = 'quiz-next-btn';
+  next.textContent = quizIndex + 1 < quizQuestions.length ? 'Next Question →' : 'See Results 🎉';
+  next.onclick = () => { quizIndex++; renderQuizQuestion(); };
+  body.appendChild(next);
+}
+
+function renderQuizScore() {
+  const perfect  = quizScore === quizTotal;
+  const pct      = Math.round((quizScore / quizTotal) * 100);
+  document.getElementById('quizProgress').textContent = 'Complete!';
+  document.getElementById('quizBody').innerHTML = `
+    <div class="quiz-score">
+      ${perfect ? '<div class="quiz-perfect">🏆</div>' : ''}
+      <div class="quiz-score-num">${quizScore}/${quizTotal}</div>
+      <div class="quiz-score-label">${pct}% · ${perfect ? 'Perfect score! Streak bonus 🔥' : pct >= 60 ? 'Well done!' : 'Keep learning!'}</div>
+      ${perfect ? '<div style="font-size:13px;color:#7c3aed;font-weight:700;margin-bottom:20px">+1 bonus streak day earned 🎉</div>' : ''}
+      <button class="quiz-close-btn" onclick="closeQuizModal()">Done ✓</button>
+    </div>
+  `;
+  // Bonus streak on perfect score
+  if (perfect) {
+    const s = local.get('cb_streak', {count:1, last:''});
+    s.count++; s.last = getTodayStr();
+    local.set('cb_streak', s);
+    document.getElementById('streakCount').textContent = s.count;
+    syncToMomentum();
+  }
 }
 
 try { init(); } catch(e) { console.error("Init error:", e); }
