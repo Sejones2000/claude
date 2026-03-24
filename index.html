@@ -1,2024 +1,1112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- ============================================================
-    SECTION 1: HEAD / META / PWA CONFIG
-    Controls: App title, mobile display, iOS home screen icon,
-    theme colour, font imports, PWA manifest (inline)
-  ============================================================ -->
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="MOMENTUM" />
-  <meta name="theme-color" content="#0A0A0C" />
-  <title>MOMENTUM</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ANCHOR</title>
+<link rel="manifest" id="manifest-placeholder">
+<meta name="theme-color" content="#1A1A1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F7F4EF;
+    --paper-dark: #EDE9E1;
+    --ink: #1A1A18;
+    --ink-light: #5A5750;
+    --ink-faint: #A8A49C;
+    --accent: #2C4A3E;
+    --accent-warm: #8B4513;
+    --rule: #D8D3CA;
+    --section-brain: #2C4A3E;
+    --section-emotion: #5C3D5C;
+    --section-purpose: #2C4A3E;
+    --section-gratitude: #8B4513;
+    --section-creative: #1A3A4A;
+    --section-close: #1A1A18;
+  }
 
-  <!-- PWA Manifest (inline via JS blob — no server needed for iOS) -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230A0A0C'/%3E%3Ctext y='.9em' font-size='80' x='10'%3E%E2%97%88%3C/text%3E%3C/svg%3E" />
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  body {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+  }
 
-  <!-- ============================================================
-    SECTION 2: GLOBAL CSS VARIABLES & RESET
-    Controls: colour palette, font stack, spacing tokens
-    If colours look wrong, check --gold, --blue, --green, --red
-  ============================================================ -->
-  <style>
-    :root {
-      --bg:        #0A0A0C;
-      --surface:   #0E0E11;
-      --border:    #1A1A1E;
-      --border2:   #2A2A2E;
-      --text:      #E8E4DC;
-      --muted:     #555;
-      --dim:       #333;
-      --gold:      #E8C547;
-      --blue:      #4FA3E8;
-      --green:     #6BE0A0;
-      --red:       #E85447;
-      --orange:    #E87A4F;
-      --font-mono: 'DM Mono', 'Courier New', monospace;
-      --font-disp: 'Syne', sans-serif;
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --nav-h: 64px;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      height: 100%; background: var(--bg); color: var(--text);
-      font-family: var(--font-mono); font-size: 14px;
-      -webkit-font-smoothing: antialiased;
-      overflow: hidden; /* keeps body from double-scrolling on mobile */
-    }
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
 
-    /* ============================================================
-      SECTION 3: SCROLLBAR & UTILITY CLASSES
-      Controls: scrollbar appearance, fade-in animation,
-      transition helpers
-    ============================================================ */
-    ::-webkit-scrollbar { width: 3px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  /* ── HOME SCREEN ── */
+  #home {
+    padding: 0;
+    background: var(--paper);
+  }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pop {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(1.15); }
-      100% { transform: scale(1); }
-    }
-    .fade-up { animation: fadeUp 0.35s ease forwards; }
-    .pop     { animation: pop 0.25s ease; }
+  .home-top {
+    padding: 60px 32px 32px;
+    border-bottom: 1px solid var(--rule);
+  }
 
-    /* ============================================================
-      SECTION 4: APP SHELL LAYOUT
-      Controls: main container, scrollable content area,
-      bottom nav spacing, iOS safe area handling.
-      IMPORTANT: min-height:0 on both #app and #content is
-      required for flexbox scroll to work — without it, flex
-      children won't shrink and #content can't get a bounded
-      height to scroll within. Do not remove these.
-    ============================================================ */
-    #app {
-      display: flex; flex-direction: column;
-      height: 100vh; height: -webkit-fill-available;
-      min-height: 0;           /* KEY: allows flex children to shrink */
-      overflow: hidden; position: relative;
-    }
-    #header {
-      flex-shrink: 0;
-      padding: 52px 20px 14px;   /* top pad covers iOS status bar */
-      background: rgba(10,10,12,0.96);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-      z-index: 50;
-    }
-    #content {
-      flex: 1 1 0;             /* KEY: 1 1 0 not 1 alone — sets flex-basis to 0 */
-      min-height: 0;           /* KEY: without this, content expands past viewport */
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 20px 16px;
-      padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 32px);
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior-y: contain;
-    }
-    #bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      height: calc(var(--nav-h) + var(--safe-bottom));
-      padding-bottom: var(--safe-bottom);
-      background: rgba(10,10,12,0.97);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border);
-      display: flex; align-items: stretch;
-      z-index: 100;
-    }
+  .home-wordmark {
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
 
-    /* ============================================================
-      SECTION 5: BOTTOM NAVIGATION TABS
-      Controls: nav tab labels, active indicator dot,
-      tab icons. Edit labels here if needed.
-    ============================================================ */
-    .nav-tab {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 4px; cursor: pointer;
-      color: var(--muted); transition: color 0.2s;
-      padding-top: 4px;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    .nav-tab.active { color: var(--gold); }
-    .nav-tab .nav-icon { font-size: 18px; line-height: 1; }
-    .nav-tab .nav-label { font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; }
-    .nav-tab .nav-dot {
-      width: 4px; height: 4px; border-radius: 50%;
-      background: var(--gold); opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .nav-tab.active .nav-dot { opacity: 1; }
+  .home-date {
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    color: var(--ink-light);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
 
-    /* ============================================================
-      SECTION 6: HEADER ELEMENTS
-      Controls: app title, streak badge, week score display
-    ============================================================ */
-    #header-top {
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    #app-title {
-      font-family: var(--font-disp); font-size: 18px;
-      font-weight: 800; letter-spacing: -0.5px;
-    }
-    #app-title span { color: var(--gold); }
-    #header-stats { display: flex; gap: 20px; align-items: center; }
-    .stat-chip {
-      text-align: center;
-    }
-    .stat-chip .val {
-      font-family: var(--font-disp); font-size: 18px;
-      font-weight: 800; line-height: 1;
-    }
-    .stat-chip .lbl {
-      font-size: 7px; letter-spacing: 2px;
-      color: var(--muted); text-transform: uppercase; margin-top: 2px;
-    }
-    #date-bar {
-      margin-top: 10px;
-      font-size: 10px; color: var(--muted); letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
+  .home-greeting {
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
 
-    /* ============================================================
-      SECTION 7: DAY SELECTOR (TODAY / WEEK STRIP)
-      Controls: the horizontal row of 7 day buttons at top of
-      Today view. Edit day abbreviations in JS SECTION 14.
-    ============================================================ */
-    #day-strip {
-      display: flex; gap: 6px; margin-bottom: 22px; overflow-x: auto;
-      scrollbar-width: none; -ms-overflow-style: none;
-    }
-    #day-strip::-webkit-scrollbar { display: none; }
-    .day-btn {
-      flex: 1; min-width: 40px; padding: 10px 4px;
-      border-radius: 8px; border: 1px solid var(--border);
-      background: var(--surface); text-align: center;
-      cursor: pointer; transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .day-btn.selected {
-      border-color: var(--gold);
-      background: rgba(232,197,71,0.07);
-    }
-    .day-btn.today-btn { border-color: var(--border2); }
-    .day-btn .d-name { font-size: 7px; letter-spacing: 1.5px; color: var(--muted); }
-    .day-btn.selected .d-name { color: var(--gold); }
-    .day-btn .d-num {
-      font-family: var(--font-disp); font-size: 15px;
-      font-weight: 700; color: var(--muted); margin-top: 4px;
-    }
-    .day-btn.selected .d-num,
-    .day-btn.today-btn .d-num { color: var(--text); }
-    .day-btn.selected .d-num { color: var(--gold); }
-    .day-dots { display: flex; justify-content: center; gap: 2px; margin-top: 5px; min-height: 5px; }
-    .day-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
+  .home-greeting em {
+    font-style: italic;
+    color: var(--accent);
+  }
 
-    /* ============================================================
-      SECTION 8: HABIT CARDS
-      Controls: card background, border, check-box, progress bar,
-      expanded tip panel. Each habit card is one .habit-card div.
-    ============================================================ */
-    .cat-label {
-      display: flex; align-items: center; gap: 8px;
-      margin-bottom: 8px; margin-top: 18px;
-    }
-    .cat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .cat-name { font-size: 8px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+  .streak-bar {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
 
-    .habit-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px; margin-bottom: 6px;
-      overflow: hidden; transition: border-color 0.2s;
-    }
-    .habit-card.done { border-color: rgba(232,197,71,0.25); }
-    .habit-row {
-      display: flex; align-items: center; gap: 12px; padding: 13px 12px;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-    }
-    .check-box {
-      width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
-      border: 1.5px solid var(--border2); display: flex;
-      align-items: center; justify-content: center;
-      font-size: 13px; transition: all 0.15s; cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .check-box.checked { background: rgba(232,197,71,0.15); border-color: var(--gold); color: var(--gold); }
+  .streak-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 36px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+  }
 
-    .habit-info { flex: 1; min-width: 0; }
-    .habit-name {
-      font-family: var(--font-disp); font-size: 13px; font-weight: 600;
-      color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .habit-name.done-text { color: var(--text); }
-    .habit-desc { font-size: 10px; color: var(--dim); margin-top: 2px; line-height: 1.4; }
+  .streak-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
 
-    .week-mini { text-align: right; flex-shrink: 0; min-width: 52px; }
-    .week-frac { font-size: 9px; color: var(--muted); }
-    .week-frac.on-track { color: var(--gold); }
-    .mini-bar { height: 2px; background: var(--border); border-radius: 1px; margin-top: 4px; }
-    .mini-fill { height: 100%; border-radius: 1px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+  .streak-label span:first-child {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
 
-    .expand-btn {
-      font-size: 11px; color: var(--dim); padding: 4px;
-      transition: transform 0.2s; flex-shrink: 0;
-    }
-    .expand-btn.open { transform: rotate(180deg); }
+  .streak-label span:last-child {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
 
-    .habit-tip {
-      padding: 0 12px 12px 52px; font-size: 10px; color: #666;
-      border-top: 1px solid var(--border); padding-top: 10px;
-      font-style: italic; line-height: 1.7; display: none;
-    }
-    .habit-tip.visible { display: block; }
+  .streak-dots {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
 
-    /* ============================================================
-      SECTION 9: COUNTER WIDGET (for quantitative habits)
-      Controls: +/− buttons and number display for
-      skill_build (minutes) and cold_approach (count) habits
-    ============================================================ */
-    .counter { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .counter-btn {
-      width: 26px; height: 26px; background: var(--border);
-      border-radius: 5px; display: flex; align-items: center;
-      justify-content: center; cursor: pointer; font-size: 14px;
-      color: var(--muted); transition: background 0.15s;
-      -webkit-tap-highlight-color: transparent; user-select: none;
-    }
-    .counter-btn:active { background: var(--border2); }
-    .counter-val {
-      font-family: var(--font-disp); font-size: 14px; font-weight: 700;
-      min-width: 38px; text-align: center;
-    }
-    .counter-unit { font-size: 8px; color: var(--muted); display: block; margin-top: 1px; }
+  .streak-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rule);
+    transition: background 0.3s;
+  }
 
-    /* ============================================================
-      SECTION 10: WEEKLY SUMMARY PANEL
-      Controls: the "Weekly Targets" bar list at bottom of
-      Today view. Shows all habit progress in one glance.
-    ============================================================ */
-    #weekly-summary {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 16px; margin-top: 8px;
-    }
-    #weekly-summary h3 {
-      font-size: 9px; letter-spacing: 3px; color: var(--muted);
-      text-transform: uppercase; margin-bottom: 12px;
-      display: flex; justify-content: space-between;
-    }
-    #week-score-label { }
-    .summary-row {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
-    }
-    .summary-name { font-size: 10px; color: var(--muted); width: 130px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .summary-bar { flex: 1; height: 3px; background: var(--border); border-radius: 2px; }
-    .summary-fill { height: 100%; border-radius: 2px; transition: width 0.5s; }
-    .summary-num { font-size: 9px; color: var(--muted); min-width: 42px; text-align: right; }
+  .streak-dot.filled { background: var(--accent); }
+  .streak-dot.today { background: var(--accent); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--accent); }
 
-    /* ============================================================
-      SECTION 11: MONTH VIEW — HEATMAP
-      Controls: 30-day heatmap grid, cell colours, month
-      category score cards
-    ============================================================ */
-    #heatmap-grid {
-      display: grid; grid-template-columns: repeat(10, 1fr);
-      gap: 5px; margin-bottom: 24px;
-    }
-    .heat-cell {
-      aspect-ratio: 1; border-radius: 5px; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 8px; cursor: pointer; transition: transform 0.15s;
-      border: 1px solid transparent;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .heat-cell:active { transform: scale(0.9); }
-    .heat-cell.today-cell { border-color: var(--gold); }
+  .home-sections-preview {
+    flex: 1;
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--rule);
+  }
 
-    .month-cards { display: flex; flex-direction: column; gap: 10px; }
-    .month-card {
-      background: var(--surface); border-radius: 10px;
-      padding: 16px; border: 1px solid var(--border);
-    }
-    .month-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .month-card-pct { font-family: var(--font-disp); font-size: 28px; font-weight: 800; }
-    .month-bar { height: 4px; background: var(--border); border-radius: 2px; }
-    .month-fill { height: 100%; border-radius: 2px; transition: width 0.6s; }
+  .section-pill {
+    background: var(--paper);
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+  }
 
-    /* ============================================================
-      SECTION 12: YEAR VIEW — GOALS & MILESTONES
-      Controls: yearly objective cards, milestone chips,
-      identity statement block
-    ============================================================ */
-    .year-goal {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 18px; margin-bottom: 14px;
-    }
-    .year-goal-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-    .year-goal-icon { font-size: 20px; flex-shrink: 0; }
-    .year-goal-label { font-family: var(--font-disp); font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-    .year-goal-desc { font-size: 10px; color: var(--muted); line-height: 1.5; }
-    .year-pct { font-family: var(--font-disp); font-size: 26px; font-weight: 800; flex-shrink: 0; }
-    .year-bar { height: 5px; background: var(--border); border-radius: 3px; margin-bottom: 12px; }
-    .year-fill { height: 100%; border-radius: 3px; transition: width 0.6s; }
-    .milestones { display: flex; flex-direction: column; gap: 6px; }
-    .milestone {
-      padding: 8px 10px; border-radius: 6px; font-size: 10px;
-      border: 1px solid var(--border); color: var(--muted); line-height: 1.4;
-    }
-    .milestone.reached { color: inherit; }
-    #identity-block {
-      margin-top: 4px; padding: 20px; border-radius: 12px;
-      background: linear-gradient(135deg, rgba(232,197,71,0.05), rgba(79,163,232,0.05));
-      border: 1px solid rgba(232,197,71,0.15);
-    }
-    #identity-label {
-      font-size: 8px; letter-spacing: 3px; color: var(--muted);
-      text-transform: uppercase; margin-bottom: 10px;
-    }
-    #identity-text { font-size: 12px; color: #888; line-height: 1.9; }
+  .section-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
 
-    /* ============================================================
-      SECTION 13: CAREER RESEARCH LOG
-      Controls: log entry form, entry cards, excitement stars,
-      sector tags, delete button. All career log data is stored
-      under localStorage key "ht_career_log".
-    ============================================================ */
-    #log-form {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 16px; margin-bottom: 20px;
-    }
-    #log-form h3 {
-      font-family: var(--font-disp); font-size: 12px; font-weight: 700;
-      letter-spacing: 1px; margin-bottom: 14px; color: var(--blue);
-    }
-    .form-field { margin-bottom: 12px; }
-    .form-field label {
-      display: block; font-size: 9px; letter-spacing: 2px;
-      color: var(--muted); text-transform: uppercase; margin-bottom: 5px;
-    }
-    .form-field input, .form-field textarea, .form-field select {
-      width: 100%; background: var(--bg); border: 1px solid var(--border2);
-      color: var(--text); font-family: var(--font-mono); font-size: 12px;
-      padding: 10px 12px; border-radius: 7px; outline: none;
-      transition: border-color 0.2s; resize: none;
-    }
-    .form-field input:focus, .form-field textarea:focus, .form-field select:focus {
-      border-color: var(--blue);
-    }
-    .form-field textarea { min-height: 70px; }
-    .form-field select option { background: var(--bg); }
+  .section-pill-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    font-weight: 300;
+    flex: 1;
+  }
 
-    /* Excitement rating stars */
-    #star-row { display: flex; gap: 6px; }
-    .star {
-      font-size: 20px; cursor: pointer; color: var(--border2);
-      transition: color 0.15s; -webkit-tap-highlight-color: transparent;
-    }
-    .star.lit { color: var(--gold); }
+  .section-pill-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
 
-    #log-submit {
-      width: 100%; padding: 12px; background: var(--blue);
-      color: #fff; border: none; border-radius: 8px; cursor: pointer;
-      font-family: var(--font-disp); font-size: 12px; font-weight: 700;
-      letter-spacing: 1px; margin-top: 6px; transition: opacity 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    #log-submit:active { opacity: 0.8; }
+  .home-cta {
+    padding: 24px 32px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
 
-    /* Log entry cards */
-    .log-entry {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 10px; padding: 14px; margin-bottom: 10px;
-    }
-    .log-entry-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-    .log-sector { font-family: var(--font-disp); font-size: 13px; font-weight: 700; color: var(--blue); }
-    .log-date { font-size: 9px; color: var(--muted); margin-top: 2px; }
-    .log-stars { color: var(--gold); font-size: 11px; letter-spacing: 1px; }
-    .log-field { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
-    .log-field strong { color: var(--text); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
-    .log-delete {
-      font-size: 10px; color: var(--dim); cursor: pointer; padding: 2px 6px;
-      border: 1px solid var(--border); border-radius: 4px; flex-shrink: 0;
-      margin-left: 8px; -webkit-tap-highlight-color: transparent;
-    }
-    .log-delete:active { color: var(--red); border-color: var(--red); }
+  .btn-begin {
+    width: 100%;
+    padding: 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 300;
+    transition: background 0.2s, transform 0.1s;
+  }
 
-    #log-empty {
-      text-align: center; padding: 40px 20px;
-      color: var(--muted); font-size: 11px; line-height: 2;
-    }
-    #log-empty .big { font-family: var(--font-disp); font-size: 28px; color: var(--border2); }
+  .btn-begin:active { transform: scale(0.99); background: var(--accent); }
 
-    /* Sector filter tags */
-    #sector-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-    .sector-tag {
-      padding: 4px 10px; border-radius: 20px; font-size: 9px;
-      letter-spacing: 1px; border: 1px solid var(--border); color: var(--muted);
-      cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent;
-    }
-    .sector-tag.active { border-color: var(--blue); color: var(--blue); background: rgba(79,163,232,0.08); }
+  .already-done {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink-faint);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
 
-    /* Section headings shared */
-    .view-title {
-      font-size: 9px; letter-spacing: 3px; color: var(--muted);
-      text-transform: uppercase; margin-bottom: 16px;
-      font-family: var(--font-disp); font-weight: 600;
-    }
+  /* ── SESSION SCREEN ── */
+  #session {
+    background: var(--paper);
+  }
 
-    /* ============================================================
-      SECTION 33: DAILY CHALLENGE CARD (CSS)
-      Controls: the rotating challenge banner shown at top of
-      Today view. One Bold Act + one Social challenge per day.
-      Background gradient shifts between gold and orange tones.
-    ============================================================ */
-    #daily-challenge {
-      border-radius: 12px; padding: 16px;
-      background: linear-gradient(135deg, rgba(232,197,71,0.12), rgba(232,122,79,0.08));
-      border: 1px solid rgba(232,197,71,0.25);
-      margin-bottom: 20px; position: relative; overflow: hidden;
-    }
-    #daily-challenge::before {
-      content: ''; position: absolute; top: -20px; right: -20px;
-      width: 80px; height: 80px; border-radius: 50%;
-      background: rgba(232,197,71,0.06); pointer-events: none;
-    }
-    #dc-label {
-      font-size: 8px; letter-spacing: 3px; color: var(--gold);
-      text-transform: uppercase; margin-bottom: 10px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    #dc-label::before { content: '⚡'; font-size: 10px; }
-    .dc-challenge { margin-bottom: 8px; }
-    .dc-challenge:last-child { margin-bottom: 0; }
-    .dc-type {
-      font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--muted); margin-bottom: 3px;
-    }
-    .dc-text {
-      font-family: var(--font-disp); font-size: 13px; font-weight: 600;
-      color: var(--text); line-height: 1.4;
-    }
-    .dc-divider {
-      height: 1px; background: rgba(232,197,71,0.12); margin: 10px 0;
-    }
+  .session-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 10;
+  }
 
-    /* ============================================================
-      SECTION 37: DAILY NON-NEGOTIABLES — TIME-OF-DAY (CSS)
-      Controls: 3-tab check-in selector (Morning/Midday/Evening),
-      collapsible NN panel, item rows, score pill, counter widget.
-      --purple used exclusively for the Non-Negotiables theme.
-      Tab selector stored in activeCheckin (JS Section 38).
-      If tabs don't switch, check checkinTabClick() in Section 38.
-    ============================================================ */
-    :root { --purple: #B48EF0; }
+  .btn-back {
+    background: none;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-faint);
+    cursor: pointer;
+    text-transform: uppercase;
+    padding: 4px 0;
+  }
 
-    /* Time-of-day tab strip */
-    #checkin-tabs {
-      display: flex; gap: 6px; margin-bottom: 16px;
-    }
-    .checkin-tab {
-      flex: 1; padding: 8px 4px; border-radius: 8px;
-      border: 1px solid var(--border); background: var(--surface);
-      text-align: center; cursor: pointer; transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent; user-select: none;
-    }
-    .checkin-tab.active {
-      border-color: var(--purple);
-      background: rgba(180,142,240,0.08);
-    }
-    .checkin-tab .ct-icon { font-size: 16px; line-height: 1; }
-    .checkin-tab .ct-label {
-      font-size: 8px; letter-spacing: 1.5px; color: var(--muted);
-      text-transform: uppercase; margin-top: 4px;
-    }
-    .checkin-tab.active .ct-label { color: var(--purple); }
-    .checkin-tab .ct-pill {
-      font-size: 8px; color: var(--dim); margin-top: 3px;
-      font-family: var(--font-mono);
-    }
-    .checkin-tab.active .ct-pill { color: var(--purple); }
+  .session-progress-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 
-    /* NN panel */
-    #nn-panel {
-      background: var(--surface);
-      border: 1px solid rgba(180,142,240,0.25);
-      border-radius: 12px; margin-bottom: 20px; overflow: hidden;
-    }
-    #nn-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 13px 14px; cursor: pointer;
-      -webkit-tap-highlight-color: transparent; user-select: none;
-    }
-    #nn-header-left { display: flex; align-items: center; gap: 10px; }
-    #nn-title {
-      font-family: var(--font-disp); font-size: 12px; font-weight: 700;
-      color: var(--purple); letter-spacing: 0.5px;
-    }
-    #nn-score-pill {
-      font-size: 9px; padding: 2px 8px; border-radius: 20px;
-      border: 1px solid rgba(180,142,240,0.4); color: var(--purple);
-      font-family: var(--font-mono);
-    }
-    #nn-chevron {
-      font-size: 11px; color: var(--dim);
-      transition: transform 0.25s; flex-shrink: 0;
-    }
-    #nn-chevron.open { transform: rotate(180deg); }
-    #nn-body { display: none; border-top: 1px solid var(--border); padding: 6px 0; }
-    #nn-body.open { display: block; }
+  .session-step-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
 
-    /* NN item rows */
-    .nn-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 14px; cursor: pointer;
-      -webkit-tap-highlight-color: transparent; transition: background 0.15s;
-    }
-    .nn-item:active { background: rgba(180,142,240,0.05); }
-    .nn-check {
-      width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0;
-      border: 1.5px solid var(--border2); display: flex;
-      align-items: center; justify-content: center;
-      font-size: 12px; transition: all 0.15s; cursor: pointer;
-    }
-    .nn-check.checked { background: rgba(180,142,240,0.15); border-color: var(--purple); color: var(--purple); }
-    .nn-info { flex: 1; }
-    .nn-label { font-family: var(--font-disp); font-size: 12px; font-weight: 600; color: var(--muted); }
-    .nn-label.done { color: var(--text); }
-    .nn-sublabel { font-size: 10px; color: var(--dim); margin-top: 1px; }
-    .nn-icon { font-size: 15px; flex-shrink: 0; opacity: 0.6; }
+  .progress-track {
+    height: 2px;
+    background: var(--rule);
+    border-radius: 1px;
+    overflow: hidden;
+  }
 
-    /* Steps counter inside NN */
-    .nn-counter { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .nn-counter-btn {
-      width: 24px; height: 24px; background: var(--border); border-radius: 5px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 13px; color: var(--muted);
-      -webkit-tap-highlight-color: transparent; user-select: none;
-    }
-    .nn-counter-btn:active { background: var(--border2); }
-    .nn-counter-val {
-      font-family: var(--font-disp); font-size: 12px; font-weight: 700;
-      min-width: 44px; text-align: center; color: var(--purple);
-    }
-    .nn-counter-unit { font-size: 8px; color: var(--muted); display: block; }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 0.5s ease;
+  }
 
-    /* Connected Apps bridge panel */
-    #connected-apps {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px; margin-bottom: 20px;
-    }
-    #ca-title {
-      font-size: 8px; letter-spacing: 3px; color: var(--muted);
-      text-transform: uppercase; margin-bottom: 12px;
-      font-family: var(--font-disp); font-weight: 600;
-    }
-    .ca-app {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 0; border-bottom: 1px solid var(--border);
-    }
-    .ca-app:last-child { border-bottom: none; padding-bottom: 0; }
-    .ca-dot {
-      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-    }
-    .ca-dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); }
-    .ca-dot.offline { background: var(--border2); }
-    .ca-name {
-      font-family: var(--font-disp); font-size: 12px; font-weight: 600;
-      flex: 1;
-    }
-    .ca-value { font-size: 10px; color: var(--muted); }
-    .ca-value.live { color: var(--green); }
-  </style>
+  /* ── SECTION CARD ── */
+  .section-card {
+    flex: 1;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    animation: fadeSlide 0.4s ease;
+  }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .section-tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .section-tag-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  .section-instruction {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .section-instruction em { font-style: italic; color: var(--ink-light); }
+
+  .section-subtext {
+    font-size: 14px;
+    color: var(--ink-faint);
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  /* AI Prompt Box */
+  .ai-prompt-box {
+    background: var(--paper-dark);
+    border-left: 2px solid var(--accent);
+    padding: 16px 18px;
+    margin-bottom: 28px;
+    position: relative;
+    min-height: 60px;
+  }
+
+  .ai-prompt-box.loading::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 40%;
+    height: 2px;
+    background: var(--accent);
+    animation: loadBar 1.2s ease infinite;
+  }
+
+  @keyframes loadBar {
+    0% { width: 0; opacity: 1; }
+    70% { width: 80%; opacity: 1; }
+    100% { width: 100%; opacity: 0; }
+  }
+
+  .ai-prompt-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+    font-weight: 300;
+  }
+
+  .ai-prompt-text {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  /* Timer */
+  .timer-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .timer-ring {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+  }
+
+  .timer-ring svg {
+    transform: rotate(-90deg);
+  }
+
+  .timer-ring-bg { fill: none; stroke: var(--rule); stroke-width: 2; }
+  .timer-ring-fill {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+  }
+
+  .timer-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  .timer-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .timer-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
+
+  .btn-timer {
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: var(--ink-light);
+    transition: all 0.15s;
+    display: inline-flex;
+    width: fit-content;
+  }
+
+  .btn-timer:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-timer.running { border-color: var(--accent); color: var(--accent); }
+
+  /* Navigation */
+  .section-nav {
+    margin-top: auto;
+    padding-top: 24px;
+    display: flex;
+    gap: 12px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .btn-prev {
+    flex: 0;
+    padding: 16px 20px;
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-prev:hover { border-color: var(--ink-light); }
+
+  .btn-next {
+    flex: 1;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 300;
+    transition: background 0.2s;
+  }
+
+  .btn-next:hover { background: var(--accent); }
+  .btn-next:active { transform: scale(0.99); }
+
+  /* Closing sentence section */
+  .closing-stem {
+    font-size: 18px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--ink-light);
+    line-height: 1.5;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 12px;
+  }
+
+  /* ── COMPLETE SCREEN ── */
+  #complete {
+    justify-content: center;
+    align-items: center;
+    padding: 40px 32px;
+    text-align: center;
+    background: var(--paper);
+  }
+
+  .complete-mark {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 32px;
+    animation: scaleIn 0.5s ease;
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .complete-mark svg { stroke: var(--accent); }
+
+  .complete-wordmark {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 300;
+  }
+
+  .complete-title {
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .complete-title em { font-style: italic; color: var(--accent); }
+
+  .complete-streak {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-bottom: 48px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  .complete-rule {
+    width: 40px;
+    height: 1px;
+    background: var(--rule);
+    margin: 0 auto 32px;
+  }
+
+  .complete-quote {
+    font-size: 16px;
+    font-style: italic;
+    color: var(--ink-light);
+    line-height: 1.6;
+    max-width: 280px;
+    font-weight: 300;
+  }
+
+  .btn-home {
+    margin-top: 48px;
+    padding: 16px 32px;
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-home:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ── UTILS ── */
+  .divider { height: 1px; background: var(--rule); margin: 24px 0; }
+
+  .loading-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-style: italic;
+    font-weight: 300;
+  }
+</style>
 </head>
 <body>
 
-<!-- ============================================================
-  SECTION 14: APP HTML SHELL
-  Controls: overall DOM structure — header, content area,
-  bottom nav. Each view panel is a div with id="view-*".
-  Only one is visible at a time (controlled by showView() in JS).
-============================================================ -->
-<div id="app">
-
-  <!-- HEADER -->
-  <div id="header">
-    <div id="header-top">
-      <div id="app-title">MOMENTUM <span>◈</span></div>
-      <div id="header-stats">
-        <div class="stat-chip">
-          <div class="val" id="streak-val" style="color:var(--gold)">0</div>
-          <div class="lbl">Day Streak</div>
-        </div>
-        <div class="stat-chip">
-          <div class="val" id="week-score-val" style="color:var(--green)">0%</div>
-          <div class="lbl">Week Score</div>
-        </div>
-      </div>
-    </div>
-    <div id="date-bar"></div>
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <div class="home-wordmark">Anchor</div>
+    <div class="home-date" id="home-date"></div>
+    <div class="home-greeting">Good morning,<br><em>let's begin.</em></div>
   </div>
 
-  <!-- CONTENT PANELS -->
-  <div id="content">
-
-    <!-- TODAY VIEW -->
-    <div id="view-today" class="fade-up">
-      <!-- SECTION 33: DAILY CHALLENGE CARD (HTML)
-           Populated by renderDailyChallenge() in JS Section 34.
-           Uses date-seeded rotation — same challenge all day. -->
-      <div id="daily-challenge">
-        <div id="dc-label">Today's Challenges</div>
-        <div id="dc-content"></div>
-      </div>
-
-      <!-- ============================================================
-        SECTION 37b: DAILY NON-NEGOTIABLES HTML
-        Three check-in tabs (Morning / Midday / Evening) rendered
-        by renderCheckinTabs() in JS Section 38.
-        Active tab stored in activeCheckin variable.
-        NN panel collapses/expands via #nn-header click.
-        Steps counter uses nn-counter widget (Midday only).
-      ============================================================ -->
-
-      <!-- Check-in tab selector -->
-      <div id="checkin-tabs">
-        <div class="checkin-tab active" data-checkin="morning" onclick="checkinTabClick('morning')">
-          <div class="ct-icon">🌅</div>
-          <div class="ct-label">Morning</div>
-          <div class="ct-pill" id="pill-morning">0/6</div>
-        </div>
-        <div class="checkin-tab" data-checkin="midday" onclick="checkinTabClick('midday')">
-          <div class="ct-icon">☀️</div>
-          <div class="ct-label">Midday</div>
-          <div class="ct-pill" id="pill-midday">0/3</div>
-        </div>
-        <div class="checkin-tab" data-checkin="evening" onclick="checkinTabClick('evening')">
-          <div class="ct-icon">🌙</div>
-          <div class="ct-label">Evening</div>
-          <div class="ct-pill" id="pill-evening">0/3</div>
-        </div>
-      </div>
-
-      <!-- NN collapsible panel — items swapped by active check-in -->
-      <div id="nn-panel">
-        <div id="nn-header">
-          <div id="nn-header-left">
-            <div id="nn-title">Morning Routine</div>
-            <div id="nn-score-pill">0/6</div>
-          </div>
-          <div id="nn-chevron">▾</div>
-        </div>
-        <div id="nn-body"><!-- Items injected by JS --></div>
-      </div>
-
-      <!-- Connected Apps — reads ht_external from localStorage -->
-      <div id="connected-apps">
-        <div id="ca-title">Connected Apps</div>
-        <div id="ca-list"></div>
-      </div>
-
-      <div id="day-strip"></div>
-      <div id="habits-container"></div>
-      <div id="weekly-summary">
-        <h3>
-          <span>Weekly Targets</span>
-          <span id="week-score-label"></span>
-        </h3>
-        <div id="summary-rows"></div>
-      </div>
+  <div class="streak-bar">
+    <div class="streak-number" id="streak-num">0</div>
+    <div class="streak-label">
+      <span>Day streak</span>
+      <span id="streak-sub">Start your first session</span>
     </div>
+    <div class="streak-dots" id="streak-dots"></div>
+  </div>
 
-    <!-- MONTH VIEW -->
-    <div id="view-month" style="display:none" class="fade-up">
-      <div class="view-title" id="month-heading"></div>
-      <div id="heatmap-grid"></div>
-      <div class="month-cards" id="month-cards"></div>
+  <div class="home-sections-preview">
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-brain)"></div>
+      <div class="section-pill-name">Brain Dump</div>
+      <div class="section-pill-time">2 min</div>
     </div>
-
-    <!-- YEAR VIEW -->
-    <div id="view-year" style="display:none" class="fade-up">
-      <div class="view-title">2026 Objectives</div>
-      <div id="year-goals"></div>
-      <div id="identity-block">
-        <div id="identity-label">Your 2026 Identity</div>
-        <div id="identity-text">
-          By December 2026, I am someone who
-          <span style="color:var(--gold)">speaks up without hesitation</span>,
-          has made the leap into
-          <span style="color:var(--blue)">a career that excites me</span>,
-          and approaches life with the confidence of someone who
-          <span style="color:var(--green)">chooses discomfort daily</span>.
-        </div>
-      </div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-emotion)"></div>
+      <div class="section-pill-name">Emotional Check-in</div>
+      <div class="section-pill-time">3 min</div>
     </div>
-
-    <!-- CAREER LOG VIEW -->
-    <div id="view-log" style="display:none" class="fade-up">
-      <div class="view-title">Career Research Log</div>
-      <div id="log-form">
-        <h3>◎ New Entry</h3>
-        <div class="form-field">
-          <label>Sector / Role Explored</label>
-          <input type="text" id="f-sector" placeholder="e.g. Private Equity, Fintech, Strategy…" />
-        </div>
-        <div class="form-field">
-          <label>Person Spoken To / Resource Read</label>
-          <input type="text" id="f-person" placeholder="e.g. John at Blackstone, Acquired podcast ep…" />
-        </div>
-        <div class="form-field">
-          <label>Key Insight or Takeaway</label>
-          <textarea id="f-insight" placeholder="What did you learn? What surprised you?"></textarea>
-        </div>
-        <div class="form-field">
-          <label>Excitement Rating</label>
-          <div id="star-row">
-            <span class="star" data-v="1">★</span>
-            <span class="star" data-v="2">★</span>
-            <span class="star" data-v="3">★</span>
-            <span class="star" data-v="4">★</span>
-            <span class="star" data-v="5">★</span>
-            <span class="star" data-v="6">★</span>
-            <span class="star" data-v="7">★</span>
-            <span class="star" data-v="8">★</span>
-            <span class="star" data-v="9">★</span>
-            <span class="star" data-v="10">★</span>
-          </div>
-        </div>
-        <button id="log-submit">SAVE ENTRY</button>
-      </div>
-
-      <!-- Filter tags (auto-generated from entries) -->
-      <div id="sector-filters"></div>
-
-      <!-- Entry list -->
-      <div id="log-entries"></div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-purpose)"></div>
+      <div class="section-pill-name">Purpose Anchor</div>
+      <div class="section-pill-time">2 min</div>
     </div>
-
-  </div><!-- /content -->
-
-  <!-- BOTTOM NAVIGATION -->
-  <div id="bottom-nav">
-    <div class="nav-tab active" data-view="today" onclick="showView('today')">
-      <div class="nav-icon">◈</div>
-      <div class="nav-label">Today</div>
-      <div class="nav-dot"></div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-gratitude)"></div>
+      <div class="section-pill-name">Gratitude</div>
+      <div class="section-pill-time">2 min</div>
     </div>
-    <div class="nav-tab" data-view="month" onclick="showView('month')">
-      <div class="nav-icon">◷</div>
-      <div class="nav-label">Month</div>
-      <div class="nav-dot"></div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-creative)"></div>
+      <div class="section-pill-name">Creative Prompt</div>
+      <div class="section-pill-time">4 min</div>
     </div>
-    <div class="nav-tab" data-view="year" onclick="showView('year')">
-      <div class="nav-icon">▲</div>
-      <div class="nav-label">Year</div>
-      <div class="nav-dot"></div>
-    </div>
-    <div class="nav-tab" data-view="log" onclick="showView('log')">
-      <div class="nav-icon">◎</div>
-      <div class="nav-label">Research</div>
-      <div class="nav-dot"></div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-close)"></div>
+      <div class="section-pill-name">Closing Sentence</div>
+      <div class="section-pill-time">2 min</div>
     </div>
   </div>
 
-</div><!-- /app -->
+  <div class="home-cta">
+    <button class="btn-begin" id="btn-begin">Begin today's session</button>
+    <div class="already-done" id="already-done" style="display:none">✓ completed today</div>
+  </div>
+</div>
+
+<!-- SESSION -->
+<div id="session" class="screen">
+  <div class="session-header">
+    <button class="btn-back" id="btn-back">← back</button>
+    <div class="session-progress-wrap">
+      <div class="session-step-label" id="step-label">1 of 6</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="section-card" id="section-card"></div>
+</div>
+
+<!-- COMPLETE -->
+<div id="complete" class="screen">
+  <div class="complete-mark">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="complete-wordmark">Anchor</div>
+  <div class="complete-title">Session<br><em>complete.</em></div>
+  <div class="complete-streak" id="complete-streak"></div>
+  <div class="complete-rule"></div>
+  <div class="complete-quote" id="complete-quote"></div>
+  <button class="btn-home" onclick="goHome()">Return home</button>
+</div>
 
 <script>
-/* ============================================================
-  SECTION 15: DATA DEFINITIONS — HABITS CONFIG
-  Controls: all habits, their categories, types, weekly
-  targets, icons, and coaching tips.
-  To add a new habit: add an object to the HABITS array.
-  To change a target: edit weeklyTarget.
-============================================================ */
-const HABITS = [
+// ── CONFIG ──────────────────────────────────────────────
+const SECTIONS = [
   {
-    id: 'journal', label: 'Morning Journal', category: 'boldness',
-    desc: 'Reflect, plan, set intention for the day',
-    type: 'check', icon: '✦', weeklyTarget: 7,
-    tip: 'Write 1 thing that scares you today. Then do it.'
+    id: 'brain',
+    name: 'Brain Dump',
+    color: 'var(--section-brain)',
+    minutes: 2,
+    type: 'fixed',
+    instruction: 'Write without stopping.',
+    subtext: 'No filtering, no structure. Just clear the noise from your head. Whatever is present — thoughts, feelings, worries, nothing in particular.',
+    prompt: null
   },
   {
-    id: 'bold_act', label: 'Bold Act', category: 'boldness',
-    desc: 'One uncomfortable action: speak up, ask for what you want',
-    type: 'check', icon: '⚡', weeklyTarget: 5,
-    tip: 'Rate your discomfort 1–10. Aim for 6+. Log it in your journal.'
+    id: 'emotion',
+    name: 'Emotional Check-in',
+    color: 'var(--section-emotion)',
+    minutes: 3,
+    type: 'ai',
+    instruction: 'What\'s emotionally present right now?',
+    subtext: 'Be honest rather than aspirational. Today\'s prompt:',
+    promptSystem: `You are a thoughtful journaling guide. Generate a single emotional check-in prompt for a morning journaling session. The user is working on: emotional processing (fear of rejection, overanalysis of social signals, moving on from unrequited feelings), building self-worth independently of others' approval, and not fixating after setbacks. 
+
+The prompt should be specific, penetrating, and invite genuine honesty. It should feel fresh and different each day. Write only the prompt itself — one or two sentences, no preamble, no quotation marks. Vary the angle: some days focus on what's present right now, some on the body, some on what's being avoided, some on a recent interaction.`
   },
   {
-    id: 'cold_approach', label: 'Social Approach', category: 'boldness',
-    desc: 'Talk to a stranger, network, or initiate a hard conversation',
-    type: 'count', unit: 'reps', weeklyTarget: 3,
-    tip: 'Professional or personal — both build the same muscle. Volume is the point.'
+    id: 'purpose',
+    name: 'Purpose Anchor',
+    color: 'var(--section-purpose)',
+    minutes: 2,
+    type: 'rotating',
+    instruction: 'Who are you building today?',
+    subtext: 'Reconnect to your direction before the day takes over.',
+    prompts: [
+      'The person I want to be today is someone who acts from values, not from fear. What does that look like in practice today?',
+      'What am I building — in my work, my health, my character — that matters beyond how anyone else responds to me?',
+      'If I stripped away everyone else\'s opinions and expectations, what would I most want to focus on today?',
+      'What does a version of me who has already moved past current anxieties look like? How does he move through the world?',
+      'What\'s one thing I\'ve been avoiding that the best version of me would face today?',
+      'What does living by my own standards — not anyone else\'s validation — look like this week?',
+      'Weekly reflection: what did I build this week? What would the best version of me do differently next week?'
+    ]
   },
   {
-    id: 'no_avoidance', label: 'No Avoidance', category: 'boldness',
-    desc: 'Did you do the thing you were tempted to avoid?',
-    type: 'check', icon: '→', weeklyTarget: 5,
-    tip: 'The avoided thing is always the highest-leverage thing.'
+    id: 'gratitude',
+    name: 'Gratitude',
+    color: 'var(--section-gratitude)',
+    minutes: 2,
+    type: 'ai',
+    instruction: 'Three specific things — framed as evidence.',
+    subtext: 'Use the format: "[thing that happened] — which tells me [what it says about my life or myself]." Today\'s framing nudge:',
+    promptSystem: `You are a journaling guide. Generate a single short framing nudge (one sentence) to help someone approach their gratitude journaling in a fresh, specific way today. They use the format "[specific thing] — which tells me [what it means]". Each day suggest a different angle or lens to look through — e.g. focusing on small bodily pleasures, evidence of growth, moments of connection, things that went better than expected, ordinary things that would be missed, quiet personal wins. Write only the nudge sentence itself. No preamble, no quotation marks. Keep it under 20 words.`
   },
   {
-    id: 'exercise', label: 'Exercise', category: 'energy',
-    desc: 'Move your body with intention',
-    type: 'check', icon: '◈', weeklyTarget: 4,
-    tip: 'Physical discomfort is practice for mental discomfort.'
+    id: 'creative',
+    name: 'Creative Prompt',
+    color: 'var(--section-creative)',
+    minutes: 4,
+    type: 'ai',
+    instruction: 'Something to make you think differently.',
+    subtext: 'Let this one surprise you. There\'s no right answer.',
+    promptSystem: `You are an imaginative journaling guide. Generate a single creative/reflective journaling prompt that is fresh, imaginative, and genuinely interesting. Vary widely across: thought experiments, unusual perspectives, big-picture questions about life and identity, ideas and curiosity, future visions, aesthetic preferences, creative speculation, philosophical questions, questions about meaning. The person is analytically-minded but wants to develop their creative side. The prompt should feel alive and different every day — unexpected, not generic. Avoid clichés like "imagine your ideal day" or "write a letter to your future self". Write only the prompt itself. No preamble, no quotation marks. One to three sentences max.`
   },
   {
-    id: 'career_research', label: 'Career Exploration', category: 'career',
-    desc: 'Research a role, read about PE/VC/strategy, reach out to someone',
-    type: 'check', icon: '◎', weeklyTarget: 3,
-    tip: 'Don\'t just consume — log what you learn in the Research tab.'
-  },
-  {
-    id: 'skill_build', label: 'Skill Building', category: 'career',
-    desc: 'Modelling, presenting, Python, data storytelling',
-    type: 'count', unit: 'mins', weeklyTarget: 150,
-    tip: '150 mins/week = ~130 hours of deliberate practice this year.'
-  },
-  {
-    id: 'networking', label: 'Network Touch', category: 'career',
-    desc: 'One meaningful professional connection — message, coffee, LinkedIn',
-    type: 'check', icon: '◐', weeklyTarget: 2,
-    tip: 'Your next role will come from someone you know. Build now.'
-  },
+    id: 'close',
+    name: 'Closing Sentence',
+    color: 'var(--section-close)',
+    minutes: 2,
+    type: 'closing',
+    instruction: 'Seal the session.',
+    subtext: 'Complete this sentence honestly, not aspirationally.',
+    stem: 'The thing I most want to carry with me today is…'
+  }
 ];
 
-/* ============================================================
-  SECTION 16: CATEGORY CONFIG
-  Controls: category names and accent colours.
-  If you change a colour here it updates everywhere automatically.
-============================================================ */
-const CATS = {
-  boldness: { label: 'Boldness & Confidence', color: 'var(--gold)' },
-  career:   { label: 'Career & Pivot',        color: 'var(--blue)' },
-  energy:   { label: 'Energy & Foundation',   color: 'var(--green)' },
-};
+const CLOSING_QUOTES = [
+  'The work you do in here compounds quietly over time.',
+  'Showing up is the whole practice.',
+  'Clarity doesn\'t arrive all at once. It accumulates.',
+  'You are not your thoughts. You are the one noticing them.',
+  'Every honest sentence is a small act of courage.',
+  'The goal isn\'t to fix anything. It\'s to see clearly.',
+  'This is how you become someone you respect.'
+];
 
-/* ============================================================
-  SECTION 17: PERSISTENT STORAGE HELPERS
-  Controls: read/write to localStorage.
-  Keys used:
-    ht_logs       — daily check completions  { "2026-02-25": { journal: true, ... } }
-    ht_counts     — quantitative values       { "2026-02-25": { skill_build: 45, ... } }
-    ht_career_log — career research entries  [ { id, date, sector, person, insight, rating }, ... ]
-  If data seems missing, check these keys in DevTools > Storage.
-============================================================ */
-function load(key, def) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; }
-  catch { return def; }
+// ── STATE ────────────────────────────────────────────────
+let currentStep = 0;
+let timerInterval = null;
+let timerSecondsLeft = 0;
+let timerRunning = false;
+let aiPrompts = {}; // cached for this session
+
+// ── STORAGE ──────────────────────────────────────────────
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
 }
-// save() is defined in Section 40 with Supabase sync built in
 
-let logs      = load('ht_logs', {});
-let counts    = load('ht_counts', {});
-let careerLog = load('ht_career_log', []);
-
-/* ============================================================
-  SECTION 18: DATE UTILITIES
-  Controls: day/week key generation, day-of-week helpers.
-  getDayKey  → "2026-02-25"
-  getWeekStart → Monday of current week
-  getWeekDays  → array of 7 day keys Mon–Sun
-============================================================ */
-function getDayKey(d) {
-  return d.toISOString().split('T')[0];
+function getStreak() {
+  return parseInt(localStorage.getItem('anchor_streak') || '0');
 }
-function getWeekStart(d) {
-  const c = new Date(d); c.setHours(0,0,0,0);
-  const day = c.getDay(); // 0=Sun
-  const diff = (day === 0) ? -6 : 1 - day;
-  c.setDate(c.getDate() + diff);
-  return c;
-}
-function getWeekDays(d) {
-  const start = getWeekStart(d);
-  return Array.from({length:7}, (_,i) => {
-    const x = new Date(start); x.setDate(start.getDate()+i);
-    return getDayKey(x);
-  });
-}
-const TODAY     = getDayKey(new Date());
-const WEEK_DAYS = getWeekDays(new Date());
-const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-let selectedDay = TODAY;
+function getLastDate() {
+  return localStorage.getItem('anchor_last_date') || '';
+}
 
-/* ============================================================
-  SECTION 19: PROGRESS CALCULATION HELPERS
-  Controls: per-habit week progress (used in bars/fractions),
-  overall week score (%), and streak counter.
-============================================================ */
-function weekProgress(habit) {
-  if (habit.type === 'check') {
-    const done = WEEK_DAYS.filter(d => logs[d]?.[habit.id]).length;
-    return { done, target: habit.weeklyTarget, pct: Math.min(1, done/habit.weeklyTarget) };
-  } else {
-    const done = WEEK_DAYS.reduce((a,d) => a + (counts[d]?.[habit.id]||0), 0);
-    return { done, target: habit.weeklyTarget, pct: Math.min(1, done/habit.weeklyTarget) };
+function isCompletedToday() {
+  return getLastDate() === getTodayKey();
+}
+
+function updateStreak() {
+  const today = getTodayKey();
+  const last = getLastDate();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yKey = yesterday.toISOString().slice(0, 10);
+
+  let streak = getStreak();
+  if (last === today) return streak; // already done today
+  if (last === yKey) streak += 1;
+  else if (last !== today) streak = 1;
+
+  localStorage.setItem('anchor_streak', streak);
+  localStorage.setItem('anchor_last_date', today);
+  return streak;
+}
+
+function getWeekDots() {
+  const dots = [];
+  const today = getTodayKey();
+  const last = getLastDate();
+  const streak = getStreak();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    if (key === today && last === today) dots.push('today');
+    else if (i < streak && last >= key) dots.push('filled');
+    else dots.push('empty');
   }
+  return dots;
 }
 
-function calcWeekScore() {
-  const avg = HABITS.reduce((a,h) => a + weekProgress(h).pct, 0) / HABITS.length;
-  return Math.round(avg * 100);
-}
-
-function calcStreak() {
-  let s = 0, d = new Date();
-  while (s < 400) {
-    const key = getDayKey(d);
-    const checks = HABITS.filter(h => h.type==='check');
-    const done   = checks.filter(h => logs[key]?.[h.id]).length;
-    if (done < Math.ceil(checks.length * 0.5)) break; // 50% threshold = streak day
-    s++; d.setDate(d.getDate()-1);
-  }
-  return s;
-}
-
-/* ============================================================
-  SECTION 20: VIEW SWITCHER
-  Controls: which main panel is shown. Called by bottom nav
-  onclick handlers. Also re-renders the active view.
-============================================================ */
-let currentView = 'today';
-function showView(name) {
-  ['today','month','year','log'].forEach(v => {
-    const el = document.getElementById('view-'+v);
-    if (el) el.style.display = v===name ? 'block' : 'none';
-  });
-  document.querySelectorAll('.nav-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.view===name);
-  });
-  currentView = name;
-  if (name==='today')  renderToday();
-  if (name==='month')  renderMonth();
-  if (name==='year')   renderYear();
-  if (name==='log')    renderLog();
-  updateHeader();
-}
-
-/* ============================================================
-  SECTION 21: HEADER RENDERER
-  Controls: streak number, week score, date string
-============================================================ */
-function updateHeader() {
-  document.getElementById('streak-val').textContent  = calcStreak();
-  const score = calcWeekScore();
-  document.getElementById('week-score-val').textContent = score+'%';
+// ── HOME ─────────────────────────────────────────────────
+function initHome() {
   const now = new Date();
-  document.getElementById('date-bar').textContent =
-    now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
-}
-
-/* ============================================================
-  SECTION 22: TODAY VIEW RENDERER
-  Controls: day strip, habit cards, weekly summary.
-  Called on load and every time Today tab is opened.
-============================================================ */
-function renderToday() {
-  renderNonNegotiables();
-  renderConnectedApps();
-  renderDayStrip();
-  renderHabits();
-  renderSummary();
-}
-
-function renderDayStrip() {
-  const strip = document.getElementById('day-strip');
-  strip.innerHTML = '';
-  WEEK_DAYS.forEach((dayKey, i) => {
-    const d   = new Date(dayKey + 'T12:00:00');
-    const checks = HABITS.filter(h=>h.type==='check').filter(h=>logs[dayKey]?.[h.id]);
-    const btn = document.createElement('div');
-    btn.className = 'day-btn' + (dayKey===selectedDay?' selected':'') + (dayKey===TODAY?' today-btn':'');
-    btn.innerHTML = `
-      <div class="d-name">${DAY_NAMES[i]}</div>
-      <div class="d-num">${d.getDate()}</div>
-      <div class="day-dots">${checks.slice(0,5).map(()=>'<div class="day-dot"></div>').join('')}</div>
-    `;
-    btn.onclick = () => { selectedDay = dayKey; renderToday(); };
-    strip.appendChild(btn);
+  document.getElementById('home-date').textContent = now.toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long'
   });
-}
 
-function renderHabits() {
-  const container = document.getElementById('habits-container');
-  container.innerHTML = '';
+  const streak = getStreak();
+  document.getElementById('streak-num').textContent = streak;
+  document.getElementById('streak-sub').textContent = streak === 0
+    ? 'Start your first session'
+    : streak === 1 ? '1 day — keep going'
+    : `${streak} days — well done`;
 
-  Object.entries(CATS).forEach(([catId, cat]) => {
-    const catHabits = HABITS.filter(h => h.category===catId);
-    if (!catHabits.length) return;
+  const dots = getWeekDots();
+  const dotsEl = document.getElementById('streak-dots');
+  dotsEl.innerHTML = dots.map(d =>
+    `<div class="streak-dot ${d === 'filled' ? 'filled' : d === 'today' ? 'today' : ''}"></div>`
+  ).join('');
 
-    // Category label
-    const lbl = document.createElement('div');
-    lbl.className = 'cat-label';
-    lbl.innerHTML = `<div class="cat-dot" style="background:${cat.color}"></div><div class="cat-name">${cat.label}</div>`;
-    container.appendChild(lbl);
-
-    catHabits.forEach(habit => {
-      const card = buildHabitCard(habit, cat.color);
-      container.appendChild(card);
-    });
-  });
-}
-
-/* ============================================================
-  SECTION 23: HABIT CARD BUILDER
-  Controls: individual habit card DOM — checkbox, counter,
-  week progress mini-bar, expand/collapse tip.
-  habit = HABITS entry, color = CSS color string
-============================================================ */
-function buildHabitCard(habit, color) {
-  const isChecked  = !!(logs[selectedDay]?.[habit.id]);
-  const countVal   = counts[selectedDay]?.[habit.id] || 0;
-  const wp         = weekProgress(habit);
-  const isExpanded = false;
-
-  const card = document.createElement('div');
-  card.className = 'habit-card' + (isChecked?' done':'');
-  card.id = 'card-'+habit.id;
-
-  // Build check or counter element
-  let controlHtml = '';
-  if (habit.type === 'check') {
-    controlHtml = `<div class="check-box ${isChecked?'checked':''}" id="chk-${habit.id}">${isChecked?'✓':''}</div>`;
+  if (isCompletedToday()) {
+    document.getElementById('btn-begin').textContent = 'Start again';
+    document.getElementById('already-done').style.display = 'block';
   } else {
-    controlHtml = `
-      <div class="counter">
-        <div class="counter-btn" id="dec-${habit.id}">−</div>
-        <div class="counter-val" id="cnt-${habit.id}" style="color:${color}">
-          ${countVal}<span class="counter-unit">${habit.unit}</span>
-        </div>
-        <div class="counter-btn" id="inc-${habit.id}">+</div>
+    document.getElementById('btn-begin').textContent = 'Begin today\'s session';
+    document.getElementById('already-done').style.display = 'none';
+  }
+}
+
+document.getElementById('btn-begin').addEventListener('click', startSession);
+document.getElementById('btn-back').addEventListener('click', () => {
+  clearTimerInterval();
+  showScreen('home');
+  initHome();
+});
+
+// ── SESSION ───────────────────────────────────────────────
+async function startSession() {
+  currentStep = 0;
+  aiPrompts = {};
+  showScreen('session');
+  await renderStep(0);
+}
+
+async function renderStep(idx) {
+  const s = SECTIONS[idx];
+  const total = SECTIONS.length;
+
+  document.getElementById('step-label').textContent = `${idx + 1} of ${total}`;
+  document.getElementById('progress-fill').style.width = `${((idx) / total) * 100}%`;
+
+  clearTimerInterval();
+  timerSecondsLeft = s.minutes * 60;
+  timerRunning = false;
+
+  const card = document.getElementById('section-card');
+  card.style.animation = 'none';
+  card.offsetHeight; // reflow
+  card.style.animation = '';
+
+  let promptHtml = '';
+
+  if (s.type === 'ai') {
+    if (!aiPrompts[s.id]) {
+      promptHtml = `
+        <div class="ai-prompt-box loading" id="ai-box-${s.id}">
+          <div class="ai-prompt-label">Today's prompt</div>
+          <div class="ai-prompt-text loading-text">Generating…</div>
+        </div>`;
+    } else {
+      promptHtml = `
+        <div class="ai-prompt-box" id="ai-box-${s.id}">
+          <div class="ai-prompt-label">Today's prompt</div>
+          <div class="ai-prompt-text">${aiPrompts[s.id]}</div>
+        </div>`;
+    }
+  } else if (s.type === 'rotating') {
+    const dayOfWeek = new Date().getDay(); // 0=Sun
+    const p = s.prompts[dayOfWeek % s.prompts.length];
+    promptHtml = `
+      <div class="ai-prompt-box" id="ai-box-${s.id}">
+        <div class="ai-prompt-label">Today's anchor</div>
+        <div class="ai-prompt-text">${p}</div>
       </div>`;
+  } else if (s.type === 'closing') {
+    promptHtml = `<div class="closing-stem">${s.stem}</div>`;
   }
 
-  const fracColor = wp.pct >= 1 ? color : 'var(--muted)';
+  const isLast = idx === total - 1;
+  const isFirst = idx === 0;
+
   card.innerHTML = `
-    <div class="habit-row" id="row-${habit.id}">
-      ${controlHtml}
-      <div class="habit-info">
-        <div class="habit-name ${isChecked?'done-text':''}" id="name-${habit.id}">${habit.label}</div>
-        <div class="habit-desc">${habit.desc}</div>
-      </div>
-      <div class="week-mini">
-        <div class="week-frac ${wp.pct>=1?'on-track':''}" style="color:${fracColor}">
-          ${wp.done}/${wp.target}${habit.unit?' '+habit.unit:''}
-        </div>
-        <div class="mini-bar"><div class="mini-fill" style="width:${wp.pct*100}%;background:${color}"></div></div>
-      </div>
-      <div class="expand-btn" id="exp-${habit.id}">▾</div>
+    <div class="section-tag">
+      <div class="section-tag-dot" style="background:${s.color}"></div>
+      <div class="section-tag-text" style="color:${s.color}">${s.name}</div>
     </div>
-    <div class="habit-tip" id="tip-${habit.id}">
-      <span style="color:${color}">◈ </span>${habit.tip}
-      ${getDailyExample(habit.id) ? `
-        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
-          <div style="font-size:8px;letter-spacing:2px;color:${color};text-transform:uppercase;margin-bottom:4px;font-style:normal">Today's challenge</div>
-          <div style="font-style:normal;color:var(--text);font-size:11px;line-height:1.6">${getDailyExample(habit.id)}</div>
-        </div>` : ''}
+    <div class="section-instruction">${s.instruction}</div>
+    <div class="section-subtext">${s.subtext}</div>
+    ${promptHtml}
+    <div class="timer-ring-wrap">
+      <div class="timer-ring">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle class="timer-ring-bg" cx="28" cy="28" r="24"/>
+          <circle class="timer-ring-fill" id="timer-ring-fill"
+            cx="28" cy="28" r="24"
+            stroke-dasharray="${2 * Math.PI * 24}"
+            stroke-dashoffset="0"
+            style="stroke:${s.color}"/>
+        </svg>
+        <div class="timer-ring-text" id="timer-display">${formatTime(timerSecondsLeft)}</div>
+      </div>
+      <div class="timer-controls">
+        <div class="timer-label">${s.minutes} min</div>
+        <button class="btn-timer" id="btn-timer" onclick="toggleTimer()">Start timer</button>
+      </div>
+    </div>
+    <div class="section-nav">
+      ${!isFirst ? `<button class="btn-prev" onclick="goStep(${idx - 1})">← prev</button>` : ''}
+      <button class="btn-next" onclick="${isLast ? 'finishSession()' : `goStep(${idx + 1})`}">
+        ${isLast ? 'Complete session' : 'Next →'}
+      </button>
     </div>
   `;
 
-  // Wire up events after inserting
-  setTimeout(() => {
-    if (habit.type === 'check') {
-      document.getElementById('chk-'+habit.id)?.addEventListener('click', (e) => {
-        e.stopPropagation(); toggleHabit(habit.id);
-      });
-    } else {
-      document.getElementById('inc-'+habit.id)?.addEventListener('click', (e) => {
-        e.stopPropagation(); adjustCount(habit.id, 1, habit.weeklyTarget*3);
-      });
-      document.getElementById('dec-'+habit.id)?.addEventListener('click', (e) => {
-        e.stopPropagation(); adjustCount(habit.id, -1);
-      });
-    }
-    document.getElementById('row-'+habit.id)?.addEventListener('click', () => {
-      const tip = document.getElementById('tip-'+habit.id);
-      const exp = document.getElementById('exp-'+habit.id);
-      if (tip) tip.classList.toggle('visible');
-      if (exp) exp.classList.toggle('open');
-    });
-  }, 0);
-
-  return card;
-}
-
-/* ============================================================
-  SECTION 24: HABIT INTERACTION HANDLERS
-  Controls: toggling a check habit, adjusting a count habit.
-  Both persist to localStorage immediately.
-============================================================ */
-function toggleHabit(id) {
-  if (!logs[selectedDay]) logs[selectedDay] = {};
-  logs[selectedDay][id] = !logs[selectedDay][id];
-  save('ht_logs', logs);
-  // Animate check box
-  const chk = document.getElementById('chk-'+id);
-  if (chk) { chk.classList.add('pop'); setTimeout(()=>chk.classList.remove('pop'),250); }
-  renderToday();
-  updateHeader();
-}
-
-function adjustCount(id, delta, max=9999) {
-  if (!counts[selectedDay]) counts[selectedDay] = {};
-  counts[selectedDay][id] = Math.max(0, Math.min(max, (counts[selectedDay][id]||0)+delta));
-  save('ht_counts', counts);
-  renderToday();
-  updateHeader();
-}
-
-/* ============================================================
-  SECTION 25: WEEKLY SUMMARY RENDERER
-  Controls: the bar list at the bottom of Today view showing
-  all habit progress against weekly targets.
-============================================================ */
-function renderSummary() {
-  const score = calcWeekScore();
-  document.getElementById('week-score-label').textContent =
-    score>=80 ? 'ON TRACK ✦' : score>=50 ? 'BUILDING ◈' : 'PUSH →';
-  document.getElementById('week-score-label').style.color =
-    score>=80 ? 'var(--green)' : score>=50 ? 'var(--gold)' : 'var(--red)';
-
-  const rows = document.getElementById('summary-rows');
-  rows.innerHTML = '';
-  HABITS.forEach(h => {
-    const cat = CATS[h.category];
-    const wp  = weekProgress(h);
-    const row = document.createElement('div');
-    row.className = 'summary-row';
-    row.innerHTML = `
-      <div class="summary-name">${h.label}</div>
-      <div class="summary-bar"><div class="summary-fill" style="width:${wp.pct*100}%;background:${cat.color}${wp.pct>=1?'':'88'}"></div></div>
-      <div class="summary-num" style="color:${wp.pct>=1?cat.color:'var(--muted)'}">
-        ${wp.done}/${wp.target}${h.unit?' '+h.unit:''}
-      </div>`;
-    rows.appendChild(row);
-  });
-}
-
-/* ============================================================
-  SECTION 26: MONTH VIEW RENDERER
-  Controls: heading, 30-day heatmap grid, category score cards.
-  Click a heatmap cell to jump to that day in Today view.
-============================================================ */
-function renderMonth() {
-  const now = new Date();
-  document.getElementById('month-heading').textContent =
-    MONTH_NAMES[now.getMonth()].toUpperCase() + ' ' + now.getFullYear() + ' — HEATMAP';
-
-  // Build last-30-days array
-  const days = Array.from({length:30}, (_,i) => {
-    const d = new Date(); d.setDate(d.getDate()-29+i);
-    const key = getDayKey(d);
-    const checks = HABITS.filter(h=>h.type==='check');
-    const score  = checks.length ? checks.filter(h=>logs[key]?.[h.id]).length/checks.length : 0;
-    return { key, date:d, score };
-  });
-
-  // Heatmap
-  const grid = document.getElementById('heatmap-grid');
-  grid.innerHTML = '';
-  days.forEach(({ key, date, score }) => {
-    const cell = document.createElement('div');
-    cell.className = 'heat-cell' + (key===TODAY?' today-cell':'');
-    const alpha = score===0 ? 0 : 0.1 + score*0.85;
-    cell.style.background = score===0 ? 'var(--surface)' : `rgba(232,197,71,${alpha})`;
-    cell.style.color = score > 0.55 ? '#0A0A0C' : 'var(--muted)';
-    cell.textContent = date.getDate();
-    cell.title = `${date.toLocaleDateString()} — ${Math.round(score*100)}%`;
-    cell.onclick = () => { selectedDay=key; showView('today'); };
-    grid.appendChild(cell);
-  });
-
-  // Category cards
-  const cards = document.getElementById('month-cards');
-  cards.innerHTML = '';
-  Object.entries(CATS).forEach(([catId, cat]) => {
-    const catHabits = HABITS.filter(h=>h.category===catId);
-    const total  = catHabits.reduce((a,h) => a+weekProgress(h).done,0);
-    const target = catHabits.reduce((a,h) => a+h.weeklyTarget,0);
-    const pct    = Math.min(1, total/target);
-    const card   = document.createElement('div');
-    card.className = 'month-card';
-    card.innerHTML = `
-      <div class="month-card-top">
-        <div>
-          <div style="width:8px;height:8px;border-radius:50%;background:${cat.color};margin-bottom:8px"></div>
-          <div style="font-family:var(--font-disp);font-size:12px;font-weight:700;color:var(--muted)">${cat.label}</div>
-          <div style="font-size:10px;color:var(--dim);margin-top:3px">This week · ${total}/${target} units</div>
-        </div>
-        <div class="month-card-pct" style="color:${cat.color}">${Math.round(pct*100)}%</div>
-      </div>
-      <div class="month-bar"><div class="month-fill" style="width:${pct*100}%;background:${cat.color}"></div></div>`;
-    cards.appendChild(card);
-  });
-}
-
-/* ============================================================
-  SECTION 27: YEAR VIEW RENDERER
-  Controls: yearly goal cards with milestone chips,
-  progress percentages based on cumulative log data.
-  Edit yearGoals array below to change 2026 targets.
-============================================================ */
-function renderYear() {
-  const allLogKeys  = Object.keys(logs);
-  const allCountKeys = Object.keys(counts);
-
-  const boldActsDone    = allLogKeys.filter(d=>logs[d]?.bold_act).length;
-  const networkingDone  = allLogKeys.filter(d=>logs[d]?.networking).length;
-  const totalSkillMins  = allCountKeys.reduce((a,d)=>a+(counts[d]?.skill_build||0),0);
-  const totalApproaches = allCountKeys.reduce((a,d)=>a+(counts[d]?.cold_approach||0),0);
-
-  /* ============================================================
-    SECTION 36: YEAR GOAL — CAREER PIVOT LIVE CALCULATION
-    Controls: how the "Land Career Pivot" goal updates from the
-    Research Log. Only entries rated 7+ count (quality filter).
-    Q1 milestone auto-completes when 3+ distinct sectors logged
-    at 7+. Progress bar tracks toward 50 high-quality entries.
-    If this isn't updating, check careerLog entries have rating
-    field set (saved via SECTION 29 form submit).
-  ============================================================ */
-  const highQualityEntries = careerLog.filter(e => e.rating >= 7);
-  const pivotCount         = highQualityEntries.length;
-  const uniqueHighSectors  = [...new Set(highQualityEntries.map(e => e.sector.toLowerCase().trim()))];
-  const q1Done             = uniqueHighSectors.length >= 3; // Q1: 3 distinct sectors rated 7+
-  const q2Done             = networkingDone >= 10;
-  const q3Done             = networkingDone >= 30;
-  const q4Done             = networkingDone >= 50;
-
-  const yearGoals = [
-    {
-      icon:'⚡', label:'Become Noticeably Bolder', color:'var(--gold)',
-      desc:'Complete 260 bold acts across the year. Build the identity, not just the habit.',
-      current: boldActsDone, target: 260,
-    },
-    {
-      icon:'◎', label:'Land Career Pivot', color:'var(--blue)',
-      desc:`High-quality research entries (rated 7+): ${pivotCount}/50. ${uniqueHighSectors.length} sector${uniqueHighSectors.length!==1?'s':''} explored at high excitement.`,
-      current: pivotCount, target: 50,
-      milestones: [
-        { label: 'Q1: Decide sector', done: q1Done, sub: q1Done ? `${uniqueHighSectors.length} sectors rated 7+ ✦` : `${uniqueHighSectors.length}/3 sectors rated 7+` },
-        { label: 'Q2: Build network', done: q2Done, sub: `${networkingDone} network touches` },
-        { label: 'Q3: Applications live', done: q3Done, sub: q3Done ? 'Target reached' : `${networkingDone}/30 touches` },
-        { label: 'Q4: Offer secured', done: q4Done, sub: q4Done ? '🎉 Done' : 'Keep going' },
-      ],
-    },
-    {
-      icon:'▲', label:'7,800 Mins Skill Building', color:'var(--green)',
-      desc:'150 mins/week compounds to 7,800 mins of deliberate practice this year.',
-      current: totalSkillMins, target: 7800,
-    },
-    {
-      icon:'→', label:'150 Social Approaches', color:'var(--orange)',
-      desc:'3 social approaches per week. Professional or personal. Volume = confidence.',
-      current: totalApproaches, target: 150,
-    },
-  ];
-
-  const container = document.getElementById('year-goals');
-  container.innerHTML = '';
-
-  yearGoals.forEach(goal => {
-    const pct = Math.min(1, goal.current/goal.target);
-    const div = document.createElement('div');
-    div.className = 'year-goal';
-    let milestonesHtml = '';
-    if (goal.milestones) {
-      // Milestones can be plain strings OR objects { label, done, sub }
-      milestonesHtml = `<div class="milestones">${goal.milestones.map((m) => {
-        const isObj  = typeof m === 'object';
-        const label  = isObj ? m.label : m;
-        const done   = isObj ? m.done  : false;
-        const sub    = isObj ? m.sub   : '';
-        return `<div class="milestone ${done?'reached':''}" style="${done?`border-color:${goal.color}40;background:${goal.color}10;color:${goal.color}`:''}">
-          <div>${done?'✓ ':''}${label}</div>
-          ${sub ? `<div style="font-size:9px;margin-top:3px;opacity:0.7">${sub}</div>` : ''}
-        </div>`;
-      }).join('')}</div>`;
-    }
-    div.innerHTML = `
-      <div class="year-goal-top">
-        <div style="display:flex;gap:12px;flex:1">
-          <div class="year-goal-icon">${goal.icon}</div>
-          <div>
-            <div class="year-goal-label">${goal.label}</div>
-            <div class="year-goal-desc">${goal.desc}</div>
-          </div>
-        </div>
-        <div>
-          <div class="year-pct" style="color:${goal.color}">${Math.round(pct*100)}%</div>
-          <div style="font-size:9px;color:var(--dim);text-align:right">${goal.current}/${goal.target}</div>
-        </div>
-      </div>
-      <div class="year-bar"><div class="year-fill" style="width:${pct*100}%;background:${goal.color}"></div></div>
-      ${milestonesHtml}`;
-    container.appendChild(div);
-  });
-}
-
-/* ============================================================
-  SECTION 28: CAREER LOG — STAR RATING WIDGET
-  Controls: interactive 10-star excitement rating.
-  currentRating stores selected value (1–10).
-============================================================ */
-let currentRating = 0;
-document.querySelectorAll('.star').forEach(star => {
-  star.addEventListener('click', () => {
-    currentRating = parseInt(star.dataset.v);
-    document.querySelectorAll('.star').forEach(s => {
-      s.classList.toggle('lit', parseInt(s.dataset.v) <= currentRating);
-    });
-  });
-});
-
-/* ============================================================
-  SECTION 29: CAREER LOG — SAVE ENTRY
-  Controls: form validation and saving a new entry to
-  careerLog array, then persisting to localStorage.
-============================================================ */
-document.getElementById('log-submit').addEventListener('click', () => {
-  const sector  = document.getElementById('f-sector').value.trim();
-  const person  = document.getElementById('f-person').value.trim();
-  const insight = document.getElementById('f-insight').value.trim();
-
-  if (!sector) { document.getElementById('f-sector').focus(); return; }
-
-  const entry = {
-    id:      Date.now(),
-    date:    new Date().toISOString(),
-    sector,
-    person,
-    insight,
-    rating:  currentRating,
-  };
-  careerLog.unshift(entry); // newest first
-  save('ht_career_log', careerLog);
-
-  // Reset form
-  document.getElementById('f-sector').value  = '';
-  document.getElementById('f-person').value  = '';
-  document.getElementById('f-insight').value = '';
-  currentRating = 0;
-  document.querySelectorAll('.star').forEach(s => s.classList.remove('lit'));
-
-  renderLog();
-});
-
-/* ============================================================
-  SECTION 30: CAREER LOG RENDERER
-  Controls: sector filter chips, entry card list,
-  empty state. activeFilter = null means show all.
-============================================================ */
-let activeFilter = null;
-
-function renderLog() {
-  // Build unique sector list
-  const sectors = [...new Set(careerLog.map(e=>e.sector).filter(Boolean))];
-  const filterDiv = document.getElementById('sector-filters');
-  filterDiv.innerHTML = '';
-  if (sectors.length > 1) {
-    const all = document.createElement('div');
-    all.className = 'sector-tag' + (!activeFilter?' active':'');
-    all.textContent = 'All'; all.onclick = () => { activeFilter=null; renderLog(); };
-    filterDiv.appendChild(all);
-    sectors.forEach(s => {
-      const tag = document.createElement('div');
-      tag.className = 'sector-tag' + (activeFilter===s?' active':'');
-      tag.textContent = s;
-      tag.onclick = () => { activeFilter=s; renderLog(); };
-      filterDiv.appendChild(tag);
-    });
+  // Fetch AI prompt if needed
+  if (s.type === 'ai' && !aiPrompts[s.id]) {
+    fetchAIPrompt(s);
   }
-
-  // Filter entries
-  const filtered = activeFilter ? careerLog.filter(e=>e.sector===activeFilter) : careerLog;
-  const listDiv  = document.getElementById('log-entries');
-  listDiv.innerHTML = '';
-
-  if (!filtered.length) {
-    listDiv.innerHTML = `<div id="log-empty">
-      <div class="big">◎</div>
-      No entries yet.<br>Start exploring and log<br>what you discover.
-    </div>`;
-    return;
-  }
-
-  filtered.forEach(entry => {
-    const d   = new Date(entry.date);
-    const dateStr = d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-    const stars = entry.rating ? '★'.repeat(entry.rating) + '☆'.repeat(10-entry.rating) : '—';
-
-    const card = document.createElement('div');
-    card.className = 'log-entry fade-up';
-    card.innerHTML = `
-      <div class="log-entry-top">
-        <div>
-          <div class="log-sector">${entry.sector}</div>
-          <div class="log-date">${dateStr}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="log-stars">${stars}</div>
-          <div class="log-delete" data-id="${entry.id}">✕</div>
-        </div>
-      </div>
-      ${entry.person  ? `<div class="log-field"><strong>Source / Person</strong><br>${entry.person}</div>` : ''}
-      ${entry.insight ? `<div class="log-field"><strong>Key Insight</strong><br>${entry.insight}</div>` : ''}
-    `;
-    card.querySelector('.log-delete').addEventListener('click', () => {
-      careerLog = careerLog.filter(e => e.id !== entry.id);
-      save('ht_career_log', careerLog);
-      renderLog();
-    });
-    listDiv.appendChild(card);
-  });
 }
 
-/* ============================================================
-  SECTION 34: DAILY CHALLENGE BANK + RENDERER
-  Controls: the rotating daily challenge card at top of Today.
-  Uses day-of-year as seed so it's consistent all day, fresh
-  tomorrow. boldChallenges and socialChallenges are the pools.
-  To add new challenges: append to the arrays below.
-  Each has { act } — the challenge text shown to the user.
-============================================================ */
-const boldChallenges = [
-  { act: "Say exactly what you think in the next meeting or group conversation — no softening, no hedging." },
-  { act: "Ask for something you want today that you'd normally talk yourself out of requesting." },
-  { act: "Make direct eye contact and hold it a beat longer than feels comfortable, three times today." },
-  { act: "Give someone a specific, unprompted compliment — in person, out loud." },
-  { act: "Disagree with someone openly today. State your position clearly without apologising for it." },
-  { act: "Do something in public that feels mildly embarrassing — sing, dance, talk loudly, laugh freely." },
-  { act: "Send the message you've been drafting and deleting. Today it goes." },
-  { act: "Speak first in the next group setting you're in. Don't wait to be invited." },
-  { act: "Tell someone a truth about yourself you'd normally keep private." },
-  { act: "Set a boundary out loud with someone today. 'No' is a complete sentence." },
-  { act: "Ask a question in public — a talk, a class, a meeting — even if your voice shakes." },
-  { act: "Walk into a room and act like you belong there completely. Own your entrance." },
-  { act: "Pitch an idea at work or to a friend without downplaying it first." },
-  { act: "Do the thing you planned to do 'someday'. Start today, even for 10 minutes." },
-  { act: "Call someone instead of texting them. Have the conversation in real time." },
-  { act: "Go somewhere alone — a restaurant, a bar, a cinema — and be comfortable with your own company." },
-  { act: "Volunteer to go first at something: a presentation, a game, an awkward task." },
-  { act: "Take up more physical space today — sit wider, gesture more, don't make yourself small." },
-  { act: "Tell someone 'I don't know' rather than faking confidence you don't have." },
-  { act: "Write and post something public — a thought, an opinion, a question — online." },
-  { act: "Challenge a plan or decision you think is wrong. Speak up, politely but clearly." },
-  { act: "Admit a mistake to someone directly and without over-explaining or deflecting." },
-  { act: "Ask for help with something you'd normally white-knuckle alone." },
-  { act: "Sit or stand at the front, not the back. Put yourself where you can't hide." },
-  { act: "Say 'I'll think about it' instead of immediately saying yes to something you don't want." },
-  { act: "Introduce yourself to someone you've seen around but never spoken to." },
-  { act: "Negotiate something small today — a price, a deadline, a favour. Practice the muscle." },
-  { act: "Do one thing today purely for yourself, without justifying it to anyone." },
-  { act: "Pause before agreeing. Ask yourself if you actually mean it first." },
-  { act: "Tell someone their work is excellent — or that it needs work. Either way, be honest." },
-];
-
-const socialChallenges = [
-  { act: "Strike up a conversation with someone you're waiting near — a queue, a lift, a platform." },
-  { act: "Ask a stranger for a recommendation: best coffee nearby, what they're reading, where they got their shoes." },
-  { act: "Start a conversation with someone at a social event you'd normally avoid approaching." },
-  { act: "Message someone you've been meaning to reconnect with. Today, not 'soon'." },
-  { act: "Give a genuine compliment to a stranger — their style, their dog, their energy." },
-  { act: "Ask someone you just met one meaningful question beyond small talk." },
-  { act: "Sit next to someone you don't know at lunch, a café, or on transport and say hello." },
-  { act: "Make a plan with someone you've been vaguely meaning to see. Set a specific date." },
-  { act: "Introduce yourself first — don't wait for someone else to break the ice." },
-  { act: "Follow up with someone you met recently. One message, genuine, no agenda." },
-  { act: "Ask someone what they're working on and actually listen for two minutes without talking about yourself." },
-  { act: "Pay attention to someone's name when introduced and use it once in the conversation." },
-  { act: "Start a conversation at a bar, café, or gym with someone who looks interesting." },
-  { act: "Ask someone in your life how they're really doing — and mean it." },
-  { act: "Approach someone whose work or path you admire. Tell them briefly what you respect about it." },
-  { act: "If you feel like leaving a social situation early, stay for 20 more minutes and engage." },
-  { act: "Make eye contact and smile at three strangers today. See what comes back." },
-  { act: "Say yes to a social invitation you'd normally decline." },
-  { act: "Start a conversation about something beyond weather and work — ask for their take on something real." },
-  { act: "Tell a story in a group — one you'd normally keep to yourself because it feels too personal." },
-  { act: "Ask someone you work with something personal (but appropriate). Get to know them as a person." },
-  { act: "Approach someone who is alone — at an event, a gym, a café. They might be waiting for exactly this." },
-  { act: "Send a voice note instead of a text to someone close to you." },
-  { act: "In your next group social, redirect the conversation to someone who hasn't spoken much." },
-  { act: "Reach out to someone senior to you — in work or life — purely to learn from them. No agenda." },
-  { act: "Talk to someone in a service role — barista, receptionist, driver — as if they're the most interesting person in the room." },
-  { act: "At your next social event, set a target: meet two new people and remember their names." },
-  { act: "Share something you're excited about with someone you don't know well. Enthusiasm is magnetic." },
-  { act: "Ask for an introduction from a mutual contact you've been too shy to request." },
-  { act: "Be the person who brings people together: suggest a group hang, dinner, or activity." },
-];
-
-function getDayOfYear() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  return Math.floor((now - start) / 86400000);
+async function goStep(idx) {
+  clearTimerInterval();
+  currentStep = idx;
+  await renderStep(idx);
 }
 
-function renderDailyChallenge() {
-  /* ============================================================
-    SECTION 34b: CHALLENGE SELECTION LOGIC
-    Uses day-of-year mod array length to pick today's challenge.
-    Both pools are independent so bold + social rarely overlap.
-    If challenges appear stale, check getDayOfYear() returns a
-    number that changes at midnight.
-  ============================================================ */
-  const doy   = getDayOfYear();
-  const bold  = boldChallenges[doy % boldChallenges.length];
-  const social = socialChallenges[(doy + 7) % socialChallenges.length]; // offset so they differ
-
-  const el = document.getElementById('dc-content');
-  if (!el) return;
-  el.innerHTML = `
-    <div class="dc-challenge">
-      <div class="dc-type">⚡ Bold Act</div>
-      <div class="dc-text">${bold.act}</div>
-    </div>
-    <div class="dc-divider"></div>
-    <div class="dc-challenge">
-      <div class="dc-type">→ Social Approach</div>
-      <div class="dc-text">${social.act}</div>
-    </div>`;
-}
-
-/* ============================================================
-  SECTION 35: HABIT-SPECIFIC DAILY EXAMPLES (TAP-TO-REVEAL)
-  Controls: the expanded tip panel for Bold Act and Social
-  Approach habit cards. When expanded, shows both the coaching
-  tip AND today's specific challenge example from Section 34.
-  This is wired into buildHabitCard() — the tip panel content
-  for bold_act and cold_approach is dynamically enriched here.
-============================================================ */
-function getDailyExample(habitId) {
-  const doy = getDayOfYear();
-  if (habitId === 'bold_act') {
-    return boldChallenges[doy % boldChallenges.length].act;
-  }
-  if (habitId === 'cold_approach') {
-    return socialChallenges[(doy + 7) % socialChallenges.length].act;
-  }
-  return null;
-}
-
-/* ============================================================
-  SECTION 38: DAILY NON-NEGOTIABLES — TIME-OF-DAY SYSTEM
-  Controls: 3 check-in periods, their items, tab switching,
-  collapse toggle, steps counter, and all persistence.
-
-  Data stored in localStorage:
-    ht_nn     → { "2026-03-07": { sunlight: true, steps: 4200, ... } }
-
-  CHECKIN_PERIODS defines which items belong to each period.
-  type 'check' = yes/no tick. type 'counter' = numeric input.
-  To move an item between periods: change its period value.
-  To add an item: add to NN_ITEMS and reference its id in
-  the correct CHECKIN_PERIODS array.
-============================================================ */
-const NN_ITEMS = [
-  // Morning
-  { id: 'sunlight',     label: 'Sunlight',              sublabel: 'Outdoor exposure within 30 mins of waking', icon: '☀️', type: 'check'   },
-  { id: 'journal',      label: 'Journal',               sublabel: 'Intention + one thing that scares you',     icon: '✦',  type: 'check'   },
-  { id: 'meditation',   label: 'Meditation',            sublabel: '5–10 mins breathwork or stillness',         icon: '🧘', type: 'check'   },
-  { id: 'exercise',     label: 'Exercise',              sublabel: 'Movement with intention',                   icon: '⚡', type: 'check'   },
-  { id: 'supplements',  label: 'Supplements',           sublabel: 'Daily stack taken',                        icon: '💊', type: 'check'   },
-  { id: 'breakfast',    label: 'Breakfast',             sublabel: 'Anchor meal logged',                       icon: '🌅', type: 'check'   },
-  // Midday
-  { id: 'lunch',        label: 'Lunch',                 sublabel: 'Midday meal logged',                       icon: '🥗', type: 'check'   },
-  { id: 'bold_act_nn',  label: 'Bold Act',              sublabel: 'One uncomfortable thing done',             icon: '🔥', type: 'check'   },
-  { id: 'steps',        label: 'Steps',                 sublabel: 'Daily movement beyond exercise',           icon: '👟', type: 'counter', unit: 'steps' },
-  // Evening
-  { id: 'dinner',       label: 'Dinner',                sublabel: 'Evening meal logged',                      icon: '🍽️', type: 'check'   },
-  { id: 'curious_brain',label: 'Curious Brain',         sublabel: 'At least one learning session',            icon: '🧠', type: 'check'   },
-  { id: 'wind_down',    label: 'Screen-free Wind-down', sublabel: 'No screens 30 mins before bed',            icon: '🌙', type: 'check'   },
-];
-
-const CHECKIN_PERIODS = {
-  morning: { label: 'Morning Routine',  ids: ['sunlight','journal','meditation','exercise','supplements','breakfast'] },
-  midday:  { label: 'Midday Check-in',  ids: ['lunch','bold_act_nn','steps'] },
-  evening: { label: 'Evening Check-in', ids: ['dinner','curious_brain','wind_down'] },
-};
-
-let nnLogs       = load('ht_nn', {});
-let nnOpen       = false;
-let activeCheckin = 'morning';
-
-/* ============================================================
-  SECTION 38b: CHECK-IN TAB SWITCHER
-  Called by onclick on each .checkin-tab in HTML Section 37b.
-  Updates activeCheckin, re-renders panel title + items,
-  and refreshes all three tab score pills.
-============================================================ */
-function checkinTabClick(period) {
-  activeCheckin = period;
-  document.querySelectorAll('.checkin-tab').forEach(t =>
-    t.classList.toggle('active', t.dataset.checkin === period)
-  );
-  const title = document.getElementById('nn-title');
-  if (title) title.textContent = CHECKIN_PERIODS[period].label;
-  renderNonNegotiables();
-}
-
-/* ============================================================
-  SECTION 38c: NN RENDERER
-  Renders items for the active check-in period into #nn-body.
-  Also updates all three tab score pills and the header pill.
-  Steps item renders a +/- counter instead of a checkbox.
-============================================================ */
-function renderNonNegotiables() {
-  const body    = document.getElementById('nn-body');
-  const chevron = document.getElementById('nn-chevron');
-  const pill    = document.getElementById('nn-score-pill');
-
-  // Update all three tab pills
-  Object.entries(CHECKIN_PERIODS).forEach(([period, cfg]) => {
-    const tabPill = document.getElementById('pill-' + period);
-    if (!tabPill) return;
-    const items   = cfg.ids.map(id => NN_ITEMS.find(n => n.id === id)).filter(Boolean);
-    const checks  = items.filter(n => n.type === 'check');
-    const done    = checks.filter(n => nnLogs[selectedDay]?.[n.id]).length;
-    // Steps counts as done if > 0
-    const stepsDone = period === 'midday' && (nnLogs[selectedDay]?.steps || 0) > 0 ? 1 : 0;
-    const totalDone = done + stepsDone;
-    const total     = checks.length + (period === 'midday' ? 1 : 0);
-    tabPill.textContent = `${totalDone}/${total}`;
-    tabPill.style.color = totalDone === total ? 'var(--green)' : '';
-  });
-
-  // Header pill for active period
-  const cfg     = CHECKIN_PERIODS[activeCheckin];
-  const items   = cfg.ids.map(id => NN_ITEMS.find(n => n.id === id)).filter(Boolean);
-  const checks  = items.filter(n => n.type === 'check');
-  const done    = checks.filter(n => nnLogs[selectedDay]?.[n.id]).length;
-  const stepsDone = activeCheckin === 'midday' && (nnLogs[selectedDay]?.steps || 0) > 0 ? 1 : 0;
-  const totalDone = done + stepsDone;
-  const total     = checks.length + (activeCheckin === 'midday' ? 1 : 0);
-  if (pill) {
-    pill.textContent   = `${totalDone}/${total}`;
-    pill.style.color   = totalDone === total ? 'var(--green)' : 'var(--purple)';
-    pill.style.borderColor = totalDone === total ? 'rgba(107,224,160,0.6)' : 'rgba(180,142,240,0.4)';
-  }
-
-  if (!body) return;
-  body.innerHTML = '';
-
-  items.forEach(item => {
-    const row = document.createElement('div');
-    row.className = 'nn-item';
-
-    if (item.type === 'counter') {
-      /* ============================================================
-        SECTION 38d: STEPS COUNTER WIDGET
-        Tapping +/- updates nnLogs[selectedDay].steps directly.
-        Large increments: hold + to add 500 at a time would be
-        ideal — for now single taps add 100 per press.
-        To change step size: edit the delta values below.
-      ============================================================ */
-      const val = nnLogs[selectedDay]?.steps || 0;
-      row.innerHTML = `
-        <div class="nn-icon">${item.icon}</div>
-        <div class="nn-info">
-          <div class="nn-label ${val > 0 ? 'done' : ''}">${item.label}</div>
-          <div class="nn-sublabel">${item.sublabel}</div>
-        </div>
-        <div class="nn-counter">
-          <div class="nn-counter-btn" id="nn-steps-dec">−</div>
-          <div class="nn-counter-val">${val.toLocaleString()}<span class="nn-counter-unit">${item.unit}</span></div>
-          <div class="nn-counter-btn" id="nn-steps-inc">+</div>
-        </div>
-      `;
-      row.addEventListener('click', e => e.stopPropagation());
-      body.appendChild(row);
-      setTimeout(() => {
-        document.getElementById('nn-steps-inc')?.addEventListener('click', e => {
-          e.stopPropagation(); adjustSteps(500);
-        });
-        document.getElementById('nn-steps-dec')?.addEventListener('click', e => {
-          e.stopPropagation(); adjustSteps(-500);
-        });
-      }, 0);
-    } else {
-      const checked = !!(nnLogs[selectedDay]?.[item.id]);
-      row.innerHTML = `
-        <div class="nn-check ${checked ? 'checked' : ''}" id="nn-chk-${item.id}">${checked ? '✓' : ''}</div>
-        <div class="nn-info">
-          <div class="nn-label ${checked ? 'done' : ''}">${item.label}</div>
-          <div class="nn-sublabel">${item.sublabel}</div>
-        </div>
-        <div class="nn-icon">${item.icon}</div>
-      `;
-      row.addEventListener('click', () => toggleNN(item.id));
-      body.appendChild(row);
-    }
-  });
-
-  body.classList.toggle('open', nnOpen);
-  if (chevron) chevron.classList.toggle('open', nnOpen);
-}
-
-/* ============================================================
-  SECTION 38e: NN INTERACTION HANDLERS
-  toggleNN — flips a check item, persists, re-renders.
-  adjustSteps — adds delta to step count (min 0), persists.
-============================================================ */
-function toggleNN(id) {
-  if (!nnLogs[selectedDay]) nnLogs[selectedDay] = {};
-  nnLogs[selectedDay][id] = !nnLogs[selectedDay][id];
-  save('ht_nn', nnLogs);
-  renderNonNegotiables();
-  updateHeader();
-}
-
-function adjustSteps(delta) {
-  if (!nnLogs[selectedDay]) nnLogs[selectedDay] = {};
-  nnLogs[selectedDay].steps = Math.max(0, (nnLogs[selectedDay].steps || 0) + delta);
-  save('ht_nn', nnLogs);
-  renderNonNegotiables();
-}
-
-// Collapse toggle
-document.getElementById('nn-header').addEventListener('click', () => {
-  nnOpen = !nnOpen;
-  document.getElementById('nn-body')?.classList.toggle('open', nnOpen);
-  document.getElementById('nn-chevron')?.classList.toggle('open', nnOpen);
-});
-
-/* ============================================================
-  SECTION 39: CONNECTED APPS BRIDGE
-  Controls: the "Connected Apps" panel which reads from the
-  shared localStorage key "ht_external".
-
-  HOW OTHER APPS WRITE TO MOMENTUM:
-  ─────────────────────────────────
-  In Shredz, add this snippet to your daily save function:
-  ┌─────────────────────────────────────────────────────────┐
-  │ const today = new Date().toISOString().split('T')[0];   │
-  │ const ext = JSON.parse(                                 │
-  │   localStorage.getItem('ht_external') || '{}'          │
-  │ );                                                      │
-  │ ext.shredz = {                                         │
-  │   date: today,                                         │
-  │   value: waterMl + 'ml · ' + proteinG + 'g protein',  │
-  │   score: Math.round((waterMl/2500)*100)                │
-  │ };                                                      │
-  │ localStorage.setItem('ht_external', JSON.stringify(ext));│
-  └─────────────────────────────────────────────────────────┘
-
-  In Curious Brain, add this snippet when a session completes:
-  ┌─────────────────────────────────────────────────────────┐
-  │ const today = new Date().toISOString().split('T')[0];   │
-  │ const ext = JSON.parse(                                 │
-  │   localStorage.getItem('ht_external') || '{}'          │
-  │ );                                                      │
-  │ ext.curious_brain = {                                  │
-  │   date: today,                                         │
-  │   value: topicName + ' · ' + minutesSpent + ' mins',  │
-  │   score: 100                                           │
-  │ };                                                      │
-  │ localStorage.setItem('ht_external', JSON.stringify(ext));│
-  └─────────────────────────────────────────────────────────┘
-
-  MOMENTUM reads ht_external on every render and shows live/offline
-  status per app based on whether the date field matches today.
-  Add more apps by adding to CONNECTED_APP_DEFS below.
-============================================================ */
-const CONNECTED_APP_DEFS = [
-  { id: 'shredz',       label: 'Shredz',       icon: '💧', desc: 'Nutrition & water' },
-  { id: 'curious_brain',label: 'Curious Brain', icon: '🧠', desc: 'Daily learning'   },
-];
-
-function renderConnectedApps() {
-  const ext     = load('ht_external', {});
-  const today   = getDayKey(new Date());
-  const listDiv = document.getElementById('ca-list');
-  if (!listDiv) return;
-  listDiv.innerHTML = '';
-
-  CONNECTED_APP_DEFS.forEach(app => {
-    const data    = ext[app.id];
-    const isLive  = data && data.date === today;
-    const row     = document.createElement('div');
-    row.className = 'ca-app';
-    row.innerHTML = `
-      <div class="ca-dot ${isLive ? 'live' : 'offline'}"></div>
-      <div style="font-size:14px">${app.icon}</div>
-      <div class="ca-name">${app.label}</div>
-      <div class="ca-value ${isLive ? 'live' : ''}">
-        ${isLive ? data.value : app.desc + ' · not connected'}
-      </div>
-    `;
-    listDiv.appendChild(row);
-  });
-}
-/* ============================================================
-  SECTION 40: SUPABASE CLOUD SYNC
-  Controls: two-way sync between localStorage and Supabase.
-  All app data is written to the "app_sync" table with app_id
-  "momentum" and a date key. On load, cloud data is merged into
-  localStorage so the most recent write always wins.
-
-  INTEGRATION SNIPPETS FOR OTHER APPS:
-  ─────────────────────────────────────
-  Copy the SUPABASE_URL and SUPABASE_KEY constants below into
-  Shredz and Curious Brain. Then call syncToSupabase() after
-  any save. The payload object should match the structure below
-  for each app:
-
-  Shredz — paste into your save function:
-  ┌─────────────────────────────────────────────────────────────┐
-  │ const SUPABASE_URL = 'https://ebvvhgutvgwsqvizwbyv.supabase.co'; │
-  │ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidnZoZ3V0dmd3c3F2aXp3Ynl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDc5ODUsImV4cCI6MjA4NzY4Mzk4NX0.VWOhDXbkQc6ExD2Goklkcw9Bx0pwn6XmTFSCKG9bmEc'; │
-  │ async function syncShredz(waterMl, calories, protein) {    │
-  │   const today = new Date().toISOString().split('T')[0];    │
-  │   await fetch(`${SUPABASE_URL}/rest/v1/app_sync`, {        │
-  │     method: 'POST',                                        │
-  │     headers: {                                             │
-  │       'Content-Type': 'application/json',                  │
-  │       'apikey': SUPABASE_KEY,                              │
-  │       'Authorization': `Bearer ${SUPABASE_KEY}`,           │
-  │       'Prefer': 'resolution=merge-duplicates'              │
-  │     },                                                     │
-  │     body: JSON.stringify({                                 │
-  │       app_id: 'shredz', date: today,                      │
-  │       payload: { waterMl, calories, protein,               │
-  │                  value: `${waterMl}ml · ${protein}g protein` } │
-  │     })                                                     │
-  │   });                                                      │
-  │ }                                                          │
-  └─────────────────────────────────────────────────────────────┘
-
-  Curious Brain — paste into your session-complete handler:
-  ┌─────────────────────────────────────────────────────────────┐
-  │ const SUPABASE_URL = 'https://ebvvhgutvgwsqvizwbyv.supabase.co'; │
-  │ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidnZoZ3V0dmd3c3F2aXp3Ynl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDc5ODUsImV4cCI6MjA4NzY4Mzk4NX0.VWOhDXbkQc6ExD2Goklkcw9Bx0pwn6XmTFSCKG9bmEc'; │
-  │ async function syncCuriousBrain(topic, streak) {           │
-  │   const today = new Date().toISOString().split('T')[0];    │
-  │   await fetch(`${SUPABASE_URL}/rest/v1/app_sync`, {        │
-  │     method: 'POST',                                        │
-  │     headers: {                                             │
-  │       'Content-Type': 'application/json',                  │
-  │       'apikey': SUPABASE_KEY,                              │
-  │       'Authorization': `Bearer ${SUPABASE_KEY}`,           │
-  │       'Prefer': 'resolution=merge-duplicates'              │
-  │     },                                                     │
-  │     body: JSON.stringify({                                 │
-  │       app_id: 'curious_brain', date: today,               │
-  │       payload: { topic, streak,                            │
-  │                  value: `${topic} · streak ${streak}` }   │
-  │     })                                                     │
-  │   });                                                      │
-  │ }                                                          │
-  └─────────────────────────────────────────────────────────────┘
-
-  If Connected Apps panel shows "not connected", check:
-  1. The app_sync table exists in Supabase (run SQL in Section 40 setup)
-  2. RLS policies are set (public read + write)
-  3. The other app is calling its sync function on save
-============================================================ */
-const SUPABASE_URL = 'https://ebvvhgutvgwsqvizwbyv.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidnZoZ3V0dmd3c3F2aXp3Ynl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDc5ODUsImV4cCI6MjA4NzY4Mzk4NX0.VWOhDXbkQc6ExD2Goklkcw9Bx0pwn6XmTFSCKG9bmEc';
-
-// Write MOMENTUM's full daily state to Supabase
-async function syncToSupabase() {
+async function fetchAIPrompt(section) {
   try {
-    const today = getDayKey(new Date());
-    await fetch(`${SUPABASE_URL}/rest/v1/app_sync`, {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Prefer': 'resolution=merge-duplicates'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        app_id: 'momentum',
-        date: today,
-        payload: {
-          logs:      logs,
-          counts:    counts,
-          nnLogs:    nnLogs,
-          careerLog: careerLog
-        }
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: section.promptSystem,
+        messages: [{ role: 'user', content: `Generate today's prompt. Today is ${new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}.` }]
       })
     });
-  } catch(e) { console.warn('Supabase sync failed (offline?):', e); }
+    const data = await res.json();
+    const text = data.content?.[0]?.text?.trim() || 'What are you holding onto right now that you haven\'t fully acknowledged?';
+    aiPrompts[section.id] = text;
+
+    const box = document.getElementById(`ai-box-${section.id}`);
+    if (box) {
+      box.classList.remove('loading');
+      box.querySelector('.ai-prompt-text').textContent = text;
+      box.querySelector('.ai-prompt-text').classList.remove('loading-text');
+    }
+  } catch (e) {
+    aiPrompts[section.id] = getFallbackPrompt(section.id);
+    const box = document.getElementById(`ai-box-${section.id}`);
+    if (box) {
+      box.classList.remove('loading');
+      box.querySelector('.ai-prompt-text').textContent = aiPrompts[section.id];
+      box.querySelector('.ai-prompt-text').classList.remove('loading-text');
+    }
+  }
 }
 
-// Read today's data for all apps from Supabase on load
-async function loadFromSupabase() {
-  try {
-    const today = getDayKey(new Date());
-
-    // Load MOMENTUM's own cloud state and merge into localStorage
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/app_sync?app_id=eq.momentum&date=eq.${today}&select=payload`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
-    );
-    const rows = await res.json();
-    if (rows?.length && rows[0].payload) {
-      const p = rows[0].payload;
-      if (p.logs)      { logs      = p.logs;      save('ht_logs', logs); }
-      if (p.counts)    { counts    = p.counts;    save('ht_counts', counts); }
-      if (p.nnLogs)    { nnLogs    = p.nnLogs;    save('ht_nn', nnLogs); }
-      if (p.careerLog) { careerLog = p.careerLog; save('ht_career_log', careerLog); }
-    }
-
-    // Load external apps (Shredz, Curious Brain) and write to ht_external
-    const extRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/app_sync?app_id=in.(shredz,curious_brain)&date=eq.${today}&select=app_id,payload`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Accept': 'application/json' } }
-    );
-    const extRows = await extRes.json();
-    if (extRows?.length) {
-      const ext = load('ht_external', {});
-      extRows.forEach(row => {
-        ext[row.app_id] = { ...row.payload, date: today };
-      });
-      save('ht_external', ext);
-    }
-  } catch(e) { console.warn('Supabase load failed (offline?):', e); }
+function getFallbackPrompt(id) {
+  const fallbacks = {
+    emotion: 'What feeling have you been carrying since yesterday that you haven\'t fully acknowledged yet?',
+    gratitude: 'Notice something that happened in the last 24 hours that made things quietly easier.',
+    creative: 'If your life were a book, what genre would it be right now — and is that the genre you want to be living in?'
+  };
+  return fallbacks[id] || 'What is most present for you right now?';
 }
 
-// Patch save() to also sync to Supabase on every write
-let _syncTimer = null;
-const _localSave = (key, val) => {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) { console.warn('Storage full:', e); }
+// ── TIMER ─────────────────────────────────────────────────
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearTimerInterval();
+    timerRunning = false;
+    document.getElementById('btn-timer').textContent = 'Resume';
+    document.getElementById('btn-timer').classList.remove('running');
+  } else {
+    timerRunning = true;
+    document.getElementById('btn-timer').textContent = 'Pause';
+    document.getElementById('btn-timer').classList.add('running');
+    const total = SECTIONS[currentStep].minutes * 60;
+    timerInterval = setInterval(() => {
+      timerSecondsLeft--;
+      document.getElementById('timer-display').textContent = formatTime(timerSecondsLeft);
+      const pct = timerSecondsLeft / total;
+      const circ = 2 * Math.PI * 24;
+      const fill = document.getElementById('timer-ring-fill');
+      if (fill) fill.style.strokeDashoffset = circ * (1 - pct);
+      if (timerSecondsLeft <= 0) {
+        clearTimerInterval();
+        timerRunning = false;
+        document.getElementById('btn-timer').textContent = 'Done ✓';
+        document.getElementById('btn-timer').classList.remove('running');
+      }
+    }, 1000);
+  }
+}
+
+function clearTimerInterval() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+// ── COMPLETE ──────────────────────────────────────────────
+function finishSession() {
+  clearTimerInterval();
+  const streak = updateStreak();
+  document.getElementById('complete-streak').textContent =
+    streak === 1 ? 'Day 1 — the hardest one.' : `${streak} day streak.`;
+  document.getElementById('complete-quote').textContent =
+    CLOSING_QUOTES[Math.floor(Math.random() * CLOSING_QUOTES.length)];
+  document.getElementById('progress-fill').style.width = '100%';
+  showScreen('complete');
+}
+
+function goHome() {
+  showScreen('home');
+  initHome();
+}
+
+// ── SCREENS ───────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────
+// ── INLINE MANIFEST ───────────────────────────────────────
+const manifestData = {
+  name: "ANCHOR",
+  short_name: "ANCHOR",
+  description: "Your daily journaling companion",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#F5F2ED",
+  theme_color: "#1A1A1A",
+  orientation: "portrait",
+  icons: [
+    { src: "https://placehold.co/192x192/1A1A18/F7F4EF?text=A", sizes: "192x192", type: "image/png" },
+    { src: "https://placehold.co/512x512/1A1A18/F7F4EF?text=A", sizes: "512x512", type: "image/png" }
+  ]
 };
-function save(key, val) {
-  _localSave(key, val);
-  clearTimeout(_syncTimer);
-  _syncTimer = setTimeout(syncToSupabase, 1500);
-}
+const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+const manifestURL = URL.createObjectURL(manifestBlob);
+document.getElementById('manifest-placeholder').href = manifestURL;
 
-async function init() {
-  updateHeader();
-  renderDailyChallenge();
-  renderToday();
-  // Load cloud data then re-render with fresh state
-  await loadFromSupabase();
-  updateHeader();
-  renderToday();
-  renderConnectedApps();
-}
-
-/* ============================================================
-  SECTION 32: SERVICE WORKER (PWA / OFFLINE SUPPORT)
-  Controls: makes the app installable and cacheable.
-  The service worker is injected inline via a Blob URL so no
-  server is needed — it works when opened as a local HTML file
-  saved to your phone via Safari > Add to Home Screen.
-  If the app seems stale, clear site data in Safari Settings.
-============================================================ */
+// ── INLINE SERVICE WORKER ─────────────────────────────────
 if ('serviceWorker' in navigator) {
   const swCode = `
-    const CACHE = 'momentum-v1';
-    const ASSETS = ['/'];
-    self.addEventListener('install',  e => { self.skipWaiting(); });
-    self.addEventListener('activate', e => { self.clients.claim(); });
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        caches.match(e.request).then(r => r || fetch(e.request).catch(()=>new Response('Offline')))
-      );
-    });
+    const CACHE = 'anchor-v1';
+    self.addEventListener('install', e => e.waitUntil(
+      caches.open(CACHE).then(c => c.addAll(['./']))
+    ));
+    self.addEventListener('fetch', e => e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    ));
   `;
-  const blob = new Blob([swCode], { type:'application/javascript' });
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+  const swBlob = new Blob([swCode], { type: 'application/javascript' });
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL, { scope: './' }).catch(() => {});
 }
 
-// Kick off
-init();
+initHome();
 </script>
 </body>
 </html>
