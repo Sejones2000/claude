@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ANCHOR</title>
+<link rel="manifest" id="manifest-placeholder">
+<meta name="theme-color" content="#1A1A1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F7F4EF;
+    --paper-dark: #EDE9E1;
+    --ink: #1A1A18;
+    --ink-light: #5A5750;
+    --ink-faint: #A8A49C;
+    --accent: #2C4A3E;
+    --accent-warm: #8B4513;
+    --rule: #D8D3CA;
+    --section-brain: #2C4A3E;
+    --section-emotion: #5C3D5C;
+    --section-purpose: #2C4A3E;
+    --section-gratitude: #8B4513;
+    --section-creative: #1A3A4A;
+    --section-close: #1A1A18;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ── HOME SCREEN ── */
+  #home {
+    padding: 0;
+    background: var(--paper);
+  }
+
+  .home-top {
+    padding: 60px 32px 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .home-wordmark {
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+
+  .home-date {
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    color: var(--ink-light);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .home-greeting {
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .home-greeting em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .streak-bar {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .streak-number {
+    font-family: 'DM Mono', monospace;
+    font-size: 36px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .streak-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .streak-label span:first-child {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .streak-label span:last-child {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
+
+  .streak-dots {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .streak-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rule);
+    transition: background 0.3s;
+  }
+
+  .streak-dot.filled { background: var(--accent); }
+  .streak-dot.today { background: var(--accent); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--accent); }
+
+  .home-sections-preview {
+    flex: 1;
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--rule);
+  }
+
+  .section-pill {
+    background: var(--paper);
+    padding: 14px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+  }
+
+  .section-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .section-pill-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    font-weight: 300;
+    flex: 1;
+  }
+
+  .section-pill-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
+
+  .home-cta {
+    padding: 24px 32px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+
+  .btn-begin {
+    width: 100%;
+    padding: 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 300;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn-begin:active { transform: scale(0.99); background: var(--accent); }
+
+  .already-done {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--ink-faint);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SESSION SCREEN ── */
+  #session {
+    background: var(--paper);
+  }
+
+  .session-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 10;
+  }
+
+  .btn-back {
+    background: none;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-faint);
+    cursor: pointer;
+    text-transform: uppercase;
+    padding: 4px 0;
+  }
+
+  .session-progress-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .session-step-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
+
+  .progress-track {
+    height: 2px;
+    background: var(--rule);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 0.5s ease;
+  }
+
+  /* ── SECTION CARD ── */
+  .section-card {
+    flex: 1;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    animation: fadeSlide 0.4s ease;
+  }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .section-tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .section-tag-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 300;
+  }
+
+  .section-instruction {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .section-instruction em { font-style: italic; color: var(--ink-light); }
+
+  .section-subtext {
+    font-size: 14px;
+    color: var(--ink-faint);
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  /* AI Prompt Box */
+  .ai-prompt-box {
+    background: var(--paper-dark);
+    border-left: 2px solid var(--accent);
+    padding: 16px 18px;
+    margin-bottom: 28px;
+    position: relative;
+    min-height: 60px;
+  }
+
+  .ai-prompt-box.loading::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 40%;
+    height: 2px;
+    background: var(--accent);
+    animation: loadBar 1.2s ease infinite;
+  }
+
+  @keyframes loadBar {
+    0% { width: 0; opacity: 1; }
+    70% { width: 80%; opacity: 1; }
+    100% { width: 100%; opacity: 0; }
+  }
+
+  .ai-prompt-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+    font-weight: 300;
+  }
+
+  .ai-prompt-text {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  /* Timer */
+  .timer-ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .timer-ring {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+  }
+
+  .timer-ring svg {
+    transform: rotate(-90deg);
+  }
+
+  .timer-ring-bg { fill: none; stroke: var(--rule); stroke-width: 2; }
+  .timer-ring-fill {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear;
+  }
+
+  .timer-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  .timer-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .timer-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
+
+  .btn-timer {
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: var(--ink-light);
+    transition: all 0.15s;
+    display: inline-flex;
+    width: fit-content;
+  }
+
+  .btn-timer:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-timer.running { border-color: var(--accent); color: var(--accent); }
+
+  /* Navigation */
+  .section-nav {
+    margin-top: auto;
+    padding-top: 24px;
+    display: flex;
+    gap: 12px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .btn-prev {
+    flex: 0;
+    padding: 16px 20px;
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-prev:hover { border-color: var(--ink-light); }
+
+  .btn-next {
+    flex: 1;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 300;
+    transition: background 0.2s;
+  }
+
+  .btn-next:hover { background: var(--accent); }
+  .btn-next:active { transform: scale(0.99); }
+
+  /* Closing sentence section */
+  .closing-stem {
+    font-size: 18px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--ink-light);
+    line-height: 1.5;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 12px;
+  }
+
+  /* ── COMPLETE SCREEN ── */
+  #complete {
+    justify-content: center;
+    align-items: center;
+    padding: 40px 32px;
+    text-align: center;
+    background: var(--paper);
+  }
+
+  .complete-mark {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 32px;
+    animation: scaleIn 0.5s ease;
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .complete-mark svg { stroke: var(--accent); }
+
+  .complete-wordmark {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 300;
+  }
+
+  .complete-title {
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .complete-title em { font-style: italic; color: var(--accent); }
+
+  .complete-streak {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-bottom: 48px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  .complete-rule {
+    width: 40px;
+    height: 1px;
+    background: var(--rule);
+    margin: 0 auto 32px;
+  }
+
+  .complete-quote {
+    font-size: 16px;
+    font-style: italic;
+    color: var(--ink-light);
+    line-height: 1.6;
+    max-width: 280px;
+    font-weight: 300;
+  }
+
+  .btn-home {
+    margin-top: 48px;
+    padding: 16px 32px;
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-home:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* ── UTILS ── */
+  .divider { height: 1px; background: var(--rule); margin: 24px 0; }
+
+  .loading-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-style: italic;
+    font-weight: 300;
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <div class="home-wordmark">Anchor</div>
+    <div class="home-date" id="home-date"></div>
+    <div class="home-greeting">Good morning,<br><em>let's begin.</em></div>
+  </div>
+
+  <div class="streak-bar">
+    <div class="streak-number" id="streak-num">0</div>
+    <div class="streak-label">
+      <span>Day streak</span>
+      <span id="streak-sub">Start your first session</span>
+    </div>
+    <div class="streak-dots" id="streak-dots"></div>
+  </div>
+
+  <div class="home-sections-preview">
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-brain)"></div>
+      <div class="section-pill-name">Brain Dump</div>
+      <div class="section-pill-time">2 min</div>
+    </div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-emotion)"></div>
+      <div class="section-pill-name">Emotional Check-in</div>
+      <div class="section-pill-time">3 min</div>
+    </div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-purpose)"></div>
+      <div class="section-pill-name">Purpose Anchor</div>
+      <div class="section-pill-time">2 min</div>
+    </div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-gratitude)"></div>
+      <div class="section-pill-name">Gratitude</div>
+      <div class="section-pill-time">2 min</div>
+    </div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-creative)"></div>
+      <div class="section-pill-name">Creative Prompt</div>
+      <div class="section-pill-time">4 min</div>
+    </div>
+    <div class="section-pill">
+      <div class="section-pill-dot" style="background:var(--section-close)"></div>
+      <div class="section-pill-name">Closing Sentence</div>
+      <div class="section-pill-time">2 min</div>
+    </div>
+  </div>
+
+  <div class="home-cta">
+    <button class="btn-begin" id="btn-begin">Begin today's session</button>
+    <div class="already-done" id="already-done" style="display:none">✓ completed today</div>
+  </div>
+</div>
+
+<!-- SESSION -->
+<div id="session" class="screen">
+  <div class="session-header">
+    <button class="btn-back" id="btn-back">← back</button>
+    <div class="session-progress-wrap">
+      <div class="session-step-label" id="step-label">1 of 6</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="section-card" id="section-card"></div>
+</div>
+
+<!-- COMPLETE -->
+<div id="complete" class="screen">
+  <div class="complete-mark">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <div class="complete-wordmark">Anchor</div>
+  <div class="complete-title">Session<br><em>complete.</em></div>
+  <div class="complete-streak" id="complete-streak"></div>
+  <div class="complete-rule"></div>
+  <div class="complete-quote" id="complete-quote"></div>
+  <button class="btn-home" onclick="goHome()">Return home</button>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+const SECTIONS = [
+  {
+    id: 'brain',
+    name: 'Brain Dump',
+    color: 'var(--section-brain)',
+    minutes: 2,
+    type: 'fixed',
+    instruction: 'Write without stopping.',
+    subtext: 'No filtering, no structure. Just clear the noise from your head. Whatever is present — thoughts, feelings, worries, nothing in particular.',
+    prompt: null
+  },
+  {
+    id: 'emotion',
+    name: 'Emotional Check-in',
+    color: 'var(--section-emotion)',
+    minutes: 3,
+    type: 'ai',
+    instruction: 'What\'s emotionally present right now?',
+    subtext: 'Be honest rather than aspirational. Today\'s prompt:',
+    promptSystem: `You are a thoughtful journaling guide. Generate a single emotional check-in prompt for a morning journaling session. The user is working on: emotional processing (fear of rejection, overanalysis of social signals, moving on from unrequited feelings), building self-worth independently of others' approval, and not fixating after setbacks. 
+
+The prompt should be specific, penetrating, and invite genuine honesty. It should feel fresh and different each day. Write only the prompt itself — one or two sentences, no preamble, no quotation marks. Vary the angle: some days focus on what's present right now, some on the body, some on what's being avoided, some on a recent interaction.`
+  },
+  {
+    id: 'purpose',
+    name: 'Purpose Anchor',
+    color: 'var(--section-purpose)',
+    minutes: 2,
+    type: 'rotating',
+    instruction: 'Who are you building today?',
+    subtext: 'Reconnect to your direction before the day takes over.',
+    prompts: [
+      'The person I want to be today is someone who acts from values, not from fear. What does that look like in practice today?',
+      'What am I building — in my work, my health, my character — that matters beyond how anyone else responds to me?',
+      'If I stripped away everyone else\'s opinions and expectations, what would I most want to focus on today?',
+      'What does a version of me who has already moved past current anxieties look like? How does he move through the world?',
+      'What\'s one thing I\'ve been avoiding that the best version of me would face today?',
+      'What does living by my own standards — not anyone else\'s validation — look like this week?',
+      'Weekly reflection: what did I build this week? What would the best version of me do differently next week?'
+    ]
+  },
+  {
+    id: 'gratitude',
+    name: 'Gratitude',
+    color: 'var(--section-gratitude)',
+    minutes: 2,
+    type: 'ai',
+    instruction: 'Three specific things — framed as evidence.',
+    subtext: 'Use the format: "[thing that happened] — which tells me [what it says about my life or myself]." Today\'s framing nudge:',
+    promptSystem: `You are a journaling guide. Generate a single short framing nudge (one sentence) to help someone approach their gratitude journaling in a fresh, specific way today. They use the format "[specific thing] — which tells me [what it means]". Each day suggest a different angle or lens to look through — e.g. focusing on small bodily pleasures, evidence of growth, moments of connection, things that went better than expected, ordinary things that would be missed, quiet personal wins. Write only the nudge sentence itself. No preamble, no quotation marks. Keep it under 20 words.`
+  },
+  {
+    id: 'creative',
+    name: 'Creative Prompt',
+    color: 'var(--section-creative)',
+    minutes: 4,
+    type: 'ai',
+    instruction: 'Something to make you think differently.',
+    subtext: 'Let this one surprise you. There\'s no right answer.',
+    promptSystem: `You are an imaginative journaling guide. Generate a single creative/reflective journaling prompt that is fresh, imaginative, and genuinely interesting. Vary widely across: thought experiments, unusual perspectives, big-picture questions about life and identity, ideas and curiosity, future visions, aesthetic preferences, creative speculation, philosophical questions, questions about meaning. The person is analytically-minded but wants to develop their creative side. The prompt should feel alive and different every day — unexpected, not generic. Avoid clichés like "imagine your ideal day" or "write a letter to your future self". Write only the prompt itself. No preamble, no quotation marks. One to three sentences max.`
+  },
+  {
+    id: 'close',
+    name: 'Closing Sentence',
+    color: 'var(--section-close)',
+    minutes: 2,
+    type: 'closing',
+    instruction: 'Seal the session.',
+    subtext: 'Complete this sentence honestly, not aspirationally.',
+    stem: 'The thing I most want to carry with me today is…'
+  }
+];
+
+const CLOSING_QUOTES = [
+  'The work you do in here compounds quietly over time.',
+  'Showing up is the whole practice.',
+  'Clarity doesn\'t arrive all at once. It accumulates.',
+  'You are not your thoughts. You are the one noticing them.',
+  'Every honest sentence is a small act of courage.',
+  'The goal isn\'t to fix anything. It\'s to see clearly.',
+  'This is how you become someone you respect.'
+];
+
+// ── STATE ────────────────────────────────────────────────
+let currentStep = 0;
+let timerInterval = null;
+let timerSecondsLeft = 0;
+let timerRunning = false;
+let aiPrompts = {}; // cached for this session
+
+// ── STORAGE ──────────────────────────────────────────────
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getStreak() {
+  return parseInt(localStorage.getItem('anchor_streak') || '0');
+}
+
+function getLastDate() {
+  return localStorage.getItem('anchor_last_date') || '';
+}
+
+function isCompletedToday() {
+  return getLastDate() === getTodayKey();
+}
+
+function updateStreak() {
+  const today = getTodayKey();
+  const last = getLastDate();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yKey = yesterday.toISOString().slice(0, 10);
+
+  let streak = getStreak();
+  if (last === today) return streak; // already done today
+  if (last === yKey) streak += 1;
+  else if (last !== today) streak = 1;
+
+  localStorage.setItem('anchor_streak', streak);
+  localStorage.setItem('anchor_last_date', today);
+  return streak;
+}
+
+function getWeekDots() {
+  const dots = [];
+  const today = getTodayKey();
+  const last = getLastDate();
+  const streak = getStreak();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    if (key === today && last === today) dots.push('today');
+    else if (i < streak && last >= key) dots.push('filled');
+    else dots.push('empty');
+  }
+  return dots;
+}
+
+// ── HOME ─────────────────────────────────────────────────
+function initHome() {
+  const now = new Date();
+  document.getElementById('home-date').textContent = now.toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+
+  const streak = getStreak();
+  document.getElementById('streak-num').textContent = streak;
+  document.getElementById('streak-sub').textContent = streak === 0
+    ? 'Start your first session'
+    : streak === 1 ? '1 day — keep going'
+    : `${streak} days — well done`;
+
+  const dots = getWeekDots();
+  const dotsEl = document.getElementById('streak-dots');
+  dotsEl.innerHTML = dots.map(d =>
+    `<div class="streak-dot ${d === 'filled' ? 'filled' : d === 'today' ? 'today' : ''}"></div>`
+  ).join('');
+
+  if (isCompletedToday()) {
+    document.getElementById('btn-begin').textContent = 'Start again';
+    document.getElementById('already-done').style.display = 'block';
+  } else {
+    document.getElementById('btn-begin').textContent = 'Begin today\'s session';
+    document.getElementById('already-done').style.display = 'none';
+  }
+}
+
+document.getElementById('btn-begin').addEventListener('click', startSession);
+document.getElementById('btn-back').addEventListener('click', () => {
+  clearTimerInterval();
+  showScreen('home');
+  initHome();
+});
+
+// ── SESSION ───────────────────────────────────────────────
+async function startSession() {
+  currentStep = 0;
+  aiPrompts = {};
+  showScreen('session');
+  await renderStep(0);
+}
+
+async function renderStep(idx) {
+  const s = SECTIONS[idx];
+  const total = SECTIONS.length;
+
+  document.getElementById('step-label').textContent = `${idx + 1} of ${total}`;
+  document.getElementById('progress-fill').style.width = `${((idx) / total) * 100}%`;
+
+  clearTimerInterval();
+  timerSecondsLeft = s.minutes * 60;
+  timerRunning = false;
+
+  const card = document.getElementById('section-card');
+  card.style.animation = 'none';
+  card.offsetHeight; // reflow
+  card.style.animation = '';
+
+  let promptHtml = '';
+
+  if (s.type === 'ai') {
+    if (!aiPrompts[s.id]) {
+      promptHtml = `
+        <div class="ai-prompt-box loading" id="ai-box-${s.id}">
+          <div class="ai-prompt-label">Today's prompt</div>
+          <div class="ai-prompt-text loading-text">Generating…</div>
+        </div>`;
+    } else {
+      promptHtml = `
+        <div class="ai-prompt-box" id="ai-box-${s.id}">
+          <div class="ai-prompt-label">Today's prompt</div>
+          <div class="ai-prompt-text">${aiPrompts[s.id]}</div>
+        </div>`;
+    }
+  } else if (s.type === 'rotating') {
+    const dayOfWeek = new Date().getDay(); // 0=Sun
+    const p = s.prompts[dayOfWeek % s.prompts.length];
+    promptHtml = `
+      <div class="ai-prompt-box" id="ai-box-${s.id}">
+        <div class="ai-prompt-label">Today's anchor</div>
+        <div class="ai-prompt-text">${p}</div>
+      </div>`;
+  } else if (s.type === 'closing') {
+    promptHtml = `<div class="closing-stem">${s.stem}</div>`;
+  }
+
+  const isLast = idx === total - 1;
+  const isFirst = idx === 0;
+
+  card.innerHTML = `
+    <div class="section-tag">
+      <div class="section-tag-dot" style="background:${s.color}"></div>
+      <div class="section-tag-text" style="color:${s.color}">${s.name}</div>
+    </div>
+    <div class="section-instruction">${s.instruction}</div>
+    <div class="section-subtext">${s.subtext}</div>
+    ${promptHtml}
+    <div class="timer-ring-wrap">
+      <div class="timer-ring">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle class="timer-ring-bg" cx="28" cy="28" r="24"/>
+          <circle class="timer-ring-fill" id="timer-ring-fill"
+            cx="28" cy="28" r="24"
+            stroke-dasharray="${2 * Math.PI * 24}"
+            stroke-dashoffset="0"
+            style="stroke:${s.color}"/>
+        </svg>
+        <div class="timer-ring-text" id="timer-display">${formatTime(timerSecondsLeft)}</div>
+      </div>
+      <div class="timer-controls">
+        <div class="timer-label">${s.minutes} min</div>
+        <button class="btn-timer" id="btn-timer" onclick="toggleTimer()">Start timer</button>
+      </div>
+    </div>
+    <div class="section-nav">
+      ${!isFirst ? `<button class="btn-prev" onclick="goStep(${idx - 1})">← prev</button>` : ''}
+      <button class="btn-next" onclick="${isLast ? 'finishSession()' : `goStep(${idx + 1})`}">
+        ${isLast ? 'Complete session' : 'Next →'}
+      </button>
+    </div>
+  `;
+
+  // Fetch AI prompt if needed
+  if (s.type === 'ai' && !aiPrompts[s.id]) {
+    fetchAIPrompt(s);
+  }
+}
+
+async function goStep(idx) {
+  clearTimerInterval();
+  currentStep = idx;
+  await renderStep(idx);
+}
+
+async function fetchAIPrompt(section) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: section.promptSystem,
+        messages: [{ role: 'user', content: `Generate today's prompt. Today is ${new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}.` }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text?.trim() || 'What are you holding onto right now that you haven\'t fully acknowledged?';
+    aiPrompts[section.id] = text;
+
+    const box = document.getElementById(`ai-box-${section.id}`);
+    if (box) {
+      box.classList.remove('loading');
+      box.querySelector('.ai-prompt-text').textContent = text;
+      box.querySelector('.ai-prompt-text').classList.remove('loading-text');
+    }
+  } catch (e) {
+    aiPrompts[section.id] = getFallbackPrompt(section.id);
+    const box = document.getElementById(`ai-box-${section.id}`);
+    if (box) {
+      box.classList.remove('loading');
+      box.querySelector('.ai-prompt-text').textContent = aiPrompts[section.id];
+      box.querySelector('.ai-prompt-text').classList.remove('loading-text');
+    }
+  }
+}
+
+function getFallbackPrompt(id) {
+  const fallbacks = {
+    emotion: 'What feeling have you been carrying since yesterday that you haven\'t fully acknowledged yet?',
+    gratitude: 'Notice something that happened in the last 24 hours that made things quietly easier.',
+    creative: 'If your life were a book, what genre would it be right now — and is that the genre you want to be living in?'
+  };
+  return fallbacks[id] || 'What is most present for you right now?';
+}
+
+// ── TIMER ─────────────────────────────────────────────────
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearTimerInterval();
+    timerRunning = false;
+    document.getElementById('btn-timer').textContent = 'Resume';
+    document.getElementById('btn-timer').classList.remove('running');
+  } else {
+    timerRunning = true;
+    document.getElementById('btn-timer').textContent = 'Pause';
+    document.getElementById('btn-timer').classList.add('running');
+    const total = SECTIONS[currentStep].minutes * 60;
+    timerInterval = setInterval(() => {
+      timerSecondsLeft--;
+      document.getElementById('timer-display').textContent = formatTime(timerSecondsLeft);
+      const pct = timerSecondsLeft / total;
+      const circ = 2 * Math.PI * 24;
+      const fill = document.getElementById('timer-ring-fill');
+      if (fill) fill.style.strokeDashoffset = circ * (1 - pct);
+      if (timerSecondsLeft <= 0) {
+        clearTimerInterval();
+        timerRunning = false;
+        document.getElementById('btn-timer').textContent = 'Done ✓';
+        document.getElementById('btn-timer').classList.remove('running');
+      }
+    }, 1000);
+  }
+}
+
+function clearTimerInterval() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+// ── COMPLETE ──────────────────────────────────────────────
+function finishSession() {
+  clearTimerInterval();
+  const streak = updateStreak();
+  document.getElementById('complete-streak').textContent =
+    streak === 1 ? 'Day 1 — the hardest one.' : `${streak} day streak.`;
+  document.getElementById('complete-quote').textContent =
+    CLOSING_QUOTES[Math.floor(Math.random() * CLOSING_QUOTES.length)];
+  document.getElementById('progress-fill').style.width = '100%';
+  showScreen('complete');
+}
+
+function goHome() {
+  showScreen('home');
+  initHome();
+}
+
+// ── SCREENS ───────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────
+// ── INLINE MANIFEST ───────────────────────────────────────
+const manifestData = {
+  name: "ANCHOR",
+  short_name: "ANCHOR",
+  description: "Your daily journaling companion",
+  start_url: "./",
+  display: "standalone",
+  background_color: "#F5F2ED",
+  theme_color: "#1A1A1A",
+  orientation: "portrait",
+  icons: [
+    { src: "https://placehold.co/192x192/1A1A18/F7F4EF?text=A", sizes: "192x192", type: "image/png" },
+    { src: "https://placehold.co/512x512/1A1A18/F7F4EF?text=A", sizes: "512x512", type: "image/png" }
+  ]
+};
+const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+const manifestURL = URL.createObjectURL(manifestBlob);
+document.getElementById('manifest-placeholder').href = manifestURL;
+
+// ── INLINE SERVICE WORKER ─────────────────────────────────
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'anchor-v1';
+    self.addEventListener('install', e => e.waitUntil(
+      caches.open(CACHE).then(c => c.addAll(['./']))
+    ));
+    self.addEventListener('fetch', e => e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    ));
+  `;
+  const swBlob = new Blob([swCode], { type: 'application/javascript' });
+  const swURL = URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swURL, { scope: './' }).catch(() => {});
+}
+
+initHome();
+</script>
+</body>
+</html>
