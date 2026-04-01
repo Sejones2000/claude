@@ -2,1830 +2,816 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Curious Brain 🧠</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ANCHOR</title>
+<link rel="manifest" id="manifest-placeholder">
+<meta name="theme-color" content="#1A1A1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #FFF8F0;
-    --card1: #FF6B6B;
-    --card2: #4ECDC4;
-    --card3: #FFE66D;
-    --fact-bg: #1a1a2e;
-    --fact-accent: #e94560;
-    --fact-glow: #f5a623;
-    --accent: #2D2D2D;
-    --soft: #F5EFE8;
-    --white: #FFFFFF;
-    --text: #2D2D2D;
-    --muted: #888;
-    --deep-bg: #0f0f23;
-    --deep-accent: #7c3aed;
-    --deep-gold: #f59e0b;
+    --paper: #F7F4EF;
+    --paper-dark: #EDE9E1;
+    --ink: #1A1A18;
+    --ink-light: #5A5750;
+    --ink-faint: #A8A49C;
+    --accent: #2C4A3E;
+    --rule: #D8D3CA;
+    --c1: #2C4A3E;
+    --c2: #5C3D5C;
+    --c3: #2C4A3E;
+    --c4: #1A1A18;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
     min-height: 100vh;
-    color: var(--text);
+    min-height: -webkit-fill-available;
     overflow-x: hidden;
-    padding-bottom: 80px;
   }
 
-  body::before {
-    content: '';
-    position: fixed; top: -20%; right: -10%;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, #FFD6E0 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed; bottom: -10%; left: -10%;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, #C3F0ED 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ── HOME ── */
+  .home-top {
+    padding: 56px 32px 28px;
+    border-bottom: 1px solid var(--rule);
   }
 
-  /* Bottom Nav */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: var(--white);
-    border-top: 2px solid #f0ebe4;
-    display: flex; z-index: 100;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  .wordmark {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    font-weight: 300;
+    margin-bottom: 36px;
   }
 
-  .nav-tab {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 10px 4px 12px; cursor: pointer;
-    border: none; background: none;
-    font-family: 'Nunito', sans-serif;
-    font-size: 11px; font-weight: 700;
-    color: var(--muted); transition: color 0.2s;
-    gap: 3px; position: relative;
+  .home-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+    font-weight: 300;
   }
 
-  .nav-tab.active { color: var(--accent); }
-  .nav-tab .nav-icon { font-size: 22px; }
-
-  .research-badge {
-    position: absolute; top: 6px; right: calc(50% - 20px);
-    background: var(--fact-accent); color: white;
-    font-size: 9px; font-weight: 800;
-    border-radius: 50px; padding: 2px 6px;
-    animation: pulse-badge 2s ease-in-out infinite;
+  .home-heading {
+    font-size: 40px;
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
   }
 
-  @keyframes pulse-badge {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.12); }
+  .home-heading em { font-style: italic; color: var(--accent); }
+
+  .streak-row {
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
 
-  /* Views */
-  .view { display: none; }
-  .view.active { display: block; }
-
-  .app {
-    max-width: 420px; margin: 0 auto;
-    padding: 24px 20px 16px;
-    position: relative; z-index: 1;
+  .streak-n {
+    font-family: 'DM Mono', monospace;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1;
   }
 
-  /* Header */
-  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .logo { font-family: 'Fredoka One', cursive; font-size: 26px; color: var(--text); }
-  .logo span { display: inline-block; animation: wiggle 3s ease-in-out infinite; }
+  .streak-info { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+  .streak-info strong { font-size: 13px; font-weight: 500; letter-spacing: 0.02em; }
+  .streak-info span { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink-faint); font-weight: 300; }
 
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(0deg); }
-    20% { transform: rotate(-10deg); }
-    40% { transform: rotate(10deg); }
-    60% { transform: rotate(-5deg); }
+  .streak-dots { display: flex; gap: 5px; align-items: center; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--rule); transition: background 0.3s; }
+  .dot.on { background: var(--accent); }
+  .dot.now { background: var(--accent); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--accent); }
+
+  .sections-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--rule);
   }
 
-  /* Meta bar */
-  .meta-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 20px; background: var(--white);
-    border-radius: 16px; padding: 11px 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  }
-  .streak { font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 5px; }
-  .streak-fire { font-size: 18px; }
-  .date-label { font-size: 12px; color: var(--muted); font-weight: 600; }
-
-  /* Section labels */
-  .section-title { font-family: 'Fredoka One', cursive; font-size: 21px; margin-bottom: 4px; }
-  .section-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; font-weight: 600; }
-
-  /* Concept Cards */
-  .cards-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
-
-  .concept-card {
-    border-radius: 20px; padding: 18px 20px;
-    cursor: pointer; position: relative; overflow: hidden;
-    border: 3px solid transparent;
-    transition: transform 0.2s, box-shadow 0.2s;
-    animation: slideIn 0.4s ease both;
+  .section-row {
+    background: var(--paper);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
 
-  .concept-card:nth-child(1) { background: var(--card1); animation-delay: 0.05s; }
-  .concept-card:nth-child(2) { background: var(--card2); animation-delay: 0.10s; }
-  .concept-card:nth-child(3) { background: var(--card3); animation-delay: 0.15s; }
+  .section-row-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(18px); }
-    to { opacity: 1; transform: translateY(0); }
+  .section-row-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    font-weight: 300;
+    flex: 1;
   }
 
-  .concept-card:hover, .fact-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 28px rgba(0,0,0,0.15); }
-  .concept-card.selected { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(45,45,45,0.15); }
-
-  .card-emoji { font-size: 32px; margin-bottom: 6px; display: block; }
-  .card-topic { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; margin-bottom: 3px; }
-  .card-concept { font-family: 'Fredoka One', cursive; font-size: 20px; color: var(--text); line-height: 1.2; }
-  .card-teaser { font-size: 12px; margin-top: 5px; opacity: 0.75; font-weight: 600; }
-  .card-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; opacity: 0.4; }
-
-  /* Fun Fact Card */
-  .fact-card {
-    background: var(--fact-bg);
-    border-radius: 20px; padding: 20px;
-    cursor: pointer; position: relative; overflow: hidden;
-    border: 3px solid transparent;
-    transition: transform 0.2s, box-shadow 0.2s;
-    animation: slideIn 0.4s ease 0.22s both;
+  .section-row-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    font-weight: 300;
   }
 
-  .fact-card::before {
-    content: ''; position: absolute; top: -40px; right: -40px;
-    width: 120px; height: 120px;
-    background: radial-gradient(circle, rgba(233,69,96,0.3) 0%, transparent 70%);
-    pointer-events: none;
+  .home-bottom {
+    padding: 20px 32px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
   }
 
-  .fact-card::after {
-    content: ''; position: absolute; bottom: -30px; left: -20px;
-    width: 100px; height: 100px;
-    background: radial-gradient(circle, rgba(245,166,35,0.2) 0%, transparent 70%);
-    pointer-events: none;
+  .btn-primary {
+    width: 100%;
+    padding: 18px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 300;
+    transition: background 0.2s;
   }
 
-  .fact-card:hover { box-shadow: 0 10px 30px rgba(233,69,96,0.3); }
-  .fact-card.selected { border-color: var(--fact-glow); box-shadow: 0 0 0 4px rgba(245,166,35,0.3); }
+  .btn-primary:active { background: var(--accent); transform: scale(0.99); }
 
-  .fact-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 2px;
-    color: var(--fact-accent); margin-bottom: 8px;
-    display: flex; align-items: center; gap: 6px;
-  }
-
-  .fact-label::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--fact-accent); }
-
-  .fact-emoji { font-size: 28px; margin-bottom: 6px; display: block; }
-
-  .fact-text {
-    font-family: 'Playfair Display', serif;
-    font-size: 15px; color: #f0f0f0;
-    line-height: 1.5; font-style: italic;
-  }
-
-  .fact-remember {
+  .done-note {
+    text-align: center;
     margin-top: 10px;
-    background: rgba(245,166,35,0.15);
-    border-left: 3px solid var(--fact-glow);
-    border-radius: 0 8px 8px 0;
-    padding: 6px 10px;
-    font-family: 'Space Mono', monospace;
-    font-size: 10px; color: var(--fact-glow); font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-weight: 300;
+    letter-spacing: 0.05em;
   }
 
-  /* Buttons */
-  .learn-btn {
-    width: 100%; background: var(--accent); color: white;
-    border: none; border-radius: 18px; padding: 16px;
-    font-family: 'Fredoka One', cursive; font-size: 19px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-    transition: transform 0.2s, background 0.2s;
-    margin-bottom: 12px; box-shadow: 0 4px 18px rgba(45,45,45,0.25);
+  /* ── SESSION ── */
+  .session-bar {
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 10;
   }
 
-  .learn-btn:hover:not(:disabled) { transform: translateY(-2px); background: #444; }
-  .learn-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .loading-dots span {
-    display: inline-block; width: 8px; height: 8px;
-    border-radius: 50%; background: white; margin: 0 3px;
-    animation: bounce 1s ease infinite;
-  }
-  .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
-  .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+  .btn-back {
+    background: none;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+    cursor: pointer;
+    text-transform: uppercase;
   }
 
-  /* Lesson View */
-  .lesson-view { display: none; animation: fadeUp 0.4s ease both; }
+  .prog-wrap { flex: 1; display: flex; flex-direction: column; gap: 5px; }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
+  .prog-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 300;
+  }
+
+  .prog-track { height: 1px; background: var(--rule); }
+  .prog-fill { height: 100%; background: var(--accent); transition: width 0.5s ease; }
+
+  /* ── CARD ── */
+  .card {
+    flex: 1;
+    padding: 36px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    animation: rise 0.35s ease;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .lesson-header { border-radius: 20px; padding: 22px; margin-bottom: 18px; }
-  .back-btn {
-    background: rgba(0,0,0,0.15); border: none; border-radius: 50px;
-    padding: 6px 14px; font-family: 'Nunito', sans-serif;
-    font-weight: 700; font-size: 13px; cursor: pointer;
-    margin-bottom: 12px; display: inline-flex; align-items: center; gap: 6px;
-    color: var(--text); transition: transform 0.2s;
-  }
-  .back-btn.light { color: #fff; background: rgba(255,255,255,0.15); }
-  .back-btn:hover { transform: translateX(-2px); }
-
-  .lesson-emoji { font-size: 48px; margin-bottom: 8px; display: block; }
-  .lesson-topic-tag { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.65; margin-bottom: 5px; }
-  .lesson-title { font-family: 'Fredoka One', cursive; font-size: 26px; line-height: 1.15; color: var(--text); }
-  .lesson-title.light { color: #fff; }
-
-  .lesson-body {
-    background: var(--white); border-radius: 20px; padding: 22px;
-    font-size: 15px; line-height: 1.75; font-weight: 600; color: var(--text);
-    box-shadow: 0 2px 16px rgba(0,0,0,0.07); margin-bottom: 14px; white-space: pre-wrap;
+  .card-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
   }
 
-  .lesson-body.fact-body {
-    background: var(--fact-bg); color: #f0f0f0;
-    font-family: 'Playfair Display', serif;
-    font-weight: 400; font-size: 16px;
-    border: 1px solid rgba(233,69,96,0.3);
+  .card-tag-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+  .card-tag-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 300;
   }
 
-  .save-btn {
-    width: 100%; background: #4ECDC4; color: var(--text);
-    border: none; border-radius: 18px; padding: 16px;
-    font-family: 'Fredoka One', cursive; font-size: 19px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-    transition: transform 0.2s; box-shadow: 0 4px 18px rgba(78,205,196,0.35);
-  }
-  .save-btn:hover { transform: translateY(-2px); }
-  .save-btn.saved { background: var(--card3); }
-
-  /* Library */
-  .encyclo-header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
-  .encyclo-title { font-family: 'Fredoka One', cursive; font-size: 24px; }
-  .encyclo-count { background: var(--card1); border-radius: 50px; padding: 3px 12px; font-weight: 800; font-size: 13px; margin-left: auto; }
-  .encyclo-empty { text-align: center; padding: 50px 20px; color: var(--muted); font-size: 14px; font-weight: 700; }
-  .encyclo-empty .big { font-size: 44px; margin-bottom: 10px; }
-
-  .encyclo-item {
-    background: var(--white); border-radius: 16px; padding: 14px 16px;
-    margin-bottom: 10px; display: flex; align-items: center; gap: 12px;
-    cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
-  .encyclo-item:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-  .encyclo-item.fact-item { background: var(--fact-bg); }
-  .encyclo-item-emoji { font-size: 28px; }
-  .encyclo-item-info { flex: 1; }
-  .encyclo-item-concept { font-family: 'Fredoka One', cursive; font-size: 16px; margin-bottom: 2px; }
-  .fact-item .encyclo-item-concept { color: #f0f0f0; font-family: 'Playfair Display', serif; font-size: 14px; font-style: italic; font-weight: 700; }
-  .encyclo-item-meta { font-size: 11px; color: var(--muted); font-weight: 600; }
-  .fact-item .encyclo-item-meta { color: var(--fact-glow); }
-  .topic-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-
-  /* Deep Dive */
-  .deep-header {
-    background: var(--deep-bg);
-    border-radius: 0 0 28px 28px; padding: 28px 20px 24px;
-    margin-bottom: 20px; position: relative; overflow: hidden;
-  }
-  .deep-header::before {
-    content: ''; position: absolute; top: -60px; right: -60px;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%);
-  }
-  .deep-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .deep-icon { font-size: 32px; }
-  .deep-title { font-family: 'Playfair Display', serif; font-size: 24px; color: white; font-weight: 700; }
-  .deep-subtitle { font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 600; font-family: 'Space Mono', monospace; }
-
-  .topic-setter {
-    background: var(--white); border-radius: 20px; padding: 20px;
-    margin: 0 20px 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-  }
-  .topic-setter-label { font-family: 'Fredoka One', cursive; font-size: 17px; margin-bottom: 4px; }
-  .topic-setter-sub { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 14px; }
-
-  .current-topic-pill {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(124,58,237,0.1); border: 2px solid rgba(124,58,237,0.3);
-    border-radius: 50px; padding: 6px 14px;
-    font-size: 12px; font-weight: 800; color: var(--deep-accent); margin-bottom: 14px;
+  .card-title {
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
   }
 
-  .topic-input {
-    width: 100%; border: 2px solid #e8e0d8; border-radius: 12px;
-    padding: 12px 14px; font-family: 'Nunito', sans-serif;
-    font-size: 14px; font-weight: 700; color: var(--text);
-    outline: none; transition: border-color 0.2s; margin-bottom: 10px;
-  }
-  .topic-input:focus { border-color: var(--deep-accent); }
+  .card-title em { font-style: italic; color: var(--ink-light); }
 
-  .topic-set-btn {
-    width: 100%; background: var(--deep-accent); color: white;
-    border: none; border-radius: 12px; padding: 12px;
-    font-family: 'Fredoka One', cursive; font-size: 16px;
-    cursor: pointer; transition: transform 0.2s;
-  }
-  .topic-set-btn:hover { transform: translateY(-1px); }
-
-  .deep-reads-section { padding: 0 20px; }
-  .deep-reads-title { font-family: 'Fredoka One', cursive; font-size: 19px; margin-bottom: 14px; }
-
-  .deep-read-card {
-    background: var(--white); border-radius: 20px; padding: 20px;
-    margin-bottom: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-    cursor: pointer; transition: transform 0.2s;
-    border-left: 5px solid var(--deep-accent);
-  }
-  .deep-read-card:hover { transform: translateY(-2px); }
-  .deep-read-tag { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--deep-accent); margin-bottom: 6px; }
-  .deep-read-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
-  .deep-read-meta { font-size: 11px; color: var(--muted); font-weight: 600; }
-  .deep-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; font-weight: 700; }
-  .deep-empty .big { font-size: 44px; margin-bottom: 10px; }
-
-  /* Article */
-  .article-view { display: none; animation: fadeUp 0.4s ease both; }
-  .article-header { background: var(--deep-bg); padding: 28px 20px 24px; position: relative; overflow: hidden; }
-  .article-header::before {
-    content: ''; position: absolute; top: -80px; right: -80px;
-    width: 250px; height: 250px;
-    background: radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%);
-  }
-  .article-tag { font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--deep-gold); margin-bottom: 10px; }
-  .article-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; line-height: 1.3; margin-bottom: 8px; }
-  .article-meta { font-size: 11px; color: rgba(255,255,255,0.35); font-family: 'Space Mono', monospace; }
-  .article-body { padding: 24px 20px; font-size: 15px; line-height: 1.85; color: var(--text); font-weight: 600; white-space: pre-wrap; max-width: 420px; margin: 0 auto; }
-  .article-body h2 { font-family: 'Playfair Display', serif; font-size: 19px; margin: 24px 0 10px; color: var(--deep-accent); font-weight: 700; }
-
-  /* Modals */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6); z-index: 200;
-    align-items: center; justify-content: center; backdrop-filter: blur(4px);
-  }
-  .modal-overlay.show { display: flex; }
-
-  .modal-box {
-    background: var(--white); border-radius: 28px; padding: 32px 28px;
-    max-width: 360px; width: 90%;
-    animation: popIn 0.35s cubic-bezier(0.175,0.885,0.32,1.275) both;
+  .card-sub {
+    font-size: 14px;
+    color: var(--ink-faint);
+    font-style: italic;
+    line-height: 1.5;
+    font-weight: 300;
+    margin-bottom: 32px;
   }
 
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
+  .opening-line {
+    border-left: 1px solid var(--accent);
+    padding: 14px 18px;
+    margin-bottom: 32px;
+    background: var(--paper-dark);
+    min-height: 52px;
+    position: relative;
   }
 
-  .modal-emoji { font-size: 48px; margin-bottom: 12px; display: block; text-align: center; }
-  .modal-title { font-family: 'Fredoka One', cursive; font-size: 22px; text-align: center; margin-bottom: 6px; }
-  .modal-sub { font-size: 13px; color: var(--muted); text-align: center; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
-  .modal-input {
-    width: 100%; border: 2px solid #e8e0d8; border-radius: 14px;
-    padding: 14px 16px; font-family: 'Nunito', sans-serif;
-    font-size: 14px; font-weight: 700; color: var(--text); outline: none;
-    transition: border-color 0.2s; margin-bottom: 12px;
-  }
-  .modal-input:focus { border-color: var(--deep-accent); }
-  .modal-btn {
-    width: 100%; background: var(--deep-accent); color: white;
-    border: none; border-radius: 14px; padding: 14px;
-    font-family: 'Fredoka One', cursive; font-size: 18px; cursor: pointer; transition: transform 0.2s;
-  }
-  .modal-btn:hover { transform: translateY(-1px); }
-
-  /* Research Notification */
-  .notif-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.65); z-index: 300;
-    align-items: center; justify-content: center; backdrop-filter: blur(6px);
-  }
-  .notif-overlay.show { display: flex; }
-
-  .notif-box {
-    background: var(--deep-bg); border-radius: 28px; padding: 36px 28px;
-    max-width: 340px; width: 90%; text-align: center;
-    border: 1px solid rgba(124,58,237,0.4);
-    animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;
-    position: relative; overflow: hidden;
-  }
-  .notif-box::before {
-    content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%);
-  }
-  .notif-icon { font-size: 56px; margin-bottom: 16px; display: block; }
-  .notif-title { font-family: 'Playfair Display', serif; font-size: 21px; color: white; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
-  .notif-sub { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; margin-bottom: 24px; line-height: 1.5; }
-  .notif-btn {
-    width: 100%; background: var(--deep-accent); color: white;
-    border: none; border-radius: 14px; padding: 14px;
-    font-family: 'Fredoka One', cursive; font-size: 18px;
-    cursor: pointer; margin-bottom: 10px; transition: transform 0.2s;
-  }
-  .notif-btn:hover { transform: translateY(-1px); }
-  .notif-dismiss { background: none; border: none; color: rgba(255,255,255,0.35); font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; padding: 8px; width: 100%; }
-
-  /* Skeleton */
-  .skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%; animation: shimmer 1.4s infinite;
-    border-radius: 8px; height: 18px; margin-bottom: 12px;
-  }
-  .skeleton.short { width: 60%; }
-  .skeleton.tall { height: 120px; }
-
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+  .opening-line.loading::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 1px;
+    background: var(--accent);
+    animation: loadbar 1.4s ease infinite;
   }
 
-  /* Toast */
-  .toast {
-    position: fixed; bottom: 90px; left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--accent); color: white;
-    padding: 11px 22px; border-radius: 50px;
-    font-weight: 700; font-size: 13px;
-    transition: transform 0.3s ease; z-index: 999; white-space: nowrap;
+  @keyframes loadbar {
+    0% { width: 0; opacity: 1; }
+    80% { width: 90%; opacity: 1; }
+    100% { width: 100%; opacity: 0; }
   }
-  .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* Topic picker modal */
-  #topicPickerInner { background: #1a1a2e; min-height: 100vh; }
-  #topicPickerHeader {
-    padding: 50px 24px 24px; text-align: center;
+  .opening-line-text {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink);
+    font-style: italic;
+    font-weight: 300;
   }
-  #topicPickerTitle {
-    font-family: 'Fredoka One', cursive; font-size: 26px;
-    color: white; margin-bottom: 6px;
-  }
-  #topicPickerSub {
-    font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.5);
-  }
-  #topicPickerGrid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px; padding: 8px 20px 24px;
-  }
-  .topic-pill {
-    padding: 14px 12px; border-radius: 14px;
-    border: 2px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.05);
-    cursor: pointer; text-align: center;
-    transition: all 0.2s; -webkit-tap-highlight-color: transparent;
-  }
-  .topic-pill.selected {
-    border-color: white; background: rgba(255,255,255,0.15);
-  }
-  .topic-pill-emoji { font-size: 24px; margin-bottom: 6px; }
-  .topic-pill-label {
-    font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.8);
-    line-height: 1.3; text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .topic-pill.selected .topic-pill-label { color: white; }
-  #topicPickerConfirm {
-    width: 100%; padding: 16px;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    border: none; border-radius: 14px; color: white;
-    font-family: 'Fredoka One', cursive; font-size: 20px;
-    cursor: pointer; transition: opacity 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  #topicPickerConfirm:disabled { opacity: 0.3; cursor: default; }
-  #topicPickerConfirm:not(:disabled):active { opacity: 0.85; }
 
-  /* Quiz Me button */
-  .quiz-btn {
-    width: 100%; margin-top: 12px; padding: 14px;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    border: none; border-radius: 14px; color: white;
-    font-family: 'Fredoka One', cursive; font-size: 18px;
-    letter-spacing: 1px; cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .quiz-btn:active { opacity: 0.85; }
+  .opening-line-text.faint { color: var(--ink-faint); font-size: 13px; }
 
-  /* Weekly roundup button */
-  .weekly-quiz-btn {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
-    border: none; border-radius: 14px; color: white;
-    font-family: 'Fredoka One', cursive; font-size: 17px;
-    letter-spacing: 1px; cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+  .timer-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
   }
-  .weekly-quiz-btn:active { opacity: 0.85; }
 
-  /* Quiz modal */
-  #quizInner {
-    background: white; min-height: 100vh;
-    padding: 0 0 40px 0;
+  .timer-ring { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
+  .timer-ring svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--rule); stroke-width: 1.5; }
+  .ring-fg { fill: none; stroke-width: 1.5; stroke-linecap: round; transition: stroke-dashoffset 1s linear; }
+  .timer-text {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; font-weight: 400; color: var(--ink);
   }
-  #quizHeader {
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    padding: 50px 24px 24px; color: white;
-  }
-  #quizTitle {
-    font-family: 'Fredoka One', cursive; font-size: 24px; margin-bottom: 4px;
-  }
-  #quizProgress {
-    font-size: 13px; font-weight: 700; opacity: 0.8;
-  }
-  #quizBody { padding: 24px; }
 
-  .quiz-question {
-    font-family: 'Fredoka One', cursive; font-size: 18px;
-    color: #2D2D2D; margin-bottom: 20px; line-height: 1.4;
-  }
-  .quiz-option {
-    width: 100%; margin-bottom: 12px; padding: 14px 16px;
-    background: #f5f0e8; border: 2px solid #e8e0d8;
-    border-radius: 12px; text-align: left;
-    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
-    color: #2D2D2D; cursor: pointer; transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .quiz-option:active { background: #ede9fe; border-color: #7c3aed; }
-  .quiz-option.correct { background: #d1fae5; border-color: #10b981; color: #065f46; }
-  .quiz-option.wrong   { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
-  .quiz-option.reveal  { background: #d1fae5; border-color: #10b981; color: #065f46; }
-  .quiz-option:disabled { cursor: default; }
+  .timer-right { display: flex; flex-direction: column; gap: 6px; }
 
-  .quiz-explanation {
-    background: #ede9fe; border-radius: 12px; padding: 14px 16px;
-    font-size: 13px; font-weight: 700; color: #5b21b6;
-    margin-bottom: 20px; line-height: 1.5;
+  .timer-min {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 300;
   }
-  .quiz-next-btn {
-    width: 100%; padding: 14px;
-    background: #2D2D2D; border: none; border-radius: 12px;
-    color: white; font-family: 'Fredoka One', cursive; font-size: 18px;
-    cursor: pointer; margin-top: 8px;
-    -webkit-tap-highlight-color: transparent;
+
+  .btn-timer {
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    cursor: pointer;
+    color: var(--ink-light);
+    transition: all 0.15s;
+    width: fit-content;
   }
-  .quiz-score {
-    text-align: center; padding: 20px 0 30px;
+
+  .btn-timer.on { border-color: var(--accent); color: var(--accent); }
+
+  .card-nav {
+    margin-top: auto;
+    display: flex;
+    gap: 10px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
-  .quiz-score-num {
-    font-family: 'Fredoka One', cursive; font-size: 64px; color: #7c3aed;
+
+  .btn-prev {
+    padding: 16px 18px;
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--ink-light);
+    cursor: pointer;
   }
-  .quiz-score-label {
-    font-size: 16px; font-weight: 700; color: #888; margin-bottom: 20px;
+
+  .btn-next {
+    flex: 1;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 300;
+    transition: background 0.2s;
   }
-  .quiz-perfect {
-    font-size: 40px; margin-bottom: 8px; animation: pop 0.4s ease;
+
+  .btn-next:hover { background: var(--accent); }
+
+  /* ── COMPLETE ── */
+  #complete {
+    justify-content: center;
+    align-items: center;
+    padding: 48px 32px;
+    text-align: center;
   }
-  .quiz-close-btn {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    border: none; border-radius: 12px; color: white;
-    font-family: 'Fredoka One', cursive; font-size: 18px;
-    cursor: pointer; -webkit-tap-highlight-color: transparent;
+
+  .complete-ring {
+    width: 60px; height: 60px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    animation: pop 0.45s ease;
   }
+
   @keyframes pop {
-    0% { transform: scale(0.5); opacity: 0; }
-    70% { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
   }
-  .quiz-loading {
-    text-align: center; padding: 60px 20px;
-    font-family: 'Fredoka One', cursive; font-size: 20px; color: #7c3aed;
-  }</style>
+
+  .complete-wm {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    font-weight: 300;
+  }
+
+  .complete-h {
+    font-size: 34px;
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .complete-h em { font-style: italic; color: var(--accent); }
+
+  .complete-streak {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+
+  .complete-line { width: 32px; height: 1px; background: var(--rule); margin: 0 auto 28px; }
+
+  .complete-q {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--ink-light);
+    line-height: 1.65;
+    max-width: 260px;
+    font-weight: 300;
+  }
+
+  .btn-ghost {
+    margin-top: 44px;
+    padding: 14px 28px;
+    background: none;
+    border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+</style>
 </head>
 <body>
 
-<!-- HOME VIEW -->
-<div class="view active" id="homeViewWrap">
-  <div class="app">
-    <div class="header">
-      <div class="logo">Curious Brain <span>🧠</span></div>
-      <button onclick="showSyncId()" style="background:var(--soft);border:none;border-radius:50px;padding:7px 13px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:5px">🔗 Sync</button>
-    </div>
-    <div class="meta-bar">
-      <div class="streak"><span class="streak-fire">🔥</span> <span id="streakCount">1</span> day streak</div>
-      <div class="date-label" id="todayDate"></div>
-    </div>
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <div class="wordmark">Anchor</div>
+    <div class="home-date" id="home-date"></div>
+    <div class="home-heading">Good morning,<br><em>let's begin.</em></div>
+  </div>
 
-    <div id="homeView">
-      <div class="section-title">What tickles your brain today?</div>
-      <div class="section-sub" id="unseenLabel">Pick one to learn about 👇</div>
-      <div class="cards-container" id="cardsContainer"></div>
-      <button class="learn-btn" id="learnBtn" onclick="fetchLesson()" disabled>✨ Teach me!</button>
-      <div id="weeklyRoundupWrap" style="display:none;margin-top:16px">
-        <button class="weekly-quiz-btn" onclick="startWeeklyRoundup()">📅 Weekly Roundup Quiz</button>
-      </div>
+  <div class="streak-row">
+    <div class="streak-n" id="streak-n">0</div>
+    <div class="streak-info">
+      <strong>Day streak</strong>
+      <span id="streak-sub">Start your first session</span>
     </div>
+    <div class="streak-dots" id="streak-dots"></div>
+  </div>
 
-  <!-- TOPIC PICKER MODAL — shown once per day on first open -->
-  <div id="topicPickerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;overflow-y:auto;-webkit-overflow-scrolling:touch">
-    <div id="topicPickerInner">
-      <div id="topicPickerHeader">
-        <div id="topicPickerTitle">🧠 What's on your mind today?</div>
-        <div id="topicPickerSub">Pick 1–5 topics to explore</div>
-      </div>
-      <div id="topicPickerGrid"></div>
-      <div style="padding:0 20px 40px">
-        <button id="topicPickerConfirm" onclick="confirmTopics()" disabled>Let's go →</button>
-      </div>
+  <div class="sections-list">
+    <div class="section-row">
+      <div class="section-row-dot" style="background:var(--c1)"></div>
+      <div class="section-row-name">Open Page</div>
+      <div class="section-row-time">3 min</div>
+    </div>
+    <div class="section-row">
+      <div class="section-row-dot" style="background:var(--c2)"></div>
+      <div class="section-row-name">What's Present</div>
+      <div class="section-row-time">4 min</div>
+    </div>
+    <div class="section-row">
+      <div class="section-row-dot" style="background:var(--c3)"></div>
+      <div class="section-row-name">Who I'm Becoming</div>
+      <div class="section-row-time">4 min</div>
+    </div>
+    <div class="section-row">
+      <div class="section-row-dot" style="background:var(--c4)"></div>
+      <div class="section-row-name">One True Thing</div>
+      <div class="section-row-time">3 min</div>
     </div>
   </div>
 
-  <!-- QUIZ MODAL -->
-  <div id="quizModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch">
-    <div id="quizInner">
-      <div id="quizHeader">
-        <div id="quizTitle">Quiz Time 🧩</div>
-        <div id="quizProgress">Question 1 of 5</div>
-      </div>
-      <div id="quizBody"></div>
-    </div>
-  </div>
-
-    <div id="lessonView" class="lesson-view">
-      <div class="lesson-header" id="lessonHeader">
-        <button class="back-btn" id="lessonBackBtn" onclick="goBack()">← Back</button>
-        <span class="lesson-emoji" id="lessonEmoji"></span>
-        <div class="lesson-topic-tag" id="lessonTopic"></div>
-        <div class="lesson-title" id="lessonTitle"></div>
-      </div>
-      <div class="lesson-body" id="lessonBody"></div>
-      <button class="save-btn" id="saveBtn" onclick="saveConcept()">⭐ Save to My Library</button>
-      <button class="quiz-btn" id="quizBtn" onclick="startQuiz()" style="display:none">🧩 Quiz Me</button>
-    </div>
+  <div class="home-bottom">
+    <button class="btn-primary" id="btn-begin">Begin today's session</button>
+    <div class="done-note" id="done-note" style="display:none">✓ completed today</div>
   </div>
 </div>
 
-<!-- LIBRARY VIEW -->
-<div class="view" id="libraryViewWrap">
-  <div class="app">
-    <div class="encyclo-header">
-      <div class="encyclo-title">My Library 📚</div>
-      <div class="encyclo-count" id="encycloCount">0</div>
+<!-- SESSION -->
+<div id="session" class="screen">
+  <div class="session-bar">
+    <button class="btn-back" id="btn-back">← back</button>
+    <div class="prog-wrap">
+      <div class="prog-label" id="prog-label">1 of 4</div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
     </div>
-    <div id="encycloList"></div>
   </div>
+  <div class="card" id="card"></div>
 </div>
 
-<!-- DEEP DIVE VIEW -->
-<div class="view" id="deepViewWrap">
-  <div id="deepView">
-    <div class="deep-header">
-      <div class="deep-title-row">
-        <span class="deep-icon">🔭</span>
-        <div class="deep-title">Deep Dive</div>
-      </div>
-      <div class="deep-subtitle">YOUR WEEKLY RESEARCH SYNTHESIS</div>
-    </div>
-
-    <div class="topic-setter" id="topicSetter">
-      <div class="topic-setter-label">This week's topic</div>
-      <div class="topic-setter-sub" id="topicSetterSub">Set a theme and get two advanced reads — Monday &amp; Friday</div>
-      <div id="currentTopicPill" style="display:none" class="current-topic-pill">
-        <span>🎯</span><span id="currentTopicText"></span>
-      </div>
-      <input class="topic-input" id="topicInput" placeholder="e.g. Music psychology of Fred again.." />
-      <button class="topic-set-btn" onclick="setWeeklyTopic()">Set this week's topic →</button>
-    </div>
-
-    <div class="deep-reads-section">
-      <div class="deep-reads-title">Your reads this week</div>
-      <div id="deepReadsList"></div>
-    </div>
+<!-- COMPLETE -->
+<div id="complete" class="screen">
+  <div class="complete-ring">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#2C4A3E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 5 8.5 15.5 4 11"></polyline>
+    </svg>
   </div>
-
-  <div id="articleView" class="article-view">
-    <div class="article-header">
-      <button class="back-btn light" onclick="closeArticle()">← Back</button>
-      <div class="article-tag" id="articleTag"></div>
-      <div class="article-title" id="articleTitle"></div>
-      <div class="article-meta" id="articleMeta"></div>
-    </div>
-    <div class="article-body" id="articleBody"></div>
-  </div>
+  <div class="complete-wm">Anchor</div>
+  <div class="complete-h">Session<br><em>complete.</em></div>
+  <div class="complete-streak" id="complete-streak"></div>
+  <div class="complete-line"></div>
+  <div class="complete-q" id="complete-q"></div>
+  <button class="btn-ghost" onclick="goHome()">Return home</button>
 </div>
 
-<!-- WEEKLY TOPIC MODAL -->
-<div class="modal-overlay" id="weeklyModal">
-  <div class="modal-box">
-    <span class="modal-emoji">🗓️</span>
-    <div class="modal-title">New week, new deep dive!</div>
-    <div class="modal-sub">What topic should your two advanced research reads this week be about? Be as specific as you like.</div>
-    <input class="modal-input" id="modalTopicInput" placeholder="e.g. Harmonic theory in minimal techno…" />
-    <button class="modal-btn" onclick="setWeeklyTopicFromModal()">Let's go 🚀</button>
-  </div>
-</div>
-
-<!-- RESEARCH READY NOTIFICATION -->
-<div class="notif-overlay" id="researchNotif">
-  <div class="notif-box">
-    <span class="notif-icon">📖</span>
-    <div class="notif-title" id="notifTitle">Your in-depth research for today is ready</div>
-    <div class="notif-sub" id="notifSub">Your weekly deep dive is waiting.</div>
-    <button class="notif-btn" onclick="goToResearch()">Read now →</button>
-    <button class="notif-dismiss" onclick="dismissNotif()">Maybe later</button>
-  </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-tab active" id="tab-home" onclick="switchTab('home')">
-    <span class="nav-icon">🧠</span>Today
-  </button>
-  <button class="nav-tab" id="tab-library" onclick="switchTab('library')">
-    <span class="nav-icon">📚</span>Library
-  </button>
-  <button class="nav-tab" id="tab-deep" onclick="switchTab('deep')">
-    <span class="nav-icon">🔭</span>Deep Dive
-    <span class="research-badge" id="researchBadge" style="display:none">NEW</span>
-  </button>
-</nav>
-
-<div class="toast" id="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ════════════════════════════════
-// CONFIG
-// ════════════════════════════════
-const ANTHROPIC_API_KEY = ""; // Key secured via Supabase Edge Function proxy
-const ANTHROPIC_PROXY_URL = "https://ebvvhgutvgwsqvizwbyv.supabase.co/functions/v1/anthropic-proxy";
-const SUPABASE_URL = "https://ebvvhgutvgwsqvizwbyv.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidnZoZ3V0dmd3c3F2aXp3Ynl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDc5ODUsImV4cCI6MjA4NzY4Mzk4NX0.VWOhDXbkQc6ExD2Goklkcw9Bx0pwn6XmTFSCKG9bmEc";
+const SECTIONS = [
+  {
+    id: 'open',
+    name: 'Open Page',
+    color: 'var(--c1)',
+    minutes: 3,
+    title: 'Write anything.<br><em>Start anywhere.</em>',
+    sub: 'No prompt. No structure. Just clear whatever is in your head right now.',
+    type: 'none'
+  },
+  {
+    id: 'present',
+    name: "What's Present",
+    color: 'var(--c2)',
+    minutes: 4,
+    title: "What's alive in you<br><em>this morning?</em>",
+    sub: 'A question to open the door. Write wherever it takes you.',
+    type: 'ai',
+    system: `You are a thoughtful journaling companion. Generate a single open-ended question for a morning emotional check-in.
 
-// Init Supabase client
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+The person is working through: fear of rejection and overanalysis of other people's signals, moving on from unrequited feelings, building self-worth that doesn't depend on others' approval, and developing a stronger internal sense of direction.
 
-// ── User identity ──
-// We use a stable anonymous user ID stored in localStorage.
-// Same device = same ID across sessions. Different device = different ID until sync.
-// For a personal app this is fine; upgrade to auth.signIn for multi-device identity.
-function getUserId() {
-  let uid = localStorage.getItem("cb_uid");
-  if (!uid) { uid = "user_" + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("cb_uid", uid); }
-  return uid;
-}
-const USER_ID = getUserId();
+The question should feel like a gentle doorway, not a task. Open enough that the person can take it anywhere — there's no right answer. Vary the angle each day: sometimes focus on the body or physical sensation, sometimes on what's being avoided, sometimes on mood or energy, sometimes on something unspoken, sometimes on a recent interaction.
 
-// ── Local cache (fallback + fast reads) ──
-const local = {
-  get(k, fb) { try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : fb; } catch(e) { return fb; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
-};
+Write only the question. No preamble. No quotation marks. One sentence, conversational tone. Don't be clinical or therapeutic-sounding.`
+  },
+  {
+    id: 'becoming',
+    name: "Who I'm Becoming",
+    color: 'var(--c3)',
+    minutes: 4,
+    title: "The person I'm<br><em>building.</em>",
+    sub: 'An opening line to write from. Take it wherever feels true.',
+    type: 'rotating',
+    lines: [
+      "The version of me I most want to become moves through the world like…",
+      "When I'm living by my own values rather than other people's reactions, I…",
+      "The things I'm quietly building — in my work, my body, my character — are…",
+      "What I want my life to feel like from the inside, not how it looks from the outside, is…",
+      "The gap between who I am now and who I'm becoming is closing because…",
+      "If I stopped waiting for external validation, the first thing I'd do differently is…",
+      "Looking back on this period of my life, I want to be able to say that I…"
+    ]
+  },
+  {
+    id: 'truth',
+    name: 'One True Thing',
+    color: 'var(--c4)',
+    minutes: 3,
+    title: "The most honest<br><em>thing I can say.</em>",
+    sub: "A loose stem to finish. Don't make it sound good — make it true.",
+    type: 'ai',
+    system: `You are a journaling companion. Generate a single sentence stem for a closing journaling prompt.
 
-// ── Supabase helpers ──
-async function dbGet(table, fallback) {
-  try {
-    const { data, error } = await _supabase.from(table).select("*").eq("user_id", USER_ID).maybeSingle();
-    if (error) throw error;
-    return data || fallback;
-  } catch(e) { console.warn("dbGet failed", table, e); return fallback; }
-}
+The person has just completed a 12-minute journaling session. The stem should invite one genuinely honest sentence about today, themselves, or where they are right now. It should point toward something real — not aspirational or gratitude-based.
 
-async function dbUpsert(table, payload) {
-  try {
-    const { error } = await _supabase.from(table).upsert({ user_id: USER_ID, ...payload }, { onConflict: "user_id" });
-    if (error) throw error;
-  } catch(e) { console.warn("dbUpsert failed", table, e); }
-}
+Vary across: what they're carrying today, what they're realising, what they're letting go of, what they actually want, what they've been avoiding saying, what they know to be true.
 
-async function dbGetLibrary() {
-  try {
-    const { data, error } = await _supabase.from("library").select("*").eq("user_id", USER_ID).order("created_at", { ascending: false });
-    if (error) throw error;
-    return (data || []).map(row => ({
-      name: row.name, emoji: row.emoji, topic: row.topic,
-      lesson: row.lesson, isFact: row.is_fact, savedAt: row.saved_at, _id: row.id
-    }));
-  } catch(e) { console.warn("dbGetLibrary failed", e); return local.get("cb_library", []); }
-}
-
-async function dbAddLibraryItem(item) {
-  try {
-    const { error } = await _supabase.from("library").insert({
-      user_id: USER_ID, name: item.name, emoji: item.emoji,
-      topic: item.topic, lesson: item.lesson,
-      is_fact: item.isFact || false, saved_at: item.savedAt
-    });
-    if (error) throw error;
-    // Also update local cache
-    const lib = local.get("cb_library", []);
-    lib.unshift(item); local.set("cb_library", lib);
-  } catch(e) { console.warn("dbAddLibraryItem failed", e); const lib = local.get("cb_library", []); lib.unshift(item); local.set("cb_library", lib); }
-}
-
-async function dbGetSeen() {
-  try {
-    const { data, error } = await _supabase.from("seen_concepts").select("concept_name").eq("user_id", USER_ID);
-    if (error) throw error;
-    return (data || []).map(r => r.concept_name);
-  } catch(e) { return local.get("cb_seen", []); }
-}
-
-async function dbAddSeen(name) {
-  try {
-    await _supabase.from("seen_concepts").upsert({ user_id: USER_ID, concept_name: name }, { onConflict: "user_id,concept_name", ignoreDuplicates: true });
-  } catch(e) { console.warn("dbAddSeen failed", e); }
-  const seen = local.get("cb_seen", []);
-  if (!seen.includes(name)) { seen.push(name); local.set("cb_seen", seen); }
-}
-
-async function dbClearSeen() {
-  try {
-    await _supabase.from("seen_concepts").delete().eq("user_id", USER_ID);
-  } catch(e) { console.warn("dbClearSeen failed", e); }
-  local.set("cb_seen", []);
-}
-
-// ════════════════════════════════
-// DATA
-// ════════════════════════════════
-
-const TOPIC_META = [
-  { id:"psychology",   label:"Psychology & Behaviour",    emoji:"🧠", color:"#8B5CF6" },
-  { id:"philosophy",   label:"Philosophy & Ethics",       emoji:"🦉", color:"#6366F1" },
-  { id:"economics",    label:"Economics & Markets",       emoji:"📈", color:"#34D399" },
-  { id:"history",      label:"History & Civilisation",    emoji:"🏛️", color:"#C084FC" },
-  { id:"neuroscience", label:"Neuroscience & the Brain",  emoji:"🔬", color:"#F472B6" },
-  { id:"physics",      label:"Physics & the Universe",    emoji:"⚛️", color:"#FF6B6B" },
-  { id:"biology",      label:"Biology & Evolution",       emoji:"🧬", color:"#4ECDC4" },
-  { id:"mathematics",  label:"Mathematics & Logic",       emoji:"📐", color:"#FBBF24" },
-  { id:"technology",   label:"Technology & AI",           emoji:"💻", color:"#38BDF8" },
-  { id:"politics",     label:"Political Science & Power", emoji:"⚖️", color:"#FB923C" },
-  { id:"sociology",    label:"Sociology & Culture",       emoji:"🌍", color:"#A3E635" },
-  { id:"literature",   label:"Literature & Storytelling", emoji:"📖", color:"#F9A8D4" },
-  { id:"art",          label:"Art & Aesthetics",          emoji:"🎨", color:"#FCD34D" },
-  { id:"health",       label:"Health & Medicine",         emoji:"❤️", color:"#F87171" },
-  { id:"environment",  label:"Environment & Systems",     emoji:"🌿", color:"#6EE7B7" },
-];
-
-const CONCEPTS = [
-  // Psychology & Behaviour
-  { topic:"Psychology & Behaviour", emoji:"🪞", name:"Cognitive Dissonance", teaser:"Why we twist facts to protect our beliefs" },
-  { topic:"Psychology & Behaviour", emoji:"🎭", name:"The Fundamental Attribution Error", teaser:"Why we blame people but excuse ourselves" },
-  { topic:"Psychology & Behaviour", emoji:"🐑", name:"Conformity & the Asch Experiments", teaser:"How strangers convinced people to deny reality" },
-  { topic:"Psychology & Behaviour", emoji:"🔁", name:"Operant Conditioning", teaser:"Skinner's boxes and the mechanics of behaviour" },
-  { topic:"Psychology & Behaviour", emoji:"😰", name:"The Bystander Effect", teaser:"Why crowds watch and no one acts" },
-  { topic:"Psychology & Behaviour", emoji:"🧩", name:"Flow State", teaser:"Csikszentmihalyi's science of peak experience" },
-  // Philosophy & Ethics
-  { topic:"Philosophy & Ethics", emoji:"⚖️", name:"Utilitarianism", teaser:"Is the right act always the one that helps the most people?" },
-  { topic:"Philosophy & Ethics", emoji:"🪬", name:"Kantian Ethics", teaser:"Morality as a universal law, not a calculation" },
-  { topic:"Philosophy & Ethics", emoji:"🌑", name:"The Problem of Evil", teaser:"If God is good, why does suffering exist?" },
-  { topic:"Philosophy & Ethics", emoji:"🪟", name:"Plato's Allegory of the Cave", teaser:"Are you seeing reality or just its shadow?" },
-  { topic:"Philosophy & Ethics", emoji:"♾️", name:"Existentialism", teaser:"Sartre's radical idea that existence precedes essence" },
-  { topic:"Philosophy & Ethics", emoji:"🤔", name:"The Trolley Problem", teaser:"A thought experiment that reveals how you actually think about ethics" },
-  // Economics & Markets
-  { topic:"Economics & Markets", emoji:"📉", name:"The Efficient Market Hypothesis", teaser:"Why you probably can't beat the stock market" },
-  { topic:"Economics & Markets", emoji:"🤝", name:"The Nash Equilibrium", teaser:"When everyone's rational choice makes everyone worse off" },
-  { topic:"Economics & Markets", emoji:"🏦", name:"Fractional Reserve Banking", teaser:"How banks conjure money from thin air" },
-  { topic:"Economics & Markets", emoji:"💸", name:"Moral Hazard", teaser:"Why being rescued makes people take more risks" },
-  { topic:"Economics & Markets", emoji:"🔄", name:"Creative Destruction", teaser:"Why progress always kills something first" },
-  { topic:"Economics & Markets", emoji:"🧮", name:"Asymmetric Information", teaser:"Why the used car market is a disaster" },
-  // History & Civilisation
-  { topic:"History & Civilisation", emoji:"🏛️", name:"The Fall of the Western Roman Empire", teaser:"A collapse 300 years in the making" },
-  { topic:"History & Civilisation", emoji:"💀", name:"The Transatlantic Slave Trade's Economic Engine", teaser:"How slavery bankrolled the modern world" },
-  { topic:"History & Civilisation", emoji:"☢️", name:"Mutually Assured Destruction", teaser:"Why having nukes meant nobody used them" },
-  { topic:"History & Civilisation", emoji:"📜", name:"The Reformation's Political Fallout", teaser:"How Luther's 95 theses rewrote European power" },
-  { topic:"History & Civilisation", emoji:"🔴", name:"The Origins of the Cold War", teaser:"How allies became enemies in four years" },
-  { topic:"History & Civilisation", emoji:"🧭", name:"The Scramble for Africa", teaser:"A continent divided in a single Berlin meeting" },
-  // Neuroscience & the Brain
-  { topic:"Neuroscience & the Brain", emoji:"💤", name:"Memory Consolidation During Sleep", teaser:"Why pulling an all-nighter destroys what you learned" },
-  { topic:"Neuroscience & the Brain", emoji:"⚡", name:"Neuroplasticity", teaser:"Your brain physically rewires itself every time you learn" },
-  { topic:"Neuroscience & the Brain", emoji:"😊", name:"The Dopamine System", teaser:"It's not the pleasure chemical — it's the anticipation chemical" },
-  { topic:"Neuroscience & the Brain", emoji:"😱", name:"The Amygdala & Fear Response", teaser:"How a walnut-sized structure hijacks your entire body" },
-  { topic:"Neuroscience & the Brain", emoji:"🪞", name:"Mirror Neurons", teaser:"The cells that make you wince when someone else gets hurt" },
-  { topic:"Neuroscience & the Brain", emoji:"🧠", name:"The Default Mode Network", teaser:"What your brain does when you think it's doing nothing" },
-  // Physics & the Universe
-  { topic:"Physics & the Universe", emoji:"🌀", name:"General Relativity", teaser:"Gravity isn't a force — it's bent space" },
-  { topic:"Physics & the Universe", emoji:"🔋", name:"Gibbs Free Energy", teaser:"The secret formula for whether reactions happen" },
-  { topic:"Physics & the Universe", emoji:"🌡️", name:"The Second Law of Thermodynamics", teaser:"Why the universe is slowly falling apart" },
-  { topic:"Physics & the Universe", emoji:"🕳️", name:"Hawking Radiation", teaser:"How black holes slowly evaporate" },
-  { topic:"Physics & the Universe", emoji:"🌊", name:"Schrödinger's Wave Equation", teaser:"The maths that says particles are just probabilities" },
-  { topic:"Physics & the Universe", emoji:"💡", name:"The Photoelectric Effect", teaser:"Einstein's proof that light comes in packets" },
-  // Biology & Evolution
-  { topic:"Biology & Evolution", emoji:"🧬", name:"The Selfish Gene Theory", teaser:"Dawkins' idea that you exist to serve your DNA" },
-  { topic:"Biology & Evolution", emoji:"🐚", name:"Punctuated Equilibrium", teaser:"Evolution doesn't crawl — it naps then sprints" },
-  { topic:"Biology & Evolution", emoji:"🦠", name:"The Microbiome", teaser:"The trillion bacteria inside you that run the show" },
-  { topic:"Biology & Evolution", emoji:"🧪", name:"CRISPR Gene Editing", teaser:"Cut-and-paste surgery on your DNA" },
-  { topic:"Biology & Evolution", emoji:"🐜", name:"Kin Selection & Altruism", teaser:"Why animals sacrifice themselves for their relatives" },
-  { topic:"Biology & Evolution", emoji:"🌿", name:"Epigenetics", teaser:"How your experiences can change what your genes do" },
-  // Mathematics & Logic
-  { topic:"Mathematics & Logic", emoji:"∞", name:"Gödel's Incompleteness Theorems", teaser:"Some truths can never be proven — even in maths" },
-  { topic:"Mathematics & Logic", emoji:"🎲", name:"Bayes' Theorem", teaser:"How to update your beliefs when evidence arrives" },
-  { topic:"Mathematics & Logic", emoji:"🌀", name:"Chaos Theory", teaser:"Why tiny differences create wildly different outcomes" },
-  { topic:"Mathematics & Logic", emoji:"📐", name:"Euclid's Elements", teaser:"The book that defined logical proof for 2,000 years" },
-  { topic:"Mathematics & Logic", emoji:"🔢", name:"Prime Numbers & the Riemann Hypothesis", teaser:"The deepest unsolved problem in mathematics" },
-  { topic:"Mathematics & Logic", emoji:"🧮", name:"Game Theory", teaser:"The mathematics of strategic decision-making" },
-  // Technology & AI
-  { topic:"Technology & AI", emoji:"🤖", name:"How Large Language Models Work", teaser:"Prediction machines pretending to understand" },
-  { topic:"Technology & AI", emoji:"🔐", name:"Public Key Cryptography", teaser:"The maths keeping every secret on the internet" },
-  { topic:"Technology & AI", emoji:"🕸️", name:"How the Internet Actually Works", teaser:"Packets, protocols, and the physical cables under oceans" },
-  { topic:"Technology & AI", emoji:"⚖️", name:"Algorithmic Bias", teaser:"When the machine inherits human prejudice" },
-  { topic:"Technology & AI", emoji:"🧠", name:"Reinforcement Learning", teaser:"How AI learned to beat humans at every game" },
-  { topic:"Technology & AI", emoji:"💾", name:"Moore's Law & Its Limits", teaser:"The prediction that built the modern world — and its end" },
-  // Political Science & Power
-  { topic:"Political Science & Power", emoji:"👑", name:"The Social Contract", teaser:"Hobbes, Locke, Rousseau — why we gave up freedom for order" },
-  { topic:"Political Science & Power", emoji:"🏛️", name:"Separation of Powers", teaser:"Montesquieu's idea that still shapes every democracy" },
-  { topic:"Political Science & Power", emoji:"📢", name:"Propaganda & Manufactured Consent", teaser:"Chomsky's theory of how media shapes what you think" },
-  { topic:"Political Science & Power", emoji:"🗳️", name:"Voting Systems & Their Flaws", teaser:"Why democracy is harder to design than you think" },
-  { topic:"Political Science & Power", emoji:"🌐", name:"Realism vs Liberalism in International Relations", teaser:"Two theories of why nations do what they do" },
-  { topic:"Political Science & Power", emoji:"⚡", name:"Revolution Theory", teaser:"What actually causes societies to overturn themselves" },
-  // Sociology & Culture
-  { topic:"Sociology & Culture", emoji:"🪞", name:"The Looking-Glass Self", teaser:"You are who you think others think you are" },
-  { topic:"Sociology & Culture", emoji:"🏙️", name:"Urbanisation & Social Atomisation", teaser:"Why cities make us lonely even in crowds" },
-  { topic:"Sociology & Culture", emoji:"🎭", name:"Goffman's Dramaturgical Theory", teaser:"Life as performance — we're all acting all the time" },
-  { topic:"Sociology & Culture", emoji:"💰", name:"Bourdieu's Cultural Capital", teaser:"The invisible currency that controls social mobility" },
-  { topic:"Sociology & Culture", emoji:"🌍", name:"Postcolonial Theory", teaser:"How empire reshaped the minds of the colonised" },
-  { topic:"Sociology & Culture", emoji:"🔗", name:"Social Network Theory", teaser:"Why weak ties get you jobs and strong ties don't" },
-  // Literature & Storytelling
-  { topic:"Literature & Storytelling", emoji:"🏔️", name:"The Hero's Journey", teaser:"Campbell's template hidden in every story ever told" },
-  { topic:"Literature & Storytelling", emoji:"🎭", name:"Tragic Structure & Hamartia", teaser:"The fatal flaw that makes great characters fall" },
-  { topic:"Literature & Storytelling", emoji:"🔮", name:"Magical Realism", teaser:"García Márquez's world where the impossible is mundane" },
-  { topic:"Literature & Storytelling", emoji:"📖", name:"Unreliable Narration", teaser:"When you can't trust the person telling the story" },
-  { topic:"Literature & Storytelling", emoji:"🖤", name:"Gothic Literature & the Sublime", teaser:"Terror, beauty, and the landscapes of dread" },
-  { topic:"Literature & Storytelling", emoji:"✍️", name:"Show Don't Tell", teaser:"The craft principle that separates good writing from bad" },
-  // Art & Aesthetics
-  { topic:"Art & Aesthetics", emoji:"🎨", name:"The Sublime vs The Beautiful", teaser:"Burke and Kant's ideas on why art overwhelms us" },
-  { topic:"Art & Aesthetics", emoji:"🖼️", name:"Modernism & the Rejection of Tradition", teaser:"Why early 20th century art deliberately broke everything" },
-  { topic:"Art & Aesthetics", emoji:"📸", name:"How Photography Changed Painting", teaser:"The technology that forced artists to stop being realistic" },
-  { topic:"Art & Aesthetics", emoji:"🏛️", name:"The Golden Ratio in Art & Architecture", teaser:"The proportion that humans find mysteriously beautiful" },
-  { topic:"Art & Aesthetics", emoji:"🎭", name:"Symbolism & Semiotics", teaser:"How meaning lives in images, not just words" },
-  { topic:"Art & Aesthetics", emoji:"🎬", name:"Auteur Theory in Film", teaser:"Why some directors stamp every frame with their identity" },
-  // Health & Medicine
-  { topic:"Health & Medicine", emoji:"❤️", name:"The Inflammation Theory of Disease", teaser:"How the immune system secretly causes most chronic illness" },
-  { topic:"Health & Medicine", emoji:"💤", name:"Sleep Architecture", teaser:"What actually happens in your body during each sleep stage" },
-  { topic:"Health & Medicine", emoji:"🧬", name:"The Gut-Brain Axis", teaser:"How your stomach talks to your mind — and wins" },
-  { topic:"Health & Medicine", emoji:"⚖️", name:"Placebo & Nocebo Effects", teaser:"Belief can heal — and belief can kill" },
-  { topic:"Health & Medicine", emoji:"🏃", name:"The Science of VO2 Max", teaser:"The single best predictor of how long you'll live" },
-  { topic:"Health & Medicine", emoji:"🧪", name:"mRNA Vaccine Technology", teaser:"The platform that changed immunology forever" },
-  // Environment & Systems
-  { topic:"Environment & Systems", emoji:"🌊", name:"Thermohaline Circulation", teaser:"The ocean conveyor belt that controls your climate" },
-  { topic:"Environment & Systems", emoji:"🌍", name:"The Gaia Hypothesis", teaser:"Earth as one giant self-regulating organism" },
-  { topic:"Environment & Systems", emoji:"🔄", name:"Feedback Loops & Tipping Points", teaser:"Why climate change could accelerate beyond our control" },
-  { topic:"Environment & Systems", emoji:"🐝", name:"Biodiversity & Ecosystem Collapse", teaser:"What happens when you pull one thread from nature's web" },
-  { topic:"Environment & Systems", emoji:"⚡", name:"The Energy Transition", teaser:"The economics and physics of moving off fossil fuels" },
-  { topic:"Environment & Systems", emoji:"🌱", name:"Tragedy of the Commons", teaser:"Why shared resources always get destroyed without rules" },
-];
-
-const FUN_FACTS = [
-  { emoji:"🦈", fact:"Sharks are older than trees. Sharks evolved ~450 million years ago; trees didn't appear until ~350 million years ago.", memory:"Sharks predate forests." },
-  { emoji:"🌌", fact:"There are more possible iterations of a game of chess than there are atoms in the observable universe.", memory:"Chess > atoms in universe." },
-  { emoji:"🐙", fact:"Octopuses have three hearts, blue blood, and their arms can taste what they touch — each arm has its own mini-brain.", memory:"Octopus: 3 hearts, 9 brains." },
-  { emoji:"⏱️", fact:"Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid.", memory:"Cleo: closer to Moon than pyramids." },
-  { emoji:"🧠", fact:"Your brain generates enough electricity while you're awake to power a small LED lightbulb.", memory:"Your brain = lightbulb." },
-  { emoji:"🌍", fact:"If you removed all the empty space from atoms in every human on Earth, all 8 billion of us would fit in a sugar cube.", memory:"8bn people = sugar cube." },
-  { emoji:"🎵", fact:"The musical note A above middle C was standardised at 440Hz only in 1939. Before that, orchestras across Europe used completely different pitches.", memory:"A=440Hz only since 1939." },
-  { emoji:"🦋", fact:"Inside a chrysalis, a caterpillar essentially dissolves into liquid soup before reorganising into a butterfly — it doesn't just grow wings.", memory:"Butterflies are reformed soup." },
-  { emoji:"🌙", fact:"The Moon is moving away from Earth at 3.8cm per year — the same rate your fingernails grow.", memory:"Moon drifts at fingernail speed." },
-  { emoji:"🔥", fact:"Oxford University is older than the Aztec Empire. Teaching began at Oxford around 1096; the Aztec Empire was founded in 1428.", memory:"Oxford older than Aztec Empire." },
-  { emoji:"💧", fact:"Hot water can freeze faster than cold water under certain conditions — a phenomenon called the Mpemba Effect that still isn't fully explained.", memory:"Hot water freezes faster (Mpemba)." },
-  { emoji:"🐘", fact:"Elephants are the only animals known to have death rituals — they mourn, hold vigils, and return to bones of dead relatives for years.", memory:"Elephants hold funerals." },
-  { emoji:"🌿", fact:"Grass screams. When cut, it releases airborne chemicals called green leaf volatiles — distress signals to nearby plants.", memory:"Fresh cut grass = plant screams." },
-  { emoji:"⚡", fact:"Lightning strikes the Earth about 100 times per second — that's 8 million times a day.", memory:"100 lightning strikes/second." },
-  { emoji:"🎭", fact:"Shakespeare invented over 1,700 words we still use today, including 'bedroom', 'lonely', 'generous', and 'obscene'.", memory:"Shakespeare coined 1,700 words." },
-  { emoji:"🧊", fact:"Ice is less dense than water — almost uniquely weird in chemistry. Most solids sink in their liquid form. This is why life survived ice ages.", memory:"Ice floats = life exists." },
-  { emoji:"🐬", fact:"Dolphins have names for each other — unique signature whistles they use to call specific individuals, even after years apart.", memory:"Dolphins have names." },
-  { emoji:"🌺", fact:"There are more species of beetles on Earth than there are species of plants. God, apparently, is inordinately fond of beetles.", memory:"More beetles than plants." },
-  { emoji:"🍄", fact:"The largest living organism on Earth isn't a whale or a sequoia — it's a single honey fungus in Oregon covering 2,385 acres.", memory:"World's biggest thing: fungus, Oregon." },
-  { emoji:"🔭", fact:"When you look at the Andromeda Galaxy with the naked eye, you're seeing light that left it 2.5 million years ago — before humans existed.", memory:"Andromeda light is pre-human." },
-];
-
-const TOPIC_COLORS = Object.fromEntries(TOPIC_META.map(t => [t.label, t.color]));
-const CARD_COLORS = ["#FF6B6B","#4ECDC4","#FFE66D"];
-
-// ════════════════════════════════
-// STATE
-// ════════════════════════════════
-let selectedCard = null, currentConcept = null, currentLesson = "", isFact = false, currentFact = null, currentTab = "home";
-let _seenCache = null; // in-memory cache for seen concepts this session
-
-// ── Seen concepts ──
-async function getSeenConcepts() {
-  if (_seenCache !== null) return _seenCache;
-  _seenCache = await dbGetSeen();
-  local.set("cb_seen", _seenCache);
-  return _seenCache;
-}
-
-async function markConceptSeen(name) {
-  try {
-    const seen = await getSeenConcepts();
-    if (!seen.includes(name)) {
-      seen.push(name);
-      _seenCache = seen;
-      await dbAddSeen(name);
-    }
-    if (CONCEPTS.filter(c => !seen.includes(c.name)).length < 4) {
-      await dbClearSeen();
-      _seenCache = [];
-      showToast("You've seen them all! Reshuffling...");
-    }
-  } catch(e) {}
-}
-
-async function getUnseenConcepts(pool) {
-  try {
-    const p = pool || CONCEPTS;
-    const seen = await getSeenConcepts();
-    const u = p.filter(c => !seen.includes(c.name));
-    return u.length >= 3 ? u : p;
-  } catch(e) { return pool || CONCEPTS; }
-}
-
-// ── Streak ──
-function getTodayStr() { return new Date().toISOString().split("T")[0]; }
-function getYesterdayStr() { const d = new Date(); d.setDate(d.getDate()-1); return d.toISOString().split("T")[0]; }
-
-async function getStreak() {
-  try {
-    const row = await dbGet("streaks", null);
-    const today = getTodayStr();
-    let count = 1, last = "";
-    if (row) { count = row.count || 1; last = row.last_date || ""; }
-    if (last === today) return count;
-    if (last === getYesterdayStr()) { count++; }
-    else if (last !== "") { count = 1; }
-    await dbUpsert("streaks", { count, last_date: today });
-    local.set("cb_streak", { count, last: today });
-    return count;
-  } catch(e) {
-    const s = local.get("cb_streak", {count:1, last:""});
-    const today = getTodayStr();
-    if (s.last === today) return s.count;
-    if (s.last === getYesterdayStr()) { s.count++; s.last = today; }
-    else { s.count = 1; s.last = today; }
-    local.set("cb_streak", s); return s.count;
+Write only the sentence stem, ending with an ellipsis so they can complete it. No preamble. No quotation marks. Conversational, quiet tone. Under 12 words.`
   }
+];
+
+const CLOSING = [
+  'The work you do in here compounds quietly.',
+  'Showing up is the whole practice.',
+  "Clarity doesn't arrive all at once. It accumulates.",
+  'You are not your thoughts. You are the one noticing them.',
+  'Every honest sentence is a small act of courage.',
+  "The goal isn't to fix anything. It's to see clearly.",
+  'This is how you become someone you respect.'
+];
+
+let step = 0, timerInterval = null, timerLeft = 0, timerRunning = false, aiCache = {};
+
+const todayKey = () => new Date().toISOString().slice(0, 10);
+const getStreak = () => parseInt(localStorage.getItem('anchor_streak') || '0');
+const getLastDate = () => localStorage.getItem('anchor_last') || '';
+const doneToday = () => getLastDate() === todayKey();
+
+function saveStreak() {
+  const today = todayKey(), last = getLastDate();
+  const yest = new Date(); yest.setDate(yest.getDate() - 1);
+  const yKey = yest.toISOString().slice(0, 10);
+  let s = getStreak();
+  if (last === today) return s;
+  s = last === yKey ? s + 1 : 1;
+  localStorage.setItem('anchor_streak', s);
+  localStorage.setItem('anchor_last', today);
+  return s;
 }
 
-// ── Momentum Sync ──
-// Writes today's Curious Brain session data to Supabase app_sync
-// so MOMENTUM can display it in the Connected Apps panel.
-// Called after a lesson loads and after saving to library.
-let _momentumSyncTimer = null;
-async function syncToMomentum() {
-  clearTimeout(_momentumSyncTimer);
-  _momentumSyncTimer = setTimeout(async function() {
-    try {
-      const today = getTodayStr();
-      const streak = local.get("cb_streak", {count:1}).count || 1;
-      const topic  = isFact ? "Weird & Wonderful" : (currentConcept?.topic || "Learning");
-      const name   = isFact ? (currentFact?.memory || "Fact") : (currentConcept?.name || "Concept");
-      await fetch(SUPABASE_URL + '/rest/v1/app_sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-          'Prefer': 'resolution=merge-duplicates'
-        },
-        body: JSON.stringify({
-          app_id: 'curious_brain',
-          date: today,
-          payload: {
-            topic:  topic,
-            name:   name,
-            streak: streak,
-            value:  name + ' · ' + streak + ' day streak'
-          }
-        })
-      });
-    } catch(e) { console.warn('Momentum sync failed:', e); }
-  }, 1500);
+function weekDots() {
+  const last = getLastDate(), streak = getStreak();
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    const k = d.toISOString().slice(0, 10);
+    if (k === todayKey() && doneToday()) return 'now';
+    return (6 - i) < streak && last >= k ? 'on' : '';
+  });
 }
 
-// ── Library ──
-async function getLibrary() {
-  return await dbGetLibrary();
+function initHome() {
+  document.getElementById('home-date').textContent = new Date().toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+  const s = getStreak();
+  document.getElementById('streak-n').textContent = s;
+  document.getElementById('streak-sub').textContent =
+    s === 0 ? 'Start your first session' :
+    s === 1 ? '1 day — keep going' : `${s} days — well done`;
+  document.getElementById('streak-dots').innerHTML =
+    weekDots().map(d => `<div class="dot ${d}"></div>`).join('');
+  const done = doneToday();
+  document.getElementById('btn-begin').textContent = done ? 'Start again' : "Begin today's session";
+  document.getElementById('done-note').style.display = done ? 'block' : 'none';
 }
 
-async function addToLibrary(item) {
-  await dbAddLibraryItem(item);
+document.getElementById('btn-begin').addEventListener('click', startSession);
+document.getElementById('btn-back').addEventListener('click', () => { clearTimer(); show('home'); initHome(); });
+
+async function startSession() {
+  step = 0; aiCache = {};
+  show('session');
+  await render(0);
 }
 
-// ── Weekly data ──
-function getWeekStr() {
-  const d = new Date(), jan1 = new Date(d.getFullYear(),0,1);
-  return `${d.getFullYear()}-W${Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7)}`;
-}
+async function render(i) {
+  const s = SECTIONS[i];
+  clearTimer();
+  timerLeft = s.minutes * 60;
+  timerRunning = false;
 
-async function getWeeklyData() {
-  try {
-    const row = await dbGet("weekly_data", null);
-    if (row) return { topic: row.topic || "", weekStr: row.week_str || "", reads: row.reads || [] };
-    return { topic: "", weekStr: "", reads: [] };
-  } catch(e) { return local.get("cb_weekly", {topic:"", weekStr:"", reads:[]}); }
-}
+  document.getElementById('prog-label').textContent = `${i + 1} of ${SECTIONS.length}`;
+  document.getElementById('prog-fill').style.width = `${(i / SECTIONS.length) * 100}%`;
 
-async function saveWeeklyData(data) {
-  try {
-    await dbUpsert("weekly_data", { topic: data.topic, week_str: data.weekStr, reads: data.reads });
-    local.set("cb_weekly", data);
-  } catch(e) { local.set("cb_weekly", data); }
-}
+  const card = document.getElementById('card');
+  card.style.animation = 'none'; card.offsetHeight; card.style.animation = '';
 
-function getDayOfWeek() { return new Date().getDay(); }
+  let lineHtml = '';
+  if (s.type === 'ai') {
+    const c = aiCache[s.id];
+    lineHtml = `<div class="opening-line${c ? '' : ' loading'}" id="ol-${s.id}">
+      <div class="opening-line-text${c ? '' : ' faint'}">${c || 'Generating…'}</div>
+    </div>`;
+  } else if (s.type === 'rotating') {
+    lineHtml = `<div class="opening-line" id="ol-${s.id}">
+      <div class="opening-line-text">${s.lines[new Date().getDay() % s.lines.length]}</div>
+    </div>`;
+  }
 
-// ════════════════════════════════
-// INIT
-// ════════════════════════════════
-async function init() {
-  // Show loading spinner while we fetch from Supabase
-  document.getElementById("cardsContainer").innerHTML = `
-    <div style="text-align:center;padding:40px 0;color:var(--muted)">
-      <div style="font-size:36px;margin-bottom:12px;animation:wiggle 1s ease-in-out infinite">🧠</div>
-      <div style="font-weight:700;font-size:14px">Syncing your brain...</div>
+  const isLast = i === SECTIONS.length - 1;
+  card.innerHTML = `
+    <div class="card-tag">
+      <div class="card-tag-dot" style="background:${s.color}"></div>
+      <div class="card-tag-text" style="color:${s.color}">${s.name}</div>
+    </div>
+    <div class="card-title">${s.title}</div>
+    <div class="card-sub">${s.sub}</div>
+    ${lineHtml}
+    <div class="timer-row">
+      <div class="timer-ring">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle class="ring-bg" cx="26" cy="26" r="22"/>
+          <circle class="ring-fg" id="ring-fg" cx="26" cy="26" r="22"
+            stroke="${s.color}"
+            stroke-dasharray="${2 * Math.PI * 22}"
+            stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-text" id="timer-txt">${fmt(timerLeft)}</div>
+      </div>
+      <div class="timer-right">
+        <div class="timer-min">${s.minutes} min</div>
+        <button class="btn-timer" id="btn-timer" onclick="toggleTimer()">Start timer</button>
+      </div>
+    </div>
+    <div class="card-nav">
+      ${i > 0 ? `<button class="btn-prev" onclick="goTo(${i - 1})">← prev</button>` : ''}
+      <button class="btn-next" onclick="${isLast ? 'finish()' : `goTo(${i + 1})`}">
+        ${isLast ? 'Complete session' : 'Next →'}
+      </button>
     </div>`;
 
-  const d = new Date();
-  document.getElementById("todayDate").textContent = d.toLocaleDateString("en-GB", {weekday:"short", day:"numeric", month:"short"});
-
-  // Load streak from Supabase
-  const streak = await getStreak();
-  document.getElementById("streakCount").textContent = streak;
-
-  // Render cards (needs seen concepts from Supabase)
-  await renderCards();
-  await checkWeeklyLogic();
-  checkWeeklyRoundup();
-  // Show topic picker if first open today
-  if (shouldShowTopicPicker()) showTopicPicker();
+  if (s.type === 'ai' && !aiCache[s.id]) fetchAI(s);
 }
 
-async function checkWeeklyLogic() {
-  const weekly = await getWeeklyData();
-  const thisWeek = getWeekStr();
-  const day = getDayOfWeek();
-  const isMonday = day === 1, isFriday = day === 5;
+async function goTo(i) { step = i; await render(i); }
 
-  if (isMonday && weekly.weekStr !== thisWeek) {
-    await saveWeeklyData({topic:"", weekStr:thisWeek, reads:[]});
-    setTimeout(() => document.getElementById("weeklyModal").classList.add("show"), 900);
-    return;
-  }
-
-  if (weekly.topic && weekly.weekStr === thisWeek) {
-    updateDeepDiveUI(weekly);
-    const reads = weekly.reads || [];
-    const hasMon = reads.some(r => r.slot === "monday");
-    const hasFri = reads.some(r => r.slot === "friday");
-
-    if (isMonday && !hasMon) { generateDeepRead("monday", weekly.topic); return; }
-    if (isFriday && !hasFri) { generateDeepRead("friday", weekly.topic); return; }
-
-    const slot = isMonday ? "monday" : isFriday ? "friday" : null;
-    if (slot) {
-      const read = reads.find(r => r.slot === slot);
-      const dismissed = local.get(`cb_notif_${getTodayStr()}`, false);
-      if (read && read.ready && !dismissed) showResearchNotif(read);
-    }
-  }
-}
-
-// ════════════════════════════════
-// CARDS
-// ════════════════════════════════
-function pickRandom(arr, n) { return [...arr].sort(() => Math.random()-0.5).slice(0, n); }
-
-async function renderCards() {
-  const todayTopics = getTodayTopics();
-  const filteredConcepts = todayTopics
-    ? CONCEPTS.filter(c => todayTopics.includes(c.topic))
-    : CONCEPTS;
-
-  const pool = await getUnseenConcepts(filteredConcepts), picked = pickRandom(pool, 3);
-  const container = document.getElementById("cardsContainer");
-  container.innerHTML = "";
-  selectedCard = null;
-  document.getElementById("learnBtn").disabled = true;
-
-  const seen = await getSeenConcepts();
-  const unseenCount = filteredConcepts.filter(c => !seen.includes(c.name)).length;
-  const total = filteredConcepts.length;
-  document.getElementById("unseenLabel").textContent =
-    todayTopics
-      ? `${todayTopics.length} topic${todayTopics.length > 1 ? 's' : ''} selected · ${unseenCount} concepts to discover 👇`
-      : unseenCount === total ? "Pick one to learn about 👇" : `${unseenCount} of ${total} concepts still to discover 👇`;
-
-  picked.forEach((concept, i) => {
-    const div = document.createElement("div");
-    div.className = "concept-card";
-    div.style.background = TOPIC_COLORS[concept.topic] || CARD_COLORS[i];
-    div.innerHTML = `<span class="card-emoji">${concept.emoji}</span><div class="card-topic">${concept.topic}</div><div class="card-concept">${concept.name}</div><div class="card-teaser">${concept.teaser}</div><span class="card-arrow">→</span>`;
-    div.onclick = () => selectCard(div, concept, false);
-    container.appendChild(div);
-  });
-
-  // Fun fact card
-  const fact = pickRandom(FUN_FACTS, 1)[0];
-  currentFact = fact;
-  const factDiv = document.createElement("div");
-  factDiv.className = "fact-card";
-  factDiv.id = "factCard";
-  factDiv.innerHTML = `
-    <div class="fact-label">✦ Weird &amp; wonderful</div>
-    <span class="fact-emoji">${fact.emoji}</span>
-    <div class="fact-text">${fact.fact}</div>
-    <div class="fact-remember">💡 Remember: ${fact.memory}</div>
-  `;
-  factDiv.onclick = () => selectFact(factDiv, fact);
-  container.appendChild(factDiv);
-}
-
-function selectCard(el, concept, factMode) {
-  document.querySelectorAll(".concept-card, .fact-card").forEach(c => c.classList.remove("selected"));
-  el.classList.add("selected");
-  selectedCard = true; currentConcept = concept; isFact = !!factMode;
-  const btn = document.getElementById("learnBtn");
-  btn.disabled = false;
-  btn.innerHTML = isFact ? "✨ Tell me more!" : "✨ Teach me!";
-}
-
-function selectFact(el, fact) {
-  document.querySelectorAll(".concept-card, .fact-card").forEach(c => c.classList.remove("selected"));
-  el.classList.add("selected");
-  isFact = true; currentFact = fact; selectedCard = true; currentConcept = null;
-  const btn = document.getElementById("learnBtn");
-  btn.disabled = false;
-  btn.innerHTML = "✨ Expand this fact!";
-}
-
-// ════════════════════════════════
-// LESSON
-// ════════════════════════════════
-async function fetchLesson() {
-  if (!selectedCard) return;
-  const btn = document.getElementById("learnBtn");
-  btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
-  btn.disabled = true;
-
-  document.getElementById("homeView").style.display = "none";
-  document.getElementById("lessonView").style.display = "block";
-
-  const header = document.getElementById("lessonHeader");
-  const titleEl = document.getElementById("lessonTitle");
-  const backBtn = document.getElementById("lessonBackBtn");
-  const body = document.getElementById("lessonBody");
-
-  if (isFact) {
-    header.style.background = "#1a1a2e";
-    document.getElementById("lessonEmoji").textContent = currentFact.emoji;
-    document.getElementById("lessonTopic").textContent = "✦ Weird & Wonderful";
-    titleEl.textContent = currentFact.memory;
-    titleEl.classList.add("light"); backBtn.classList.add("light"); body.classList.add("fact-body");
-  } else {
-    const idx = getCurrentCardIndex();
-    header.style.background = CARD_COLORS[idx] || CARD_COLORS[0];
-    document.getElementById("lessonEmoji").textContent = currentConcept.emoji;
-    document.getElementById("lessonTopic").textContent = currentConcept.topic;
-    titleEl.textContent = currentConcept.name;
-    titleEl.classList.remove("light"); backBtn.classList.remove("light"); body.classList.remove("fact-body");
-    markConceptSeen(currentConcept.name);
-  }
-
-  body.innerHTML = `<div class="skeleton"></div><div class="skeleton short"></div><div class="skeleton tall"></div><div class="skeleton short"></div>`;
-  document.getElementById("saveBtn").disabled = true;
-  document.getElementById("saveBtn").textContent = "⏳ Loading...";
-
-  const systemPrompt = isFact
-    ? `You are a brilliant science communicator. The user has been shown a fascinating fact. Expand on it in a vivid, surprising way. Give the history, the deeper science, one counterintuitive implication, and end with why this fact matters. Under 200 words. Be memorable and engaging — write for a smart, curious adult with no assumed background knowledge.`
-    : `You are a brilliant lecturer giving someone their very first encounter with this concept. The reader is highly intelligent but has no prior knowledge of this topic — no A-level background, no assumed context. Your job is to build genuine understanding from the ground up, without dumbing it down or using baby talk.
-
-Explain every term you introduce. Use real-world examples and concrete illustrations rather than abstract descriptions. Write the way a great university lecturer talks on the first day of term — clear, intellectually stimulating, and accessible without being patronising.
-
-Structure your explanation like this:
-1. Open with a crisp, intriguing statement of what this concept actually is (1-2 sentences)
-2. Build the core idea step by step, defining terms as you go and using a well-chosen real-world example (4-6 sentences)
-3. Explain one genuinely surprising or important consequence of this concept (2-3 sentences)
-4. End with: "And that's the essence of [concept]. 🌟"
-
-Under 250 words. Write for a smart, curious adult — intellectually rigorous but never assuming prior knowledge.`;
-
-  const userMsg = isFact
-    ? `Expand on this fact: "${currentFact.fact}"`
-    : `Explain "${currentConcept.name}" (topic: ${currentConcept.topic}) with vivid analogies.`;
-
+async function fetchAI(s) {
   try {
-    const response = await fetch(ANTHROPIC_PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type":"application/json", "Authorization":"Bearer " + SUPABASE_ANON_KEY },
-      body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system:systemPrompt, messages:[{role:"user",content:userMsg}] })
-    });
-    const data = await response.json();
-    const text = data.content?.[0]?.text || "Something went wrong. Try again!";
-    currentLesson = text;
-    body.textContent = text;
-    document.getElementById("saveBtn").disabled = false;
-    showQuizBtn();
-    syncToMomentum();
-
-    const lib = await getLibrary();
-    const key = isFact ? currentFact.memory : currentConcept.name;
-    const saved = lib.some(item => item.name === key);
-    document.getElementById("saveBtn").innerHTML = saved ? "✅ Saved to Library" : "⭐ Save to My Library";
-    document.getElementById("saveBtn").className = "save-btn" + (saved ? " saved" : "");
-  } catch(e) {
-    body.textContent = "Oops! Check your API key and connection. 🙈";
-    document.getElementById("saveBtn").disabled = true;
-  }
-
-  btn.innerHTML = isFact ? "✨ Expand this fact!" : "✨ Teach me!";
-  btn.disabled = false;
-}
-
-function getCurrentCardIndex() {
-  const cards = document.querySelectorAll(".concept-card");
-  for (let i = 0; i < cards.length; i++) { if (cards[i].classList.contains("selected")) return i; }
-  return 0;
-}
-
-function goBack() {
-  document.getElementById("lessonView").style.display = "none";
-  document.getElementById("homeView").style.display = "block";
-  const qBtn = document.getElementById('quizBtn');
-  if (qBtn) qBtn.style.display = 'none';
-}
-
-async function saveConcept() {
-  const lib = await getLibrary();
-  const key = isFact ? currentFact?.memory : currentConcept?.name;
-  if (!key) return;
-  if (lib.some(i => i.name === key)) { showToast("Already in your library! 📚"); return; }
-  const item = { name:key, emoji:isFact?currentFact.emoji:currentConcept.emoji, topic:isFact?"Weird & Wonderful":currentConcept.topic, lesson:currentLesson, isFact, savedAt:new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) };
-  await addToLibrary(item);
-  document.getElementById("saveBtn").innerHTML = "✅ Saved to Library!";
-  document.getElementById("saveBtn").classList.add("saved");
-  showToast("Added to your library! 🌟");
-  syncToMomentum();
-}
-
-// ════════════════════════════════
-// LIBRARY
-// ════════════════════════════════
-async function renderLibrary() {
-  document.getElementById("encycloList").innerHTML = `<div style="text-align:center;padding:30px;color:var(--muted);font-weight:700;font-size:13px">Syncing library...</div>`;
-  const lib = await getLibrary();
-  document.getElementById("encycloCount").textContent = lib.length;
-  const list = document.getElementById("encycloList");
-  if (lib.length === 0) { list.innerHTML = `<div class="encyclo-empty"><div class="big">📖</div>Your library is empty!<br>Learn your first concept to get started.</div>`; return; }
-  list.innerHTML = lib.map((item, i) => `
-    <div class="encyclo-item ${item.isFact?"fact-item":""}" onclick="showLibraryItem(${i})">
-      <div class="topic-dot" style="background:${item.isFact?"#e94560":(TOPIC_COLORS[item.topic]||"#ccc")}"></div>
-      <div class="encyclo-item-emoji">${item.emoji}</div>
-      <div class="encyclo-item-info">
-        <div class="encyclo-item-concept">${item.name}</div>
-        <div class="encyclo-item-meta">${item.topic} · ${item.savedAt}</div>
-      </div>
-      <div style="color:var(--muted);font-size:15px">→</div>
-    </div>`).join("");
-}
-
-async function showLibraryItem(index) {
-  const lib = await getLibrary();
-  const item = lib[index];
-  currentConcept = item.isFact ? null : item;
-  currentFact = item.isFact ? {emoji:item.emoji, memory:item.name, fact:""} : null;
-  isFact = item.isFact; currentLesson = item.lesson;
-  switchTab("home");
-  document.getElementById("homeView").style.display = "none";
-  document.getElementById("lessonView").style.display = "block";
-  const header = document.getElementById("lessonHeader"), titleEl = document.getElementById("lessonTitle"), backBtn = document.getElementById("lessonBackBtn"), body = document.getElementById("lessonBody");
-  if (item.isFact) { header.style.background="#1a1a2e"; titleEl.classList.add("light"); backBtn.classList.add("light"); body.classList.add("fact-body"); }
-  else { header.style.background=TOPIC_COLORS[item.topic]||"#FFE66D"; titleEl.classList.remove("light"); backBtn.classList.remove("light"); body.classList.remove("fact-body"); }
-  document.getElementById("lessonEmoji").textContent = item.emoji;
-  document.getElementById("lessonTopic").textContent = item.topic;
-  titleEl.textContent = item.name;
-  body.textContent = item.lesson;
-  const saveBtn = document.getElementById("saveBtn");
-  saveBtn.innerHTML = "✅ Saved to Library"; saveBtn.className = "save-btn saved"; saveBtn.disabled = false;
-}
-
-// ════════════════════════════════
-// DEEP DIVE
-// ════════════════════════════════
-function setWeeklyTopicFromModal() {
-  const input = document.getElementById("modalTopicInput").value.trim();
-  if (!input) return;
-  document.getElementById("weeklyModal").classList.remove("show");
-  document.getElementById("topicInput").value = input;
-  commitWeeklyTopic(input);
-}
-
-function setWeeklyTopic() {
-  const input = document.getElementById("topicInput").value.trim();
-  if (!input) { showToast("Please enter a topic first!"); return; }
-  commitWeeklyTopic(input);
-}
-
-async function commitWeeklyTopic(topic) {
-  const day = getDayOfWeek();
-  const weekly = {topic, weekStr:getWeekStr(), reads:[]};
-  await saveWeeklyData(weekly);
-  updateDeepDiveUI(weekly);
-  showToast("Topic set! Generating your first read... 📖");
-  generateDeepRead(day === 5 ? "friday" : "monday", topic);
-}
-
-async function generateDeepRead(slot, topic) {
-  const weekly = await getWeeklyData();
-  const reads = weekly.reads || [];
-  const placeholder = { slot, title:`Generating your ${slot==="monday"?"Monday":"Friday"} read...`, body:"", ready:false, generatedAt:new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short"}) };
-  reads.push(placeholder);
-  weekly.reads = reads;
-  await saveWeeklyData(weekly);
-  updateDeepDiveUI(weekly);
-
-  try {
-    const isMon = slot === "monday";
-    const response = await fetch(ANTHROPIC_PROXY_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer " + SUPABASE_ANON_KEY},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514", max_tokens:4000,
-        system:`You are an expert academic writer producing a long-form research synthesis for a highly educated reader with a music degree who is comfortable with complex musical, psychological, scientific and theoretical ideas. Write at the level of a well-researched journal feature or intellectual long-read (think Aeon, The Atlantic, a graduate seminar paper). Use a compelling title on the first line (no # prefix). Then use ## for section headings. Include specific theories, named researchers, technical terminology, and real examples. Be argumentative — have a thesis. Aim for 1,200-1,800 words. This is a genuine 10-15 minute read. ${isMon ? "This is the MONDAY read — introduce the topic broadly, lay theoretical foundations, set up key tensions and debates." : "This is the FRIDAY read — go deeper. Assume Monday context. Explore a specific contested angle or advanced application."}`,
-        messages:[{role:"user",content:`Write a ${isMon?"Monday (foundational)":"Friday (advanced)"} long-read research synthesis on: "${topic}"`}]
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: s.system,
+        messages: [{ role: 'user', content: `Today is ${new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}.` }]
       })
     });
-    const data = await response.json();
-    const text = data.content?.[0]?.text || "";
-    const lines = text.split("\n");
-    let title = `${isMon?"Monday":"Friday"} Read: ${topic}`;
-    let body = text;
-    const first = lines[0].replace(/^#+\s*/, "").trim();
-    if (first && !first.startsWith("##")) { title = first; body = lines.slice(1).join("\n").trim(); }
-
-    const updated = await getWeeklyData();
-    const idx = updated.reads.findIndex(r => r.slot === slot && !r.ready);
-    if (idx !== -1) { updated.reads[idx] = {slot, title, body, ready:true, generatedAt:placeholder.generatedAt}; }
-    await saveWeeklyData(updated);
-    updateDeepDiveUI(updated);
-    document.getElementById("researchBadge").style.display = "block";
-    showResearchNotif(updated.reads[idx !== -1 ? idx : 0]);
-  } catch(e) {
-    console.error(e);
-    showToast("Error generating read. Check API key. 🙈");
-  }
-}
-
-function updateDeepDiveUI(weekly) {
-  const topic = weekly.topic;
-  if (topic) {
-    document.getElementById("currentTopicPill").style.display = "inline-flex";
-    document.getElementById("currentTopicText").textContent = topic;
-    document.getElementById("topicInput").value = topic;
-    document.getElementById("topicSetterSub").textContent = "Update topic for next week, or keep going with this one.";
-  }
-  const reads = weekly.reads || [];
-  const list = document.getElementById("deepReadsList");
-  if (reads.length === 0) { list.innerHTML = `<div class="deep-empty"><div class="big">🔭</div>Set a topic above to generate<br>your first deep dive read.</div>`; return; }
-  list.innerHTML = reads.map((r, i) => `
-    <div class="deep-read-card" onclick="${r.ready?`openArticle(${i})`:"void(0)"}">
-      <div class="deep-read-tag">${r.slot==="monday"?"📅 Monday Read":"📅 Friday Read"}${r.ready?"":" — Generating…"}</div>
-      <div class="deep-read-title">${r.title}</div>
-      <div class="deep-read-meta">${r.generatedAt} · ${r.ready?"~10-15 min read":"⏳ Please wait…"}</div>
-    </div>`).join("");
-}
-
-async function openArticle(index) {
-  const weekly = await getWeeklyData(), read = weekly.reads[index];
-  if (!read || !read.ready) return;
-  document.getElementById("deepView").style.display = "none";
-  document.getElementById("articleView").style.display = "block";
-  document.getElementById("articleTag").textContent = read.slot==="monday"?"📅 Monday Read":"📅 Friday Read";
-  document.getElementById("articleTitle").textContent = read.title;
-  document.getElementById("articleMeta").textContent = `${read.generatedAt} · ~10-15 min read`;
-  const formatted = read.body.split("\n").map(line => line.startsWith("## ") ? `<h2>${line.replace("## ","")}</h2>` : line).join("\n");
-  document.getElementById("articleBody").innerHTML = formatted;
-}
-
-function closeArticle() {
-  document.getElementById("articleView").style.display = "none";
-  document.getElementById("deepView").style.display = "block";
-}
-
-// ════════════════════════════════
-// NOTIFICATIONS
-// ════════════════════════════════
-function showResearchNotif(read) {
-  const day = getDayOfWeek(), label = day===1?"Monday":"Friday";
-  document.getElementById("notifTitle").textContent = `Your ${label} deep dive is ready 📖`;
-  document.getElementById("notifSub").textContent = `"${read.title}" is waiting for you.`;
-  document.getElementById("researchNotif").classList.add("show");
-}
-
-function dismissNotif() {
-  document.getElementById("researchNotif").classList.remove("show");
-  local.set(`cb_notif_${getTodayStr()}`, true);
-}
-
-function goToResearch() { dismissNotif(); switchTab("deep"); }
-
-// ════════════════════════════════
-// NAV
-// ════════════════════════════════
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-  document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
-  document.getElementById(`${tab}ViewWrap`).classList.add("active");
-  document.getElementById(`tab-${tab}`).classList.add("active");
-  if (tab==="library") renderLibrary();
-  if (tab==="deep") {
-    document.getElementById("researchBadge").style.display = "none";
-    document.getElementById("articleView").style.display = "none";
-    document.getElementById("deepView").style.display = "block";
-    getWeeklyData().then(weekly => updateDeepDiveUI(weekly));
-  }
-}
-
-function showToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg; t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2800);
-}
-
-// ── Cross-device sync helper ──
-// Show user their sync ID so they can copy it to another device
-function showSyncId() {
-  const id = USER_ID;
-  const box = document.createElement("div");
-  box.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)";
-  box.innerHTML = `
-    <div style="background:white;border-radius:24px;padding:28px 24px;max-width:340px;width:90%;text-align:center">
-      <div style="font-size:36px;margin-bottom:10px">🔗</div>
-      <div style="font-family:'Fredoka One',cursive;font-size:20px;margin-bottom:8px">Sync to another device</div>
-      <div style="font-size:13px;color:#888;font-weight:600;margin-bottom:16px;line-height:1.5">Copy this ID and paste it into the sync field on your other device to share your progress.</div>
-      <div style="background:#f5f0e8;border-radius:10px;padding:12px;font-family:'Space Mono',monospace;font-size:11px;word-break:break-all;margin-bottom:14px;color:#2D2D2D">${id}</div>
-      <button onclick="navigator.clipboard.writeText('${id}').then(()=>showToast('ID copied!'))" style="width:100%;background:#7c3aed;color:white;border:none;border-radius:12px;padding:12px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-bottom:10px">Copy ID</button>
-      <div style="font-size:12px;color:#aaa;font-weight:700;margin-bottom:10px">— or paste an ID from another device —</div>
-      <input id="syncIdInput" placeholder="Paste sync ID here..." style="width:100%;border:2px solid #e8e0d8;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:700;outline:none;margin-bottom:10px"/>
-      <button onclick="applySyncId()" style="width:100%;background:#2D2D2D;color:white;border:none;border-radius:12px;padding:12px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-bottom:10px">Use this ID</button>
-      <button onclick="this.closest('div[style]').remove()" style="background:none;border:none;color:#aaa;font-size:13px;font-weight:700;cursor:pointer;padding:6px">Close</button>
-    </div>`;
-  document.body.appendChild(box);
-}
-
-function applySyncId() {
-  const input = document.getElementById("syncIdInput")?.value.trim();
-  if (!input || !input.startsWith("user_")) { showToast("Invalid ID — must start with user_"); return; }
-  localStorage.setItem("cb_uid", input);
-  showToast("Sync ID applied! Reloading...");
-  setTimeout(() => location.reload(), 1200);
-}
-
-// ════════════════════════════════
-// TOPIC PICKER
-// Shows once per day on first open.
-// Stores selected topics in localStorage under cb_topics.
-// renderCards filters CONCEPTS to selected topics only.
-// ════════════════════════════════
-let selectedTopics = [];
-
-function shouldShowTopicPicker() {
-  const stored = local.get('cb_topics', null);
-  if (!stored) return true;
-  return stored.date !== getTodayStr();
-}
-
-function showTopicPicker() {
-  selectedTopics = [];
-  const grid = document.getElementById('topicPickerGrid');
-  grid.innerHTML = '';
-  TOPIC_META.forEach(t => {
-    const pill = document.createElement('div');
-    pill.className = 'topic-pill';
-    pill.dataset.id = t.id;
-    pill.innerHTML = `<div class="topic-pill-emoji">${t.emoji}</div><div class="topic-pill-label">${t.label}</div>`;
-    pill.onclick = () => toggleTopicPill(pill, t);
-    grid.appendChild(pill);
-  });
-  document.getElementById('topicPickerModal').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-
-function toggleTopicPill(pill, topic) {
-  const idx = selectedTopics.findIndex(t => t.id === topic.id);
-  if (idx > -1) {
-    selectedTopics.splice(idx, 1);
-    pill.classList.remove('selected');
-  } else if (selectedTopics.length < 5) {
-    selectedTopics.push(topic);
-    pill.classList.add('selected');
-  }
-  const btn = document.getElementById('topicPickerConfirm');
-  btn.disabled = selectedTopics.length === 0;
-  btn.textContent = selectedTopics.length > 0
-    ? `Explore ${selectedTopics.length} topic${selectedTopics.length > 1 ? 's' : ''} →`
-    : 'Pick at least one →';
-}
-
-function confirmTopics() {
-  if (selectedTopics.length === 0) return;
-  local.set('cb_topics', { date: getTodayStr(), topics: selectedTopics.map(t => t.label) });
-  document.getElementById('topicPickerModal').style.display = 'none';
-  document.body.style.overflow = '';
-  renderCards();
-}
-
-function getTodayTopics() {
-  const stored = local.get('cb_topics', null);
-  if (stored && stored.date === getTodayStr()) return stored.topics;
-  return null;
-}
-// Daily: 5 questions on current lesson
-// Weekly: 20 questions across week's lessons (Sundays)
-// ════════════════════════════════
-let quizQuestions = [];
-let quizIndex     = 0;
-let quizScore     = 0;
-let quizTotal     = 5;
-
-// Show Quiz Me button after lesson loads
-function showQuizBtn() {
-  const btn = document.getElementById('quizBtn');
-  if (btn) btn.style.display = 'block';
-}
-
-// Show Weekly Roundup button on Sundays
-function checkWeeklyRoundup() {
-  const day = new Date().getDay(); // 0 = Sunday
-  const wrap = document.getElementById('weeklyRoundupWrap');
-  if (wrap) wrap.style.display = day === 0 ? 'block' : 'none';
-}
-
-// Generate quiz questions via proxy
-async function generateQuiz(context, count) {
-  const prompt = `You are a quiz master. Based on the following educational content, generate exactly ${count} multiple choice questions to test comprehension.
-
-Content:
-${context}
-
-Return ONLY valid JSON in this exact format, no markdown:
-{"questions":[{"q":"Question text?","options":["A) option","B) option","C) option","D) option"],"answer":"A","explanation":"Why A is correct in 1-2 sentences."}]}
-
-Rules:
-- All 4 options must be plausible
-- Answer must be one of: A, B, C, D
-- Explanations must be concise and educational
-- Questions must test genuine understanding, not just recall`;
-
-  const resp = await fetch(ANTHROPIC_PROXY_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: count === 5 ? 1500 : 5000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-  const data = await resp.json();
-  const raw  = data.content?.[0]?.text?.trim().replace(/^```json\s*/i,'').replace(/```\s*$/i,'').trim();
-  const parsed = JSON.parse(raw);
-  return parsed.questions;
-}
-
-// Start daily quiz (5 questions on current lesson)
-async function startQuiz() {
-  if (!currentLesson) return;
-  const title = isFact ? currentFact?.memory : currentConcept?.name;
-  openQuizModal(`Quiz: ${title}`, 5);
-  try {
-    const context = `Topic: ${title}\n\n${currentLesson}`;
-    quizQuestions = await generateQuiz(context, 5);
-    quizTotal = quizQuestions.length;
-    renderQuizQuestion();
-  } catch(e) {
-    document.getElementById('quizBody').innerHTML = `<div class="quiz-loading">❌ Couldn't generate quiz. Try again!</div>`;
-    console.error(e);
-  }
-}
-
-// Start weekly roundup (20 questions across week's lessons)
-async function startWeeklyRoundup() {
-  openQuizModal('Weekly Roundup 📅', 20);
-  try {
-    const lib = await getLibrary();
-    // Get items saved in the last 7 days
-    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
-    const recent = lib.slice(0, 10); // Use up to 10 most recent
-    if (recent.length === 0) {
-      document.getElementById('quizBody').innerHTML = `<div class="quiz-loading">📚 Read some lessons first, then come back on Sunday!</div>`;
-      return;
+    const data = await res.json();
+    const text = data.content?.[0]?.text?.trim() || fallback(s.id);
+    aiCache[s.id] = text;
+    const ol = document.getElementById(`ol-${s.id}`);
+    if (ol) {
+      ol.classList.remove('loading');
+      const t = ol.querySelector('.opening-line-text');
+      t.classList.remove('faint');
+      t.textContent = text;
     }
-    const context = recent.map(item => `${item.name} (${item.topic}):\n${item.lesson || 'No lesson content saved.'}`).join('\n\n---\n\n');
-    quizQuestions = await generateQuiz(context, 20);
-    quizTotal = quizQuestions.length;
-    renderQuizQuestion();
-  } catch(e) {
-    document.getElementById('quizBody').innerHTML = `<div class="quiz-loading">❌ Couldn't generate quiz. Try again!</div>`;
-    console.error(e);
+  } catch {
+    aiCache[s.id] = fallback(s.id);
+    const ol = document.getElementById(`ol-${s.id}`);
+    if (ol) {
+      ol.classList.remove('loading');
+      const t = ol.querySelector('.opening-line-text');
+      t.classList.remove('faint');
+      t.textContent = aiCache[s.id];
+    }
   }
 }
 
-function openQuizModal(title, total) {
-  quizQuestions = [];
-  quizIndex     = 0;
-  quizScore     = 0;
-  quizTotal     = total;
-  document.getElementById('quizTitle').textContent    = title;
-  document.getElementById('quizProgress').textContent = `Generating ${total} questions...`;
-  document.getElementById('quizBody').innerHTML       = `<div class="quiz-loading">🧠 Crafting your quiz...</div>`;
-  document.getElementById('quizModal').style.display  = 'block';
-  document.body.style.overflow = 'hidden';
+function fallback(id) {
+  return id === 'present'
+    ? "What are you carrying into this morning that you haven't fully looked at yet?"
+    : "The thing I keep coming back to, if I'm honest, is…";
 }
 
-function closeQuizModal() {
-  document.getElementById('quizModal').style.display = 'none';
-  document.body.style.overflow = '';
-}
+function fmt(s) { return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; }
 
-function renderQuizQuestion() {
-  if (quizIndex >= quizQuestions.length) { renderQuizScore(); return; }
-  const q = quizQuestions[quizIndex];
-  document.getElementById('quizProgress').textContent = `Question ${quizIndex + 1} of ${quizTotal}`;
-  document.getElementById('quizBody').innerHTML = `
-    <div class="quiz-question">${q.q}</div>
-    ${q.options.map((opt, i) => `
-      <button class="quiz-option" onclick="answerQuiz(${i}, '${['A','B','C','D'][i]}')">${opt}</button>
-    `).join('')}
-  `;
-}
-
-function answerQuiz(idx, letter) {
-  const q       = quizQuestions[quizIndex];
-  const correct = q.answer;
-  const buttons = document.querySelectorAll('.quiz-option');
-  const letters = ['A','B','C','D'];
-
-  // Disable all buttons
-  buttons.forEach(b => b.disabled = true);
-
-  // Reveal correct/wrong
-  buttons.forEach((b, i) => {
-    if (letters[i] === correct) b.classList.add('correct');
-    else if (i === idx)         b.classList.add('wrong');
-  });
-
-  if (letter === correct) quizScore++;
-
-  // Show explanation + next button
-  const body = document.getElementById('quizBody');
-  const exp  = document.createElement('div');
-  exp.className = 'quiz-explanation';
-  exp.textContent = '💡 ' + q.explanation;
-  body.appendChild(exp);
-
-  const next = document.createElement('button');
-  next.className   = 'quiz-next-btn';
-  next.textContent = quizIndex + 1 < quizQuestions.length ? 'Next Question →' : 'See Results 🎉';
-  next.onclick = () => { quizIndex++; renderQuizQuestion(); };
-  body.appendChild(next);
-}
-
-function renderQuizScore() {
-  const perfect  = quizScore === quizTotal;
-  const pct      = Math.round((quizScore / quizTotal) * 100);
-  document.getElementById('quizProgress').textContent = 'Complete!';
-  document.getElementById('quizBody').innerHTML = `
-    <div class="quiz-score">
-      ${perfect ? '<div class="quiz-perfect">🏆</div>' : ''}
-      <div class="quiz-score-num">${quizScore}/${quizTotal}</div>
-      <div class="quiz-score-label">${pct}% · ${perfect ? 'Perfect score! Streak bonus 🔥' : pct >= 60 ? 'Well done!' : 'Keep learning!'}</div>
-      ${perfect ? '<div style="font-size:13px;color:#7c3aed;font-weight:700;margin-bottom:20px">+1 bonus streak day earned 🎉</div>' : ''}
-      <button class="quiz-close-btn" onclick="closeQuizModal()">Done ✓</button>
-    </div>
-  `;
-  // Bonus streak on perfect score
-  if (perfect) {
-    const s = local.get('cb_streak', {count:1, last:''});
-    s.count++; s.last = getTodayStr();
-    local.set('cb_streak', s);
-    document.getElementById('streakCount').textContent = s.count;
-    syncToMomentum();
+function toggleTimer() {
+  if (timerRunning) {
+    clearTimer(); timerRunning = false;
+    const b = document.getElementById('btn-timer');
+    if (b) { b.textContent = 'Resume'; b.classList.remove('on'); }
+  } else {
+    timerRunning = true;
+    const b = document.getElementById('btn-timer');
+    if (b) { b.textContent = 'Pause'; b.classList.add('on'); }
+    const total = SECTIONS[step].minutes * 60;
+    const circ = 2 * Math.PI * 22;
+    timerInterval = setInterval(() => {
+      timerLeft--;
+      const txt = document.getElementById('timer-txt');
+      const ring = document.getElementById('ring-fg');
+      if (txt) txt.textContent = fmt(timerLeft);
+      if (ring) ring.style.strokeDashoffset = circ * (1 - timerLeft / total);
+      if (timerLeft <= 0) {
+        clearTimer(); timerRunning = false;
+        const b = document.getElementById('btn-timer');
+        if (b) { b.textContent = 'Done ✓'; b.classList.remove('on'); }
+      }
+    }, 1000);
   }
 }
 
-try { init(); } catch(e) { console.error("Init error:", e); }
+function clearTimer() { if (timerInterval) { clearInterval(timerInterval); timerInterval = null; } }
+
+function finish() {
+  clearTimer();
+  const s = saveStreak();
+  document.getElementById('complete-streak').textContent =
+    s === 1 ? 'Day 1 — the hardest one.' : `${s} day streak.`;
+  document.getElementById('complete-q').textContent =
+    CLOSING[Math.floor(Math.random() * CLOSING.length)];
+  show('complete');
+}
+
+function goHome() { show('home'); initHome(); }
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Inline manifest + SW
+const mBlob = new Blob([JSON.stringify({
+  name: 'ANCHOR', short_name: 'ANCHOR', start_url: './', display: 'standalone',
+  background_color: '#F7F4EF', theme_color: '#1A1A1A',
+  icons: [
+    { src: 'https://placehold.co/192x192/1A1A18/F7F4EF?text=A', sizes: '192x192', type: 'image/png' },
+    { src: 'https://placehold.co/512x512/1A1A18/F7F4EF?text=A', sizes: '512x512', type: 'image/png' }
+  ]
+})], { type: 'application/json' });
+document.getElementById('manifest-placeholder').href = URL.createObjectURL(mBlob);
+
+if ('serviceWorker' in navigator) {
+  const sw = `const C='anchor-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(['./']))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));`;
+  navigator.serviceWorker.register(
+    URL.createObjectURL(new Blob([sw], { type: 'application/javascript' })), { scope: './' }
+  ).catch(() => {});
+}
+
+initHome();
 </script>
 </body>
 </html>
