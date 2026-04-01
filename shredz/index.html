@@ -1222,13 +1222,16 @@ async function logMeal() {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization':'Bearer ' + SUPABASE_KEY
+        'Authorization':'Bearer ' + SUPABASE_KEY,
       },
       body:JSON.stringify({model:MODEL,max_tokens:2000,system:sys,messages:[{role:'user',content:userContent}]})
     });
-    if (!resp.ok) { var eData=await resp.json(); throw new Error((eData.error&&eData.error.message)||'API error '+resp.status); }
     var data = await resp.json();
-    var raw = data.content[0].text.trim().replace(/^```json\s*/i,'').replace(/```\s*$/i,'').trim();
+    if (!resp.ok || data.error || !data.content || !data.content[0]) {
+      var errMsg = (data.error && (data.error.message || JSON.stringify(data.error))) || "API error " + resp.status;
+      throw new Error(errMsg);
+    }
+    var raw = data.content[0].text.trim().replace(/^```json\s*/i,"").replace(/```\s*$/i,"").trim();
     var result = JSON.parse(raw);
     var logMeals = result.items;
 
